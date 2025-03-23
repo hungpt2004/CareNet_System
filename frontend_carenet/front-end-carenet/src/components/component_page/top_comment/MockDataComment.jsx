@@ -1,0 +1,42 @@
+export const comments = [
+   {
+     id: "1",
+     user: "Sarah Johnson",
+     text: "This product completely changed my workflow. The interface is intuitive and the features are exactly what I needed. Highly recommended!",
+     avatar: "/placeholder.svg?height=40&width=40",
+     rating: 5,
+     date: "May 15, 2023",
+   },
+   {
+     id: "2",
+     user: "Michael Chen",
+     text: "I was skeptical at first, but after using it for a month, I can say this is one of the best investments I've made for my business.",
+     avatar: "/placeholder.svg?height=40&width=40",
+     rating: 4,
+     date: "June 3, 2023",
+   },
+   {
+     id: "3",
+     user: "Emma Rodriguez",
+     text: "The customer support team is amazing! They helped me solve a complex issue within hours. The product itself is fantastic too.",
+     avatar: "/placeholder.svg?height=40&width=40",
+     rating: 5,
+     date: "April 22, 2023",
+   },
+   {
+     id: "4",
+     user: "David Kim",
+     text: "Clean design, powerful features, and regular updates. What more could you ask for? This has become an essential tool in my daily routine.",
+     avatar: "/placeholder.svg?height=40&width=40",
+     rating: 5,
+     date: "July 10, 2023",
+   },
+   {
+     id: "5",
+     user: "Olivia Wilson",
+     text: "I've tried many similar products, but this one stands out for its attention to detail and thoughtful design choices.",
+     avatar: "/placeholder.svg?height=40&width=40",
+     rating: 4,
+     date: "March 8, 2023",
+   },
+ ]

@@ -3,45 +3,45 @@
 import { Container, Navbar, Nav, Button, Row, Col, Card, Form, Image } from "react-bootstrap"
 import "bootstrap/dist/css/bootstrap.min.css"
 import { motion } from "framer-motion"
+import '../../css/LandingPage.css'
+import VolunteerArticles from "../../components/component_page/news/VolunteerArticle"
+import TopCommentsSlider from "../../components/component_page/top_comment/TopComment"
+import { comments } from "../../components/component_page/top_comment/MockDataComment"
+import CustomNavbar from "../../components/navbar/CustomNavbar"
 
 function LandingPage() {
   return (
     <div className="w-100">
       {/* Header/Navigation */}
-      <Navbar bg="light" expand="lg" className="py-3">
-        <Container fluid>
-          <Navbar.Brand href="#home" className="fw-bold">
-            VolunteerTech
-          </Navbar.Brand>
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="ms-auto">
-              <Nav.Link href="#home">Home</Nav.Link>
-              <Nav.Link href="#features">Features</Nav.Link>
-              <Nav.Link href="#how-it-works">How It Works</Nav.Link>
-              <Nav.Link href="#testimonials">Testimonials</Nav.Link>
-              <Nav.Link href="#contact">Contact</Nav.Link>
-            </Nav>
-            <Button variant="outline-primary" className="ms-2">
-              Sign In
-            </Button>
-            <Button variant="primary" className="ms-2">
-              Register
-            </Button>
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
+      <CustomNavbar/>
 
       {/* Hero Section */}
-      <section id="home" className="bg-primary text-white py-5">
+      <section id="home" className="home-section text-white py-5 position-relative" style={{ marginTop: "80px" }}>
+        <div
+          className="position-absolute top-0 start-0 w-100 h-100"
+          style={{
+            backgroundImage: "url('/volunteer_img/background.jpg')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+            zIndex: -1,
+            opacity: 0.85,
+          }}
+        ></div>
+
         <Container fluid>
           <Row className="align-items-center px-md-5">
             <Col lg={6} className="mb-4 mb-lg-0">
-              <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-                <h1 className="display-4 fw-bold mb-3">Empowering Nonprofits with Tech Volunteers</h1>
+              <motion.div
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                <h1 className="display-4 fw-bold mb-3">
+                  Empowering Nonprofits with Tech Volunteers
+                </h1>
                 <p className="lead mb-4">
-                  Connect with skilled tech volunteers who can help build, maintain, and improve your organization's
-                  website and digital presence.
+                  Connect with skilled tech volunteers who can help build, maintain, and improve your organization's website and digital presence.
                 </p>
                 <div className="d-flex flex-wrap gap-2">
                   <Button variant="light" size="lg">
@@ -53,6 +53,7 @@ function LandingPage() {
                 </div>
               </motion.div>
             </Col>
+
             <Col lg={6}>
               <motion.div
                 initial={{ opacity: 0, x: 50 }}
@@ -60,15 +61,16 @@ function LandingPage() {
                 transition={{ duration: 0.5, delay: 0.2 }}
               >
                 <img
-                  src="/placeholder.svg?height=400&width=600"
+                  src="/volunteer_img/banner.jpg"
                   alt="Volunteers collaborating"
-                  className="img-fluid rounded shadow"
+                  className="img-fluid rounded-5 shadow"
                 />
               </motion.div>
             </Col>
           </Row>
         </Container>
       </section>
+
 
       {/* Stats Section */}
       <section className="py-5 bg-light">
@@ -81,7 +83,7 @@ function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5 }}
               >
-                <h2 className="display-4 fw-bold text-primary">500+</h2>
+                <h2 className="display-4 fw-bold">500+</h2>
                 <p className="lead">Nonprofits Helped</p>
               </motion.div>
             </Col>
@@ -92,7 +94,7 @@ function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: 0.2 }}
               >
-                <h2 className="display-4 fw-bold text-primary">1,200+</h2>
+                <h2 className="display-4 fw-bold">1,200+</h2>
                 <p className="lead">Tech Volunteers</p>
               </motion.div>
             </Col>
@@ -103,7 +105,7 @@ function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: 0.4 }}
               >
-                <h2 className="display-4 fw-bold text-primary">3,000+</h2>
+                <h2 className="display-4 fw-bold">3,000+</h2>
                 <p className="lead">Projects Completed</p>
               </motion.div>
             </Col>
@@ -184,11 +186,14 @@ function LandingPage() {
         </Container>
       </section>
 
+      {/* News */}
+      <VolunteerArticles/>
+
       {/* How It Works */}
       <section id="how-it-works" className="py-5 bg-light">
         <Container fluid>
           <div className="text-center mb-5">
-            <h2 className="display-5 fw-bold">How It Works</h2>
+            <h2 className="display-5 fw-bold">Vận Hành</h2>
             <p className="lead text-muted">Simple process, powerful results</p>
           </div>
           <Row className="g-4 px-md-5">
@@ -267,6 +272,12 @@ function LandingPage() {
           </Row>
         </Container>
       </section>
+
+      <h2 className="display-5 fw-bold text-center">Top Comments</h2>
+      <div className="container mx-auto py-10">
+        <TopCommentsSlider topComments={comments} />
+      </div>
+
 
       {/* Testimonials */}
       <section id="testimonials" className="py-5">
@@ -392,7 +403,7 @@ function LandingPage() {
       </section>
 
       {/* Call to Action */}
-      <section className="py-5 bg-primary text-white">
+      <section className="py-5 text-white" style={{backgroundColor: '#FBF6E9'}}>
         <Container fluid>
           <Row className="justify-content-center">
             <Col md={10} lg={8} className="text-center">
@@ -403,7 +414,7 @@ function LandingPage() {
                 transition={{ duration: 0.5 }}
               >
                 <h2 className="display-5 fw-bold mb-3">Ready to get started?</h2>
-                <p className="lead mb-4">Join our community of nonprofits and tech volunteers today.</p>
+                <p className="lead mb-4 text-dark">Join our community of nonprofits and tech volunteers today.</p>
                 <Row className="justify-content-center">
                   <Col md={8}>
                     <Form className="d-flex gap-2">

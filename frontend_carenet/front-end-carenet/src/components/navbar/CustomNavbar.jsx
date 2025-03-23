@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, NavLink } from "react-router-dom";
-import { Heart, Menu, X } from 'lucide-react';
-import "./Navbar.css";
+import { Button, Container, Nav, Navbar } from "react-bootstrap";
 
 const CustomNavbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -27,56 +25,40 @@ const CustomNavbar = () => {
   };
 
   return (
-    <nav className={`navbar navbar-expand-lg fixed-top ${isScrolled ? "scrolled" : ""}`}>
-      <div className="container">
-        <Link to="/" className="navbar-brand d-flex align-items-center">
-          <Heart className="me-2" size={24} />
-          <span>VolunteerHub</span>
-        </Link>
-        
-        <button 
-          className="navbar-toggler border-0" 
-          type="button" 
-          onClick={toggleMobileMenu}
-          aria-label="Toggle navigation"
-        >
-          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-        
-        <div className={`collapse navbar-collapse ${mobileMenuOpen ? "show" : ""}`}>
-          <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
-            <li className="nav-item">
-              <NavLink to="/" className={({isActive}) => isActive ? "nav-link active" : "nav-link"} end>
-                Home
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink to="/about" className={({isActive}) => isActive ? "nav-link active" : "nav-link"}>
-                About
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink to="/opportunities" className={({isActive}) => isActive ? "nav-link active" : "nav-link"}>
-                Opportunities
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink to="/news" className={({isActive}) => isActive ? "nav-link active" : "nav-link"}>
-                News
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink to="/contact" className={({isActive}) => isActive ? "nav-link active" : "nav-link"}>
-                Contact
-              </NavLink>
-            </li>
-          </ul>
-          <Link to="/signup" className="btn btn-primary ms-lg-3 rounded-pill px-4">
-            Sign Up
-          </Link>
-        </div>
-      </div>
-    </nav>
+    <Navbar
+        bg="light"
+        expand="lg"
+        className="py-3 position-fixed w-100 shadow"
+        style={{
+          zIndex: 1050,
+          top: 0,
+          left: 0,
+          backgroundColor: "rgba(255, 255, 255, 0.95)",
+          backdropFilter: "blur(10px)"
+        }}
+      >
+        <Container fluid>
+          <Navbar.Brand href="#home" className="fw-bold">
+            <h1 style={{letterSpacing: '10px', color: '#5DB996'}} className="fw-bold">CARENET</h1>
+          </Navbar.Brand>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse id="basic-navbar-nav">
+            <Nav className="ms-auto">
+              <Nav.Link href="#home" className="hover-underline">Trang chủ</Nav.Link>
+              <Nav.Link href="#features" className="hover-underline">Thành tựu</Nav.Link>
+              <Nav.Link href="#how-it-works" className="hover-underline">Vận hành</Nav.Link>
+              <Nav.Link href="#testimonials" className="hover-underline">Chia sẻ</Nav.Link>
+              <Nav.Link href="#contact" className="hover-underline">Liên hệ</Nav.Link>
+            </Nav>
+            <Button style={{backgroundColor: '#5DB996', borderColor: '#5DB996'}} className="ms-2">
+              Đăng nhập
+            </Button>
+            <Button  style={{backgroundColor: '#FBF6E9', borderColor: 'grey'}} className="ms-2 text-dark">
+              Đăng Kí
+            </Button>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
   );
 };
 
