@@ -1,9 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
 import LandingPage from "./pages/landing_page/LandingPage";
 import ProfileInformation from "./pages/profile_page/ProfileInformation";
 import ProfileAvatar from "./pages/profile_page/ProfileAvatar";
 import ProfileFavourite from "./pages/profile_page/ProfileFavourite";
-import "bootstrap/dist/css/bootstrap.min.css";
 import ProfileHistory from "./pages/profile_page/ProfileHistory";
 import FailedRegister from "./pages/register_event_page/FailedRegister";
 import SuccessRegister from "./pages/register_event_page/SuccesRegister";
