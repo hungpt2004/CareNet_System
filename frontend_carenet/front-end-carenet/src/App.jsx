@@ -9,7 +9,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path='/landing-page' element={<LandingPage/>}/>
+        <Route path='/' element={<LandingPage/>}/>
         <Route path='/search' element={<VolunteerEventSearch/>}/>
       </Routes>
     </Router>
