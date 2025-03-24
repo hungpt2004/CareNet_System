@@ -1,6 +1,6 @@
 "use client"
 
-import { Container, Navbar, Nav, Button, Row, Col, Card, Form, Image } from "react-bootstrap"
+import { Container, Navbar, Nav, Button, Row, Col, Card, Form, Image, Spinner } from "react-bootstrap"
 import "bootstrap/dist/css/bootstrap.min.css"
 import { motion } from "framer-motion"
 import '../../css/LandingPage.css'
@@ -8,12 +8,49 @@ import VolunteerArticles from "../../components/component_page/news/VolunteerArt
 import TopCommentsSlider from "../../components/component_page/top_comment/TopComment"
 import { comments } from "../../components/component_page/top_comment/MockDataComment"
 import CustomNavbar from "../../components/navbar/CustomNavbar"
+import { useNavigate } from "react-router-dom"
+import { useEffect, useState } from "react"
+import { Footer } from "../../components/footer/Footer"
 
 function LandingPage() {
+
+  // Initialize state
+  const [loading, setLoading] = useState(false);
+
+  // Initialize hook
+  const navigate = useNavigate();
+
+  // Bussiness Logic
+
+  // Go to search page
+  const handleSearchPage = () => {
+    setLoading(true);
+    try {
+      navigate('/search'); 
+    } catch (error) {
+      console.log(error.message);
+      setLoading(false); 
+    }
+  };
+
+  // UseEffect 
+  useEffect(() => {
+    if (loading) {
+      const timer = setTimeout(() => {
+        setLoading(false);
+      }, 1000); 
+
+      return () => clearTimeout(timer); 
+    }
+  }, [loading]);
+
+
+
+
   return (
     <div className="w-100">
       {/* Header/Navigation */}
-      <CustomNavbar/>
+      <CustomNavbar />
 
       {/* Hero Section */}
       <section id="home" className="home-section text-white py-5 position-relative" style={{ marginTop: "80px" }}>
@@ -47,8 +84,14 @@ function LandingPage() {
                   <Button variant="light" size="lg">
                     I Need Help
                   </Button>
-                  <Button variant="outline-light" size="lg">
-                    I Want to Volunteer
+                  <Button onClick={() => handleSearchPage()} className="w-25" variant="outline-light" size="lg">
+                    {loading ? <Spinner
+                      as="span"
+                      animation="border"
+                      size="sm"
+                      role="status"
+                      aria-hidden="true"
+                    /> : "Kết nối CareNet"}
                   </Button>
                 </div>
               </motion.div>
@@ -187,7 +230,7 @@ function LandingPage() {
       </section>
 
       {/* News */}
-      <VolunteerArticles/>
+      <VolunteerArticles />
 
       {/* How It Works */}
       <section id="how-it-works" className="py-5 bg-light">
@@ -403,7 +446,7 @@ function LandingPage() {
       </section>
 
       {/* Call to Action */}
-      <section className="py-5 text-white" style={{backgroundColor: '#FBF6E9'}}>
+      <section className="py-5 text-white" style={{ backgroundColor: '#FBF6E9' }}>
         <Container fluid>
           <Row className="justify-content-center">
             <Col md={10} lg={8} className="text-center">
@@ -430,100 +473,7 @@ function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-dark text-white py-5">
-        <Container fluid>
-          <Row className="px-md-5">
-            <Col md={4} className="mb-4 mb-md-0">
-              <h5 className="fw-bold mb-3">VolunteerTech</h5>
-              <p className="mb-3">
-                Connecting nonprofits with tech volunteers to create digital solutions that make a difference.
-              </p>
-              <div className="d-flex gap-2">
-                <a href="#" className="text-white">
-                  <i className="bi bi-facebook"></i>
-                </a>
-                <a href="#" className="text-white">
-                  <i className="bi bi-twitter"></i>
-                </a>
-                <a href="#" className="text-white">
-                  <i className="bi bi-linkedin"></i>
-                </a>
-                <a href="#" className="text-white">
-                  <i className="bi bi-instagram"></i>
-                </a>
-              </div>
-            </Col>
-            <Col md={2} className="mb-4 mb-md-0">
-              <h5 className="fw-bold mb-3">About</h5>
-              <ul className="list-unstyled">
-                <li className="mb-2">
-                  <a href="#" className="text-white text-decoration-none">
-                    Our Mission
-                  </a>
-                </li>
-                <li className="mb-2">
-                  <a href="#" className="text-white text-decoration-none">
-                    Team
-                  </a>
-                </li>
-                <li className="mb-2">
-                  <a href="#" className="text-white text-decoration-none">
-                    Partners
-                  </a>
-                </li>
-                <li className="mb-2">
-                  <a href="#" className="text-white text-decoration-none">
-                    Careers
-                  </a>
-                </li>
-              </ul>
-            </Col>
-            <Col md={2} className="mb-4 mb-md-0">
-              <h5 className="fw-bold mb-3">Resources</h5>
-              <ul className="list-unstyled">
-                <li className="mb-2">
-                  <a href="#" className="text-white text-decoration-none">
-                    Blog
-                  </a>
-                </li>
-                <li className="mb-2">
-                  <a href="#" className="text-white text-decoration-none">
-                    Guides
-                  </a>
-                </li>
-                <li className="mb-2">
-                  <a href="#" className="text-white text-decoration-none">
-                    FAQ
-                  </a>
-                </li>
-                <li className="mb-2">
-                  <a href="#" className="text-white text-decoration-none">
-                    Support
-                  </a>
-                </li>
-              </ul>
-            </Col>
-            <Col md={4}>
-              <h5 className="fw-bold mb-3">Contact Us</h5>
-              <ul className="list-unstyled">
-                <li className="mb-2">
-                  <i className="bi bi-envelope me-2"></i> info@volunteertech.org
-                </li>
-                <li className="mb-2">
-                  <i className="bi bi-telephone me-2"></i> (123) 456-7890
-                </li>
-                <li className="mb-2">
-                  <i className="bi bi-geo-alt me-2"></i> 123 Nonprofit Way, Charity City
-                </li>
-              </ul>
-            </Col>
-          </Row>
-          <hr className="my-4" />
-          <div className="text-center">
-            <p className="small mb-0">© {new Date().getFullYear()} VolunteerTech. All rights reserved.</p>
-          </div>
-        </Container>
-      </footer>
+      <Footer/>
     </div>
   )
 }
