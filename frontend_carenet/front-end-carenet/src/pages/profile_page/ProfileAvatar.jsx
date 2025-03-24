@@ -4,7 +4,7 @@ import React, { useState, useRef } from "react";
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import { motion } from "framer-motion";
 import CustomNavbar from "../../components/navbar/CustomNavbar";
-
+import { useNavigate } from "react-router-dom";
 const AccountAvatar = () => {
   // CSS styles defined directly in the component
   const styles = {
@@ -204,125 +204,132 @@ const AccountAvatar = () => {
     }
   };
 
+  const navigate = useNavigate();
+
   return (
     <>
-    <CustomNavbar />
-    <Container
-      className="d-flex justify-content-center align-items-center"
-      style={{ ...styles.accountContainer, maxWidth: "1000px" }} // Limit max width
-    >
-      <Row className="w-100">
-        <Col md={4}>
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <Card style={styles.sidebarCard}>
-              <Card.Body className="p-0">
-                <div style={styles.userProfile}>
+      <CustomNavbar />
+      <Container
+        className="d-flex justify-content-center align-items-center"
+        style={{ ...styles.accountContainer, maxWidth: "1100px" }} // Limit max width
+      >
+        <Row className="w-100">
+          <Col md={4}>
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Card style={styles.sidebarCard}>
+                <Card.Body className="p-0">
+                  <div style={styles.userProfile}>
+                    <img
+                      src="https://img.freepik.com/premium-vector/avatar-profile-icon-flat-style-female-user-profile-vector-illustration-isolated-background-women-profile-sign-business-concept_157943-38866.jpg?semt=ais_hybrid"
+                      alt="User Avatar"
+                      className="avatar-img"
+                      style={styles.avatar}
+                    />
+                    <div style={styles.userInfo}>
+                      <h5 style={styles.userName}>Hung Pham Trong</h5>
+                      <p style={styles.accountType}>Normal Account</p>
+                    </div>
+                  </div>
+                  <div style={styles.menuItems}>
+                    <div
+                      className="menu-item"
+                      style={styles.menuItem}
+                      onClick={() => navigate("/profile-information")}
+                    >
+                      <span>Information</span>
+                    </div>
+                    <div
+                      className="menu-item active"
+                      style={{ ...styles.menuItem, ...styles.menuItemActive }}
+                      onClick={() => navigate("/profile-avatar")}
+                    >
+                      <span>Update Avatar</span>
+                    </div>
+                    <div className="menu-item" style={styles.menuItem} onClick={() => navigate("/profile-history")}>
+                      <span>History Effort</span>
+                    </div>
+                    <div className="menu-item" style={styles.menuItem} onClick={() => navigate("/profile-favourite")}>
+                      <span>Favourite</span>
+                    </div>
+                    <div className="menu-item" style={styles.menuItem}>
+                      <span>Log Out</span>
+                    </div>
+                  </div>
+                </Card.Body>
+              </Card>
+            </motion.div>
+          </Col>
+          <Col md={8} style={{ marginTop: "70px" }}>
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <Card style={styles.infoCard}>
+                <Card.Header style={styles.infoHeader}>
+                  <h4 className="mb-0">UPLOAD AVATAR</h4>
+                </Card.Header>
+                <Card.Body style={styles.infoCardBody}>
                   <img
-                    src="https://img.freepik.com/premium-vector/avatar-profile-icon-flat-style-female-user-profile-vector-illustration-isolated-background-women-profile-sign-business-concept_157943-38866.jpg?semt=ais_hybrid"
+                    src={
+                      selectedFile ||
+                      "https://cdn-icons-png.flaticon.com/512/6596/6596121.png"
+                    }
                     alt="User Avatar"
-                    className="avatar-img"
-                    style={styles.avatar}
+                    style={styles.largeAvatar}
                   />
-                  <div style={styles.userInfo}>
-                    <h5 style={styles.userName}>Hung Pham Trong</h5>
-                    <p style={styles.accountType}>Normal Account</p>
-                  </div>
-                </div>
-                <div style={styles.menuItems}>
-                  <div className="menu-item" style={styles.menuItem}>
-                    <span>Information</span>
-                  </div>
-                  <div
-                    className="menu-item active"
-                    style={{ ...styles.menuItem, ...styles.menuItemActive }}
-                  >
-                    <span>Update Avatar</span>
-                  </div>
-                  <div className="menu-item" style={styles.menuItem}>
-                    <span>History Effort</span>
-                  </div>
-                  <div className="menu-item" style={styles.menuItem}>
-                    <span>Favourite</span>
-                  </div>
-                  <div className="menu-item" style={styles.menuItem}>
-                    <span>Log Out</span>
-                  </div>
-                </div>
-              </Card.Body>
-            </Card>
-          </motion.div>
-        </Col>
-        <Col md={8} style={{ marginTop: "70px" }}>
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            <Card style={styles.infoCard}>
-              <Card.Header style={styles.infoHeader}>
-                <h4 className="mb-0">UPLOAD AVATAR</h4>
-              </Card.Header>
-              <Card.Body style={styles.infoCardBody}>
-                <img
-                  src={
-                    selectedFile ||
-                    "https://cdn-icons-png.flaticon.com/512/6596/6596121.png"
-                  }
-                  alt="User Avatar"
-                  style={styles.largeAvatar}
-                />
 
-                <Button
-                  variant="dark"
-                  style={styles.actionButton}
-                  onClick={handleViewAvatar}
-                >
-                  View Avatar
-                </Button>
-
-                <Button
-                  variant="dark"
-                  style={styles.actionButton}
-                  onClick={handleUploadClick}
-                >
-                  Upload File Image
-                </Button>
-
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileUpload}
-                  accept="image/jpeg, image/png"
-                  style={styles.hiddenInput}
-                />
-
-                <div style={styles.fileInfo}>
-                  <p className="mb-0">Maximum file size is 1 MB</p>
-                  <p style={styles.fileFormat}>Format: JPEG, PNG</p>
-                </div>
-
-                <div style={styles.buttonContainer}>
-                  <Button variant="light" style={styles.cancelBtn}>
-                    Cancel
-                  </Button>
                   <Button
-                    variant="primary"
-                    className="save-btn"
-                    style={styles.saveBtn}
+                    variant="dark"
+                    style={styles.actionButton}
+                    onClick={handleViewAvatar}
                   >
-                    Save
+                    View Avatar
                   </Button>
-                </div>
-              </Card.Body>
-            </Card>
-          </motion.div>
-        </Col>
-      </Row>
-    </Container>
+
+                  <Button
+                    variant="dark"
+                    style={styles.actionButton}
+                    onClick={handleUploadClick}
+                  >
+                    Upload File Image
+                  </Button>
+
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileUpload}
+                    accept="image/jpeg, image/png"
+                    style={styles.hiddenInput}
+                  />
+
+                  <div style={styles.fileInfo}>
+                    <p className="mb-0">Maximum file size is 1 MB</p>
+                    <p style={styles.fileFormat}>Format: JPEG, PNG</p>
+                  </div>
+
+                  <div style={styles.buttonContainer}>
+                    <Button variant="light" style={styles.cancelBtn}>
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="primary"
+                      className="save-btn"
+                      style={styles.saveBtn}
+                    >
+                      Save
+                    </Button>
+                  </div>
+                </Card.Body>
+              </Card>
+            </motion.div>
+          </Col>
+        </Row>
+      </Container>
     </>
   );
 };

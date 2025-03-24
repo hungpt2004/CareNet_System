@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Container, Row, Col, Card, Pagination } from "react-bootstrap";
 import { motion } from "framer-motion";
 import { HeartFill } from "react-bootstrap-icons";
-
+import { useNavigate } from "react-router-dom";
 const AccountFavourite = () => {
   // Event images
   const treeImage =
@@ -213,6 +213,8 @@ const AccountFavourite = () => {
     setFavourites(favourites.filter((fav) => fav.id !== id));
   };
 
+  const navigate = useNavigate();
+
   return (
     <Container
       className="d-flex justify-content-center align-items-center"
@@ -240,18 +242,31 @@ const AccountFavourite = () => {
                   </div>
                 </div>
                 <div style={styles.menuItems}>
-                  <div className="menu-item" style={styles.menuItem}>
+                  <div
+                    className="menu-item"
+                    style={styles.menuItem}
+                    onClick={() => navigate("/profile-information")}
+                  >
                     <span>Information</span>
                   </div>
-                  <div className="menu-item" style={styles.menuItem}>
+                  <div
+                    className="menu-item"
+                    style={styles.menuItem}
+                    onClick={() => navigate("/profile-avatar")}
+                  >
                     <span>Update Avatar</span>
                   </div>
-                  <div className="menu-item" style={styles.menuItem}>
+                  <div
+                    className="menu-item"
+                    style={styles.menuItem}
+                    onClick={() => navigate("/profile-history")}
+                  >
                     <span>History Effort</span>
                   </div>
                   <div
                     className="menu-item active"
                     style={{ ...styles.menuItem, ...styles.menuItemActive }}
+                    onClick={() => navigate("/profile-favourite")}
                   >
                     <span>Favourite</span>
                   </div>

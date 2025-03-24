@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
 import { motion } from "framer-motion";
 import CustomNavbar from "../../components/navbar/CustomNavbar";
-
+import { useNavigate } from "react-router-dom";
 const AccountInfo = () => {
   // CSS styles defined directly in the component
   const styles = {
@@ -222,13 +222,14 @@ const AccountInfo = () => {
     // Handle form submission
     console.log("Form submitted:", formData);
   };
+  const navigate = useNavigate();
 
   return (
     <>
       <CustomNavbar />
       <Container
         className="d-flex justify-content-center align-items-center"
-        style={{ ...styles.accountContainer, maxWidth: "1000px" }} // Limit max width
+        style={{ ...styles.accountContainer, maxWidth: "1100px" }} // Limit max width
         // Limit max width
       >
         <Row className="w-100">
@@ -256,16 +257,29 @@ const AccountInfo = () => {
                     <div
                       className="menu-item active"
                       style={{ ...styles.menuItem, ...styles.menuItemActive }}
+                      onClick={() => navigate("/profile-information")}
                     >
                       <span>Information</span>
                     </div>
-                    <div className="menu-item" style={styles.menuItem}>
+                    <div
+                      className="menu-item"
+                      style={styles.menuItem}
+                      onClick={() => navigate("/profile-avatar")}
+                    >
                       <span>Update Avatar</span>
                     </div>
-                    <div className="menu-item" style={styles.menuItem}>
+                    <div
+                      className="menu-item"
+                      style={styles.menuItem}
+                      onClick={() => navigate("/profile-history")}
+                    >
                       <span>History Effort</span>
                     </div>
-                    <div className="menu-item" style={styles.menuItem}>
+                    <div
+                      className="menu-item"
+                      style={styles.menuItem}
+                      onClick={() => navigate("/profile-favourite")}
+                    >
                       <span>Favourite</span>
                     </div>
                     <div className="menu-item" style={styles.menuItem}>
