@@ -1,6 +1,5 @@
 "use client"
-
-import { Container, Navbar, Nav, Button, Row, Col, Card, Form, Image, Spinner } from "react-bootstrap"
+import { Container, Navbar, Nav, Button, Row, Col, Card, Form, Image } from "react-bootstrap"
 import "bootstrap/dist/css/bootstrap.min.css"
 import { motion } from "framer-motion"
 import '../../css/LandingPage.css'
