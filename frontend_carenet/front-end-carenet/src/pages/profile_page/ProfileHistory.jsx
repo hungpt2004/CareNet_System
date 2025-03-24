@@ -5,7 +5,7 @@ import { Container, Row, Col, Card, Button, Pagination } from "react-bootstrap";
 import { motion } from "framer-motion";
 import CustomNavbar from "../../components/navbar/CustomNavbar";
 import { useNavigate } from "react-router-dom";
-const AccountHistory = () => {
+const ProfileHistory = () => {
   // CSS styles defined directly in the component
   const styles = {
     root: {
@@ -388,4 +388,4 @@ const AccountHistory = () => {
   );
 };
 
-export default AccountHistory;
+export default ProfileHistory;

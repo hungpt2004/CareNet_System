@@ -5,7 +5,7 @@ import { Container, Row, Col, Card, Pagination } from "react-bootstrap";
 import { motion } from "framer-motion";
 import { HeartFill } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
-const AccountFavourite = () => {
+const ProfileFavourite = () => {
   // Event images
   const treeImage =
     "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80";
@@ -343,4 +343,4 @@ const AccountFavourite = () => {
   );
 };
 
-export default AccountFavourite;
+export default ProfileFavourite;

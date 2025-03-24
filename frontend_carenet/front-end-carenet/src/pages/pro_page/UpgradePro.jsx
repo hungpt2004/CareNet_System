@@ -5,7 +5,7 @@ import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import { Check } from "lucide-react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import CustomNavbar from "../../components/navbar/CustomNavbar";
-const PricingTable = () => {
+const UpgradePro = () => {
   const [isYearly, setIsYearly] = useState(false);
   const [animate, setAnimate] = useState(false);
 
@@ -424,4 +424,4 @@ const PricingTable = () => {
   );
 };
 
-export default PricingTable;
+export default UpgradePro;
