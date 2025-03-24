@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
 import { motion } from "framer-motion";
-import CustomNavbar from "../../components/navbar/CustomNavbar";
+// import CustomNavbar from "../../components/navbar/CustomNavbar";
 import { useNavigate } from "react-router-dom";
 const ProfileInfo = () => {
   // CSS styles defined directly in the component
@@ -226,7 +226,7 @@ const ProfileInfo = () => {
 
   return (
     <>
-      <CustomNavbar />
+      {/* <CustomNavbar /> */}
       <Container
         className="d-flex justify-content-center align-items-center"
         style={{ ...styles.accountContainer, maxWidth: "1100px" }} // Limit max width
@@ -281,6 +281,20 @@ const ProfileInfo = () => {
                       onClick={() => navigate("/profile-favourite")}
                     >
                       <span>Favourite</span>
+                    </div>
+                    <div
+                      className="menu-item"
+                      style={styles.menuItem}
+                      onClick={() => navigate("/profile-score")}
+                    >
+                      <span>Score</span>
+                    </div>
+                    <div
+                      className="menu-item"
+                      style={styles.menuItem}
+                      onClick={() => navigate("/profile-certificate")}
+                    >
+                      <span>Certificate</span>
                     </div>
                     <div className="menu-item" style={styles.menuItem}>
                       <span>Log Out</span>

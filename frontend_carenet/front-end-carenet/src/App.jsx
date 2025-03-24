@@ -8,6 +8,9 @@ import ProfileHistory from "./pages/profile_page/ProfileHistory";
 import FailedRegister from "./pages/register_event_page/FailedRegister";
 import SuccessRegister from "./pages/register_event_page/SuccesRegister";
 import UpgradePro from "./pages/pro_page/UpgradePro";
+import ProfileScore from "./pages/profile_page/ProfileScore";
+import ProfileCertificate from "./pages/profile_page/ProfileCertificate";
+import FeedbackPage from "./pages/feedback_page/FeedbackPage";
 function App() {
   return (
     <Router>
@@ -20,6 +23,9 @@ function App() {
         <Route path="/failed-register" element={<FailedRegister />} />
         <Route path="/success-register" element={<SuccessRegister />} />
         <Route path="/upgrade-pro" element={<UpgradePro />} />
+        <Route path="/profile-score" element={<ProfileScore />} />
+        <Route path="/profile-certificate" element={<ProfileCertificate />} />
+        <Route path="/feedback-page" element={<FeedbackPage />} />
       </Routes>
     </Router>
   );
