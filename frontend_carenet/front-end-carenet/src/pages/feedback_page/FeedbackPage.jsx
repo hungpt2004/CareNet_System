@@ -317,9 +317,9 @@ const FeedbackPage = () => {
         style={styles.header}
       >
         <Title level={2} style={styles.title}>
-          Event Feedback Management
+          {/* Event Feedback Management */}
         </Title>
-        <p>View and manage your feedback for various volunteering events</p>
+        {/* <p>View and manage your feedback for various volunteering events</p> */}
       </motion.div>
 
       <motion.div
@@ -330,7 +330,7 @@ const FeedbackPage = () => {
         <Card
           title="FEEDBACK"
           style={styles.card}
-          headStyle={{ backgroundColor: "#0E606E", color: "white" }}
+          headStyle={{ backgroundColor: "#0E606E", color: "white",textAlign:"center" }}
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}

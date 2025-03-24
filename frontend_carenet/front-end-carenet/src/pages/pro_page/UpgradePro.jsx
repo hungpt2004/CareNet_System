@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import { Check } from "lucide-react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import CustomNavbar from "../../components/navbar/CustomNavbar";
+// import CustomNavbar from "../../components/navbar/CustomNavbar";
 const UpgradePro = () => {
   const [isYearly, setIsYearly] = useState(false);
   const [animate, setAnimate] = useState(false);
@@ -247,7 +247,7 @@ const UpgradePro = () => {
           }
         `}
       </style>
-      <CustomNavbar />
+      {/* <CustomNavbar /> */}
       <Container
         style={styles.mainContainer}
         className="d-flex align-items-center justify-content-center min-vh-100"
