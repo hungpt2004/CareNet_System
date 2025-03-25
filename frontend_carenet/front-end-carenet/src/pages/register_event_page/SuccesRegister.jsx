@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Container, Row, Col, Button, Card } from "react-bootstrap";
 import { CheckCircle } from "lucide-react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import CustomNavbar from "../../components/navbar/CustomNavbar";
+// import CustomNavbar from "../../components/navbar/CustomNavbar";
 
 const SuccessRegister = () => {
   const [animate, setAnimate] = useState(false);
@@ -118,7 +118,7 @@ const SuccessRegister = () => {
           }
         `}
       </style>
-      <CustomNavbar />
+      {/* <CustomNavbar /> */}
       <Container className="d-flex align-items-center justify-content-center vh-100">
         <Card style={styles.successCard}>
           <Card.Body className="text-center p-4">
