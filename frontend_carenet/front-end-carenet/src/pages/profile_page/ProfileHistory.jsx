@@ -381,7 +381,15 @@ const ProfileHistory = () => {
                   </div>
 
                   <div style={styles.paginationContainer}>
-                    <Pagination>
+                    <Pagination
+                      style={{
+                        "--bs-pagination-color": "#0E606E",
+                        "--bs-pagination-active-bg": "#0E606E",
+                        "--bs-pagination-active-border-color": "#0E606E",
+                        "--bs-pagination-hover-color": "#0E606E",
+                        "--bs-pagination-focus-color": "#0E606E",
+                      }}
+                    >
                       <Pagination.Prev />
                       <Pagination.Item active>{1}</Pagination.Item>
                       <Pagination.Item>{2}</Pagination.Item>
