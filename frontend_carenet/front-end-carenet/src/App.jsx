@@ -12,7 +12,10 @@ import UpgradePro from "./pages/pro_page/UpgradePro";
 import CustomerLayout from './layout/CustomerLayout';
 import FormRegisterPage from './pages/register_event_page/FormRegisterPage';
 import EventDetail from './pages/detail_page/EventDetailPage';
-
+import LoginPage from "./pages/login_page/LoginPage";
+import RegisterPage from "./pages/register_page/RegisterPage";
+import ForgotPasswordPage from "./pages/forgotpassword_page/ForgotPasswordPage";
+import FeedbackManagement from "./pages/feedbackmanagerment_page/FeedbackManagement";
 function App() {
   return (
     <Router>
@@ -31,6 +34,11 @@ function App() {
           <Route path='/form-register' element={<FormRegisterPage/>}/>
           <Route path='/event-detail' element={<EventDetail/>}/>
         </Route>
+        <Route path='/search' element={<VolunteerEventSearch/>}/>
+        <Route path='/login' element={<LoginPage/>}/>
+        <Route path='/register' element={<RegisterPage/>}/>
+        <Route path='/forgotpassword' element={<ForgotPasswordPage/>}/>
+        <Route path='/feedback' element={<FeedbackManagement/>}/>
       </Routes>
     </Router>
   );
