@@ -7,6 +7,7 @@ import CustomNavbar from "../../components/navbar/CustomNavbar"
 import MapComponent from "../../components/map/MapComponent"
 import { Footer } from "../../components/footer/Footer"
 import { formatDateVN } from "../../utils/FormatDateVN"
+import { useNavigate } from "react-router-dom"
 
 // Custom CSS variables for the color scheme
 const customStyles = {
@@ -98,20 +99,22 @@ export default function VolunteerEventSearch() {
     endDate: "",
     category: "",
   })
-  
+
+  const navigate = useNavigate();
+
   // State for events and filtered events
   const [events, setEvents] = useState(mockEvents)
   const [filteredEvents, setFilteredEvents] = useState(mockEvents)
-  
+
   // State for sort option
   const [sortOption, setSortOption] = useState("startDate")
-  
+
   // State for selected map area (simplified for demo)
   const [mapArea, setMapArea] = useState(null)
-  
+
   // State for loading
   const [isLoading, setIsLoading] = useState(false)
-  
+
   // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -120,64 +123,64 @@ export default function VolunteerEventSearch() {
       [name]: value,
     })
   }
-  
+
   // Handle search submission
   const handleSearch = (e) => {
     e.preventDefault()
     filterEvents()
   }
-  
+
   // Filter events based on search criteria
   const filterEvents = () => {
     setIsLoading(true) // Bắt đầu loading
-  
+
     setTimeout(() => { // Giả lập thời gian xử lý
       const filtered = events.filter((event) => {
         // Filter by name
         if (searchFilters.name && !event.name.toLowerCase().includes(searchFilters.name.toLowerCase())) {
           return false
         }
-  
+
         // Filter by location
         if (searchFilters.location && !event.location.toLowerCase().includes(searchFilters.location.toLowerCase())) {
           return false
         }
-  
+
         // Filter by start date
         if (searchFilters.startDate && new Date(event.startDate) < new Date(searchFilters.startDate)) {
           return false
         }
-  
+
         // Filter by end date
         if (searchFilters.endDate && new Date(event.endDate) > new Date(searchFilters.endDate)) {
           return false
         }
-  
+
         // Filter by category
         if (searchFilters.category && event.category !== searchFilters.category) {
           return false
         }
-  
+
         // Filter by map area (simplified)
         if (mapArea) {
           // In a real implementation, check if event coordinates are within the map bounds
           // This is just a placeholder
           return true
         }
-  
+
         return true
       })
-  
+
       // Sort the filtered events
       sortEvents(filtered, sortOption)
       setIsLoading(false) // Kết thúc loading
     }, 1000) // Giả lập trễ 1 giây (tùy chỉnh)
   }
-  
+
   // Sort events based on selected option
   const sortEvents = (eventsToSort = filteredEvents, option = sortOption) => {
     const sorted = [...eventsToSort]
-  
+
     switch (option) {
       case "name":
         sorted.sort((a, b) => a.name.localeCompare(b.name))
@@ -194,11 +197,11 @@ export default function VolunteerEventSearch() {
       default:
         break
     }
-  
+
     setFilteredEvents(sorted)
     setSortOption(option)
   }
-  
+
   // Reset all filters
   const resetFilters = () => {
     setSearchFilters({
@@ -211,16 +214,19 @@ export default function VolunteerEventSearch() {
     setFilteredEvents(events)
     setSortOption("startDate")
   }
-  
+
+  const handleGoToDetail = () => {
+    navigate('/event-detail');
+  }
+
   // Effect to filter events when search filters change
   useEffect(() => {
     filterEvents()
   }, [sortOption, mapArea])
-  
+
 
   return (
     <>
-      <CustomNavbar />
       <Container fluid className="py-4 p-5 mt-4" style={{ backgroundColor: 'white'.secondaryColor }}>
         <h1 className="mb-4 text-center" style={{ color: customStyles.primaryColor }}>
           Find Volunteer Opportunities
@@ -410,7 +416,7 @@ export default function VolunteerEventSearch() {
             {/* Event Cards */}
             {isLoading ? (
               <div className="text-center">
-<Spinner animation="border" color="primary" role="status"/>
+                <Spinner animation="border" color="primary" size="sm" role="status" />
               </div>
             ) : (filteredEvents.length > 0 ? (
               <div className="d-grid gap-3">
@@ -457,6 +463,7 @@ export default function VolunteerEventSearch() {
                             </div>
                             <Button
                               className="button w-100"
+                              onClick={() => handleGoToDetail()}
                               style={{
                                 backgroundColor: "white",
                                 color: customStyles.primaryColor,
@@ -470,7 +477,7 @@ export default function VolunteerEventSearch() {
                       </Row>
                     </Card.Body>
                   </Card>
-              ))}
+                ))}
               </div>
             ) : (
               <div className="text-center p-5 rounded" style={{ backgroundColor: "white" }}>
@@ -491,7 +498,6 @@ export default function VolunteerEventSearch() {
           </Col>
         </Row>
       </Container>
-      <Footer />
     </>
   )
 }

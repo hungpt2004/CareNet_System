@@ -226,7 +226,6 @@ const ProfileInfo = () => {
 
   return (
     <>
-      <CustomNavbar />
       <Container
         className="d-flex justify-content-center align-items-center"
         style={{ ...styles.accountContainer, maxWidth: "1100px" }} // Limit max width

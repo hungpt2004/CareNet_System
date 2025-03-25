@@ -10,6 +10,8 @@ import CustomNavbar from "../../components/navbar/CustomNavbar"
 import { useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
 import { Footer } from "../../components/footer/Footer"
+import Achievements from "../../components/component_page/achivements/Achivements"
+import Services from "../../components/component_page/services/Services"
 
 function LandingPage() {
 
@@ -45,11 +47,8 @@ function LandingPage() {
 
 
 
-
   return (
     <div className="w-100">
-      {/* Header/Navigation */}
-      <CustomNavbar />
 
       {/* Hero Section */}
       <section id="home" className="home-section text-white py-5 position-relative" style={{ marginTop: "80px" }}>
@@ -231,6 +230,8 @@ function LandingPage() {
       {/* News */}
       <VolunteerArticles />
 
+      <Achievements/>                
+
       {/* How It Works */}
       <section id="how-it-works" className="py-5 bg-light">
         <Container fluid>
@@ -314,6 +315,10 @@ function LandingPage() {
           </Row>
         </Container>
       </section>
+
+
+      <h2 className="display-5 fw-bold text-center mt-4">Dịch vụ CareNet</h2>
+      <Services/>                
 
       <h2 className="display-5 fw-bold text-center">Top Comments</h2>
       <div className="container mx-auto py-10">
@@ -471,8 +476,6 @@ function LandingPage() {
         </Container>
       </section>
 
-      {/* Footer */}
-      <Footer/>
     </div>
   )
 }
