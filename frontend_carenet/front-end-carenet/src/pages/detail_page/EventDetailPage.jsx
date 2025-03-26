@@ -8,6 +8,7 @@ import {
 import { Calendar, MapPin, Users, Clock, Heart, Share2, ChevronLeft, Star, MessageSquare, Award, Bookmark, CheckCircle, ExternalLink } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import MapComponent from '../../components/map/MapComponent'
+import styles from '../../css/AppColors.module.css'
 
 // Custom CSS variables for the color scheme
 const customStyles = {
@@ -115,7 +116,7 @@ export default function EventDetail() {
    const participationPercentage = (eventData.participants / eventData.maxParticipants) * 100
 
    return (
-      <Container fluid style={{ backgroundColor: customStyles.secondaryColor }} className="py-4 min-vh-100">
+      <Container fluid  className={`${styles.body} py-4 min-vh-100`}>
          <Container>
             {/* Back button */}
             <Link href="/search" passHref>
@@ -544,6 +545,7 @@ export default function EventDetail() {
                   <Link href={`/form-register`} >
                      <Button
                         size="lg"
+                        onClick={() => handleGotToRegisterForm()}
                         style={{
                            backgroundColor: 'white',
                            color: customStyles.primaryColor,

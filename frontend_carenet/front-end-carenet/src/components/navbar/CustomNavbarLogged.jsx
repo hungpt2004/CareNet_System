@@ -73,7 +73,7 @@ const CustomNavbarLogged = () => {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto">
-            <Nav.Link href="/" className="hover-underline">Trang chủ</Nav.Link>
+            <Nav.Link href="/home" className="hover-underline">Trang chủ</Nav.Link>
             <Nav.Link href="#features" className="hover-underline">Thành tựu</Nav.Link>
             <Nav.Link href="#how-it-works" className="hover-underline">Vận hành</Nav.Link>
             <Nav.Link href="#testimonials" className="hover-underline">Chia sẻ</Nav.Link>
@@ -116,6 +116,7 @@ const CustomNavbarLogged = () => {
                   </div>
                   <Nav className="flex-column">
                     <Nav.Link href="/profile-information" className="px-4 py-2">Thông tin cá nhân</Nav.Link>
+                    <Nav.Link href="/support" className="px-4 py-2">CSKH</Nav.Link>
                     <Nav.Link href="#settings" className="px-4 py-2">Cài đặt</Nav.Link>
                     <Nav.Link onClick={handleLogout} className="px-4 py-2 text-danger">Đăng xuất</Nav.Link>
                   </Nav>

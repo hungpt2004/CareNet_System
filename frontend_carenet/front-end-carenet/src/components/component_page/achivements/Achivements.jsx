@@ -1,5 +1,6 @@
 import React from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
+import styles from '../../../css/AppColors.module.css'
 
 const Achievements = () => {
   return (
@@ -8,16 +9,16 @@ const Achievements = () => {
         <Col md={6}>
           <div className="mb-4">
             <h2 className="fw-bold">Thành tựu</h2>
-            <h3 className="fw-bold text-primary">CareNet – Kết nối & Chia sẻ</h3>
+            <h3 className={`fw-bold ${styles.textPrimary}`}>CareNet – Kết nối & Chia sẻ</h3>
           </div>
           
-          <p className="mb-4">
+          <p className={`text-dark mb-4`}>
             <strong>CareNet</strong> là một nền tảng kết nối người có nhu cầu được giúp đỡ
             với những người có mong muốn giúp đỡ để tạo nên một cộng đồng hỗ trợ
             lẫn nhau khỏe mạnh. Dưới đây là một số thành tựu nổi bật của CareNet:
           </p>
           
-          <ul className="list-unstyled">
+          <ul className="list-unstyled text-dark">
             <li className="mb-2">
               <i className="bi bi-check-circle-fill text-primary me-2"></i>
               10.000+ người đã hoàn cảnh khó khăn đã nhận được hỗ trợ

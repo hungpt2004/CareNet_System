@@ -58,7 +58,7 @@ const RegisterPage = () => {
         </Form>
 
         <p className="text-center text-muted mt-3">
-          Bạn đã có tài khoản? <a href="#" className="text-primary">Đăng nhập</a>
+          Bạn đã có tài khoản? <a href="/" className="text-primary">Đăng nhập</a>
         </p>
       </motion.div>
 

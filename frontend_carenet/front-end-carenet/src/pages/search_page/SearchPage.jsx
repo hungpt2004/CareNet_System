@@ -8,6 +8,7 @@ import MapComponent from "../../components/map/MapComponent"
 import { Footer } from "../../components/footer/Footer"
 import { formatDateVN } from "../../utils/FormatDateVN"
 import { useNavigate } from "react-router-dom"
+import styles from '../../css/AppColors.module.css'
 
 // Custom CSS variables for the color scheme
 const customStyles = {
@@ -227,9 +228,9 @@ export default function VolunteerEventSearch() {
 
   return (
     <>
-      <Container fluid className="py-4 p-5 mt-4" style={{ backgroundColor: 'white'.secondaryColor }}>
+      <Container fluid className={`py-4 p-5 mt-4`}>
         <h1 className="mb-4 text-center" style={{ color: customStyles.primaryColor }}>
-          Find Volunteer Opportunities
+          Tìm kiếm dịch vụ thiện nguyện
         </h1>
 
         {/* Search Form */}

@@ -12,6 +12,8 @@ import { useEffect, useState } from "react"
 import { Footer } from "../../components/footer/Footer"
 import Achievements from "../../components/component_page/achivements/Achivements"
 import Services from "../../components/component_page/services/Services"
+import styles from '../../css/AppColors.module.css'
+import { FaUserPlus, FaClipboardList, FaHandshake, FaUsers } from "react-icons/fa";
 
 function LandingPage() {
 
@@ -27,10 +29,10 @@ function LandingPage() {
   const handleSearchPage = () => {
     setLoading(true);
     try {
-      navigate('/search'); 
+      navigate('/search');
     } catch (error) {
       console.log(error.message);
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
@@ -39,16 +41,16 @@ function LandingPage() {
     if (loading) {
       const timer = setTimeout(() => {
         setLoading(false);
-      }, 1000); 
+      }, 1000);
 
-      return () => clearTimeout(timer); 
+      return () => clearTimeout(timer);
     }
   }, [loading]);
 
 
 
   return (
-    <div className="w-100">
+    <div className={`${styles.body} w-100`}>
 
       {/* Hero Section */}
       <section id="home" className="home-section text-white py-5 position-relative" style={{ marginTop: "80px" }}>
@@ -230,10 +232,10 @@ function LandingPage() {
       {/* News */}
       <VolunteerArticles />
 
-      <Achievements/>                
+      <Achievements />
 
       {/* How It Works */}
-      <section id="how-it-works" className="py-5 bg-light">
+      <section id="how-it-works" className={`py-5 ${styles.containerSecondary}`}>
         <Container fluid>
           <div className="text-center mb-5">
             <h2 className="display-5 fw-bold">Vận Hành</h2>
@@ -249,15 +251,16 @@ function LandingPage() {
                 className="text-center"
               >
                 <div
-                  className="bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+                  className={`${styles.containerPrimary} rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3`}
                   style={{ width: "80px", height: "80px" }}
                 >
-                  <h3 className="text-white m-0">1</h3>
+                  <FaUserPlus size={40} color="white" />
                 </div>
                 <h4>Register</h4>
                 <p className="text-muted">Create an account for your nonprofit organization</p>
               </motion.div>
             </Col>
+
             <Col md={3}>
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
@@ -267,15 +270,16 @@ function LandingPage() {
                 className="text-center"
               >
                 <div
-                  className="bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+                  className={`${styles.containerPrimary} rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3`}
                   style={{ width: "80px", height: "80px" }}
                 >
-                  <h3 className="text-white m-0">2</h3>
+                  <FaClipboardList size={40} color="white" />
                 </div>
                 <h4>Describe Needs</h4>
                 <p className="text-muted">Tell us about your website or tech project needs</p>
               </motion.div>
             </Col>
+
             <Col md={3}>
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
@@ -285,15 +289,16 @@ function LandingPage() {
                 className="text-center"
               >
                 <div
-                  className="bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+                  className={`${styles.containerPrimary} rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3`}
                   style={{ width: "80px", height: "80px" }}
                 >
-                  <h3 className="text-white m-0">3</h3>
+                  <FaHandshake size={40} color="white" />
                 </div>
                 <h4>Get Matched</h4>
                 <p className="text-muted">We'll match you with qualified volunteers</p>
               </motion.div>
             </Col>
+
             <Col md={3}>
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
@@ -303,22 +308,23 @@ function LandingPage() {
                 className="text-center"
               >
                 <div
-                  className="bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+                  className={`${styles.containerPrimary} rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3`}
                   style={{ width: "80px", height: "80px" }}
                 >
-                  <h3 className="text-white m-0">4</h3>
+                  <FaUsers size={40} color="white" />
                 </div>
                 <h4>Collaborate</h4>
                 <p className="text-muted">Work together to complete your project</p>
               </motion.div>
             </Col>
+
           </Row>
         </Container>
       </section>
 
 
       <h2 className="display-5 fw-bold text-center mt-4">Dịch vụ CareNet</h2>
-      <Services/>                
+      <Services />
 
       <h2 className="display-5 fw-bold text-center">Top Comments</h2>
       <div className="container mx-auto py-10">

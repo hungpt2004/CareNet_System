@@ -1,0 +1,42 @@
+/* Progressbar.module.css */
+
+/* Container tổng thể */
+.progressContainer {
+   width: 100%;
+   height: 20px;
+   background-color: #e0e0e0;
+   border-radius: 50px;
+   overflow: hidden;
+   box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+   margin: 10px 0;
+ }
+ 
+ /* Thanh progress */
+ .progressBar {
+   height: 100%;
+   background: linear-gradient(135deg, #4caf50, #81c784);
+   border-radius: 50px;
+   animation: progressAnim 1s ease-in-out forwards;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   font-weight: bold;
+   color: white;
+   transition: width 0.5s ease-in-out; /* Để thay đổi mượt */
+ }
+ 
+ /* Text hiển thị phần trăm */
+ .progressText {
+   font-size: 14px;
+ }
+ 
+ /* Keyframes cho hiệu ứng mượt */
+ @keyframes progressAnim {
+   0% {
+     width: 0%;
+   }
+   100% {
+     width: 100%;
+   }
+ }
+ 

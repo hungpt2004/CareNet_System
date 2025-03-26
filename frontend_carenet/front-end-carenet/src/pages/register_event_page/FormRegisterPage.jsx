@@ -110,12 +110,6 @@ function RegisterForm({ eventId }) {
 
    const navigate = useNavigate();
 
-   // Days of the week
-   const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-
-   // Time slots
-   const timeSlots = ["Morning (8am-12pm)", "Afternoon (12pm-5pm)", "Evening (5pm-9pm)"]
-
    // How heard about options
    const heardFromOptions = ["Social Media", "Friend/Family", "Email", "Website", "School/Work", "Other"]
 
@@ -215,7 +209,7 @@ function RegisterForm({ eventId }) {
    const handleSubmit = (e) => {
       e.preventDefault()
 
-      if (validateForm()) {
+      if (!validateForm()) {
          // In a real app, you would send this to your backend
          console.log("Registration submitted:", formData)
          setSubmitted(true)
@@ -838,6 +832,7 @@ function RegisterForm({ eventId }) {
                            {/* Submit Button */}
                            <div className="d-grid mt-4">
                               <Button
+                                 onClick={() => navigate('/success-register')}
                                  type="submit"
                                  size="lg"
                                  style={{
