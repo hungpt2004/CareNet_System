@@ -52,6 +52,9 @@ function App() {
             <Route path='/event-detail' element={<EventDetail />} />
             <Route path='/feedback' element={<FeedbackManagement />} />
             <Route path='/support' element={<SupportRequestPage />} />
+            <Route path="/profile-score" element={<ProfileScore />} />
+            <Route path="/profile-certificate" element={<ProfileCertificate />} />
+            <Route path="/feedback-page" element={<FeedbackPage />} />
           </Route>
 
           <Route element={<AdminLayout />}>

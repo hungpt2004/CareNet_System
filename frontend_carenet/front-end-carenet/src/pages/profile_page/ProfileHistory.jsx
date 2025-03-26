@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Container, Row, Col, Card, Button, Pagination } from "react-bootstrap";
 import { motion } from "framer-motion";
-import CustomNavbar from "../../components/navbar/CustomNavbar";
+// import CustomNavbar from "../../components/navbar/CustomNavbar";
 import { useNavigate } from "react-router-dom";
 const ProfileHistory = () => {
   // CSS styles defined directly in the component
@@ -289,6 +289,20 @@ const ProfileHistory = () => {
                     >
                       <span>Favourite</span>
                     </div>
+                    <div
+                      className="menu-item"
+                      style={styles.menuItem}
+                      onClick={() => navigate("/profile-score")}
+                    >
+                      <span>Score</span>
+                    </div>
+                    <div
+                      className="menu-item"
+                      style={styles.menuItem}
+                      onClick={() => navigate("/profile-certificate")}
+                    >
+                      <span>Certificate</span>
+                    </div>
                     <div className="menu-item" style={styles.menuItem}>
                       <span>Log Out</span>
                     </div>
@@ -366,7 +380,15 @@ const ProfileHistory = () => {
                   </div>
 
                   <div style={styles.paginationContainer}>
-                    <Pagination>
+                    <Pagination
+                      style={{
+                        "--bs-pagination-color": "#0E606E",
+                        "--bs-pagination-active-bg": "#0E606E",
+                        "--bs-pagination-active-border-color": "#0E606E",
+                        "--bs-pagination-hover-color": "#0E606E",
+                        "--bs-pagination-focus-color": "#0E606E",
+                      }}
+                    >
                       <Pagination.Prev />
                       <Pagination.Item active>{1}</Pagination.Item>
                       <Pagination.Item>{2}</Pagination.Item>

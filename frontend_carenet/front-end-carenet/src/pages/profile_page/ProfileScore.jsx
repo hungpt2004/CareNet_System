@@ -1,19 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
-import { Container, Row, Col, Card, Pagination } from "react-bootstrap";
+import React from "react";
+import { Container, Row, Col, Card, ProgressBar } from "react-bootstrap";
 import { motion } from "framer-motion";
-import { HeartFill } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
-const ProfileFavourite = () => {
-  // Event images
-  const treeImage =
-    "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80";
-  const bloodImage =
-    "https://images.unsplash.com/photo-1615461066841-6116e61058f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80";
-  const animalImage =
-    "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1469&q=80";
-
+const ProfileScore = () => {
   // CSS styles defined directly in the component
   const styles = {
     root: {
@@ -89,51 +80,74 @@ const ProfileFavourite = () => {
     infoCardBody: {
       padding: "1.5rem",
     },
-    favouriteList: {
-      display: "flex",
-      flexDirection: "column",
-      gap: "1rem",
-      marginBottom: "1.5rem",
-    },
-    favouriteItem: {
-      display: "flex",
-      border: "1px solid #ddd",
+    scoreOverview: {
+      backgroundColor: "#f8f9fa",
       borderRadius: "10px",
-      padding: "1rem",
+      padding: "1.5rem",
+      marginBottom: "2rem",
       boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
-      backgroundColor: "#f9f9f9",
+      textAlign: "center",
     },
-    eventImage: {
-      width: "150px",
-      height: "100px",
-      objectFit: "cover",
-      borderRadius: "5px",
-      marginRight: "1rem",
-    },
-    eventContent: {
-      flex: 1,
-    },
-    eventName: {
+    totalScore: {
+      fontSize: "3rem",
       fontWeight: "bold",
+      color: "#0E606E",
       marginBottom: "0.5rem",
     },
-    eventDescription: {
-      fontSize: "0.9rem",
-      color: "#555",
+    scoreLabel: {
+      color: "#6c757d",
+      marginBottom: "1rem",
     },
-    heartIcon: {
-      cursor: "pointer",
-      fontSize: "1.5rem",
-      color: "#0E606E",
-      marginLeft: "1rem",
-      alignSelf: "center",
+    levelProgress: {
+      marginTop: "1rem",
+      marginBottom: "0.5rem",
     },
-    paginationContainer: {
+    levelLabel: {
       display: "flex",
-      justifyContent: "center",
+      justifyContent: "space-between",
+      marginBottom: "0.5rem",
     },
-    paginationItem: {
-      margin: "0 0.2rem",
+    scoreTable: {
+      width: "100%",
+      borderCollapse: "separate",
+      borderSpacing: "0 0.5rem",
+    },
+    scoreTableHeader: {
+      textAlign: "left",
+      padding: "0.5rem 1rem",
+      borderBottom: "2px solid #0E606E",
+      color: "#0E606E",
+      fontWeight: "bold",
+    },
+    scoreTableRow: {
+      backgroundColor: "#f8f9fa",
+      transition: "all 0.3s ease",
+    },
+    scoreTableRowHover: {
+      backgroundColor: "#f1f1f1",
+    },
+    scoreTableCell: {
+      padding: "1rem",
+      borderTop: "1px solid #dee2e6",
+      borderBottom: "1px solid #dee2e6",
+    },
+    scoreTableCellFirst: {
+      borderLeft: "1px solid #dee2e6",
+      borderTopLeftRadius: "5px",
+      borderBottomLeftRadius: "5px",
+    },
+    scoreTableCellLast: {
+      borderRight: "1px solid #dee2e6",
+      borderTopRightRadius: "5px",
+      borderBottomRightRadius: "5px",
+    },
+    scoreValue: {
+      fontWeight: "bold",
+      color: "#0E606E",
+    },
+    scoreDate: {
+      color: "#6c757d",
+      fontSize: "0.9rem",
     },
   };
 
@@ -174,8 +188,10 @@ const ProfileFavourite = () => {
         display: none;
       }
       
-      .heart-icon:hover {
-        transform: scale(1.1);
+      .score-table-row:hover {
+        background-color: #f1f1f1;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
       }
     `;
     document.head.appendChild(style);
@@ -185,36 +201,48 @@ const ProfileFavourite = () => {
     };
   }, []);
 
-  const [favourites, setFavourites] = useState([
+  // Sample score data
+  const scoreData = [
     {
       id: 1,
-      name: "Tree Planting Drive",
-      description:
-        "Help restore green spaces by planting trees in designated areas. This is a family-friendly event with guidance from environmental experts and all necessary tools will be provided.",
-      image: treeImage,
+      event: "Tree Planting Drive",
+      date: "April 19, 2023",
+      score: 85,
+      hours: 4,
     },
     {
       id: 2,
-      name: "Blood Donation Camp",
-      description:
-        "Donate blood and save lives! This event is organized in collaboration with local hospitals and blood banks. Medical professionals will be available to ensure a safe and comfortable donation process.",
-      image: bloodImage,
+      event: "Blood Donation Camp",
+      date: "April 23, 2023",
+      score: 70,
+      hours: 3,
     },
     {
       id: 3,
-      name: "Animal Shelter Volunteering",
-      description:
-        "Support an animal shelter by helping with feeding, cleaning, and playing with rescued animals. Volunteers will also assist in adoption events to find loving homes for pets in need.",
-      image: animalImage,
+      event: "Animal Shelter Volunteering",
+      date: "May 5, 2023",
+      score: 90,
+      hours: 5,
     },
-  ]);
+    {
+      id: 4,
+      event: "Community Park Cleanup",
+      date: "May 12, 2023",
+      score: 75,
+      hours: 3.5,
+    },
+  ];
 
-  const removeFromFavourites = (id) => {
-    setFavourites(favourites.filter((fav) => fav.id !== id));
-  };
+  // Calculate total score
+  const totalScore = scoreData.reduce((sum, item) => sum + item.score, 0);
+  const totalHours = scoreData.reduce((sum, item) => sum + item.hours, 0);
+
+  // Calculate level progress
+  const currentLevel = Math.floor(totalScore / 100) + 1;
+  const nextLevelScore = currentLevel * 100;
+  const progressPercentage = totalScore % 100;
 
   const navigate = useNavigate();
-
   return (
     <Container
       className="d-flex justify-content-center align-items-center"
@@ -264,15 +292,15 @@ const ProfileFavourite = () => {
                     <span>History Effort</span>
                   </div>
                   <div
-                    className="menu-item active"
-                    style={{ ...styles.menuItem, ...styles.menuItemActive }}
+                    className="menu-item"
+                    style={styles.menuItem}
                     onClick={() => navigate("/profile-favourite")}
                   >
                     <span>Favourite</span>
                   </div>
                   <div
-                    className="menu-item"
-                    style={styles.menuItem}
+                    className="menu-item active"
+                    style={{ ...styles.menuItem, ...styles.menuItemActive }}
                     onClick={() => navigate("/profile-score")}
                   >
                     <span>Score</span>
@@ -300,62 +328,91 @@ const ProfileFavourite = () => {
           >
             <Card style={styles.infoCard}>
               <Card.Header style={styles.infoHeader}>
-                <h4 className="mb-0">FAVOURITE</h4>
+                <h4 className="mb-0">SCORE</h4>
               </Card.Header>
               <Card.Body style={styles.infoCardBody}>
-                <div style={styles.favouriteList}>
-                  {favourites.map((favourite) => (
-                    <motion.div
-                      key={favourite.id}
-                      style={styles.favouriteItem}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <img
-                        src={favourite.image || "/placeholder.svg"}
-                        alt={favourite.name}
-                        style={styles.eventImage}
-                      />
-                      <div style={styles.eventContent}>
-                        <h5 style={styles.eventName}>
-                          Event Name: {favourite.name}
-                        </h5>
-                        <p style={styles.eventDescription}>
-                          Description: {favourite.description}
-                        </p>
-                      </div>
-                      <div style={styles.heartContainer}>
-                        <HeartFill
-                          className="heart-icon"
-                          style={styles.heartIcon}
-                          onClick={() => removeFromFavourites(favourite.id)}
-                        />
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
+                <motion.div
+                  style={styles.scoreOverview}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <div style={styles.totalScore}>{totalScore}</div>
+                  <div style={styles.scoreLabel}>Total Volunteer Points</div>
 
-                <div style={styles.paginationContainer}>
-                  <Pagination
-                    style={{
-                      "--bs-pagination-color": "#0E606E",
-                      "--bs-pagination-active-bg": "#0E606E",
-                      "--bs-pagination-active-border-color": "#0E606E",
-                      "--bs-pagination-hover-color": "#0E606E",
-                      "--bs-pagination-focus-color": "#0E606E",
-                    }}
-                  >
-                    <Pagination.Prev />
-                    <Pagination.Item active>{1}</Pagination.Item>
-                    <Pagination.Item>{2}</Pagination.Item>
-                    <Pagination.Item>{3}</Pagination.Item>
-                    <Pagination.Item>{4}</Pagination.Item>
-                    <Pagination.Ellipsis />
-                    <Pagination.Item>{40}</Pagination.Item>
-                    <Pagination.Next />
-                  </Pagination>
-                </div>
+                  <Row className="text-center mb-3">
+                    <Col>
+                      <h5>{scoreData.length}</h5>
+                      <p style={styles.scoreLabel}>Events</p>
+                    </Col>
+                    <Col>
+                      <h5>{totalHours}</h5>
+                      <p style={styles.scoreLabel}>Hours</p>
+                    </Col>
+                    <Col>
+                      <h5>{currentLevel}</h5>
+                      <p style={styles.scoreLabel}>Level</p>
+                    </Col>
+                  </Row>
+
+                  <div style={styles.levelLabel}>
+                    <span>Level {currentLevel}</span>
+                    <span>Level {currentLevel + 1}</span>
+                  </div>
+                  <ProgressBar
+                    now={progressPercentage}
+                    variant="info"
+                    style={styles.levelProgress}
+                  />
+                  <small>{progressPercentage}% to next level</small>
+                </motion.div>
+
+                <h5 className="mb-3">Event Scores</h5>
+
+                <table style={styles.scoreTable}>
+                  <thead>
+                    <tr>
+                      <th style={styles.scoreTableHeader}>Event</th>
+                      <th style={styles.scoreTableHeader}>Date</th>
+                      <th style={styles.scoreTableHeader}>Hours</th>
+                      <th style={styles.scoreTableHeader}>Score</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {scoreData.map((item, index) => (
+                      <motion.tr
+                        key={item.id}
+                        className="score-table-row"
+                        style={styles.scoreTableRow}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: index * 0.1 }}
+                      >
+                        <td
+                          style={{
+                            ...styles.scoreTableCell,
+                            ...styles.scoreTableCellFirst,
+                          }}
+                        >
+                          {item.event}
+                        </td>
+                        <td style={styles.scoreTableCell}>
+                          <span style={styles.scoreDate}>{item.date}</span>
+                        </td>
+                        <td style={styles.scoreTableCell}>{item.hours} hrs</td>
+                        <td
+                          style={{
+                            ...styles.scoreTableCell,
+                            ...styles.scoreTableCellLast,
+                            ...styles.scoreValue,
+                          }}
+                        >
+                          {item.score}
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </tbody>
+                </table>
               </Card.Body>
             </Card>
           </motion.div>
@@ -365,4 +422,4 @@ const ProfileFavourite = () => {
   );
 };
 
-export default ProfileFavourite;
+export default ProfileScore;

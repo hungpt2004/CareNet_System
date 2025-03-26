@@ -3,7 +3,7 @@
 import React, { useState, useRef } from "react";
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import { motion } from "framer-motion";
-import CustomNavbar from "../../components/navbar/CustomNavbar";
+// import CustomNavbar from "../../components/navbar/CustomNavbar";
 import { useNavigate } from "react-router-dom";
 const ProfileAvatar = () => {
   // CSS styles defined directly in the component
@@ -248,11 +248,33 @@ const ProfileAvatar = () => {
                     >
                       <span>Update Avatar</span>
                     </div>
-                    <div className="menu-item" style={styles.menuItem} onClick={() => navigate("/profile-history")}>
+                    <div
+                      className="menu-item"
+                      style={styles.menuItem}
+                      onClick={() => navigate("/profile-history")}
+                    >
                       <span>History Effort</span>
                     </div>
-                    <div className="menu-item" style={styles.menuItem} onClick={() => navigate("/profile-favourite")}>
+                    <div
+                      className="menu-item"
+                      style={styles.menuItem}
+                      onClick={() => navigate("/profile-favourite")}
+                    >
                       <span>Favourite</span>
+                    </div>
+                    <div
+                      className="menu-item"
+                      style={styles.menuItem}
+                      onClick={() => navigate("/profile-score")}
+                    >
+                      <span>Score</span>
+                    </div>
+                    <div
+                      className="menu-item"
+                      style={styles.menuItem}
+                      onClick={() => navigate("/profile-certificate")}
+                    >
+                      <span>Certificate</span>
                     </div>
                     <div className="menu-item" style={styles.menuItem}>
                       <span>Log Out</span>
@@ -262,7 +284,7 @@ const ProfileAvatar = () => {
               </Card>
             </motion.div>
           </Col>
-          <Col md={8} style={{ marginTop: "70px" }}>
+          <Col md={8} style={{ marginTop: "80px" }}>
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}

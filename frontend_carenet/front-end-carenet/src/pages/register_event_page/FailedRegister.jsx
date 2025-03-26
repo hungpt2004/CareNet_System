@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Container, Row, Col, Button, Card } from "react-bootstrap";
 import { XCircle } from "lucide-react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import CustomNavbar from "../../components/navbar/CustomNavbar";
+// import CustomNavbar from "../../components/navbar/CustomNavbar";
 
 const FailedRegister = () => {
   const [animate, setAnimate] = useState(false);
@@ -134,7 +134,7 @@ const FailedRegister = () => {
           }
         `}
       </style>
-      <CustomNavbar />
+      {/* <CustomNavbar /> */}
       <Container className="d-flex align-items-center justify-content-center vh-100">
         <Card
           style={styles.failedCard}
