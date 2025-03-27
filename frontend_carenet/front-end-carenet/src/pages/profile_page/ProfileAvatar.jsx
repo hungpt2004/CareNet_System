@@ -198,7 +198,7 @@ const ProfileAvatar = () => {
       window.open(selectedFile, "_blank");
     } else {
       window.open(
-        "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-suTKYwhiuAHDzMequZcZHjaRpCeWdp.png",
+        "https://img.freepik.com/premium-vector/avatar-profile-icon-flat-style-female-user-profile-vector-illustration-isolated-background-women-profile-sign-business-concept_157943-38866.jpg?semt=ais_hybrid",
         "_blank"
       );
     }
