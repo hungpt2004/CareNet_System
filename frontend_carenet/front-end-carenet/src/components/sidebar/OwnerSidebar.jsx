@@ -33,10 +33,9 @@ const OwnerSidebar = ({ showSidebar, isMobile }) => {
       title: "Tình Nguyện Viên",
       icon: <Users size={20} />,
       submenu: [
-        { title: "Danh sách TNV", path: "/student" },
+        { title: "Danh sách TNV", path: "/admin-participant" },
         { title: "Điểm danh TNV", path: "/owner-attendance" },
         { title: "Phê duyệt TNV", path: "/owner-user" },
-        { title: "Thành tích TNV", path: "/admin/students/records" },
       ],
     },
     {
@@ -44,52 +43,9 @@ const OwnerSidebar = ({ showSidebar, isMobile }) => {
       title: "Quản Lý Nội Bộ ",
       icon: <Award size={20} />,
       submenu: [
-        { title: "Quản Lý Bài Viết", path: "/admin-organization" },
-        { title: "Quản Lý Thành Viên", path: "/admin-post" },
-        { title: "Departments", path: "/admin/faculty/departments" },
+        { title: "Quản Lý Bài Viết", path: "/owner-post" },
+        { title: "Quản Lý Thành Viên", path: "/owner-user" },
       ],
-    },
-    {
-      id: "schedule",
-      title: "Schedule",
-      icon: <Calendar size={20} />,
-      path: "/admin/schedule",
-    },
-    {
-      id: "communication",
-      title: "Communication",
-      icon: <MessageSquare size={20} />,
-      path: "/admin/communication",
-    },
-    {
-      id: "finance",
-      title: "Finance",
-      icon: <DollarSign size={20} />,
-      path: "/admin/finance",
-    },
-    {
-      id: "reports",
-      title: "Reports",
-      icon: <BarChart2 size={20} />,
-      path: "/admin/reports",
-    },
-    {
-      id: "resources",
-      title: "Resources",
-      icon: <Layers size={20} />,
-      path: "/admin/resources",
-    },
-    {
-      id: "support-requests",
-      title: "Support Requests",
-      icon: <MessageSquare size={20} />,
-      path: "/admin-support",
-    },
-    {
-      id: "settings",
-      title: "Settings",
-      icon: <Settings size={20} />,
-      path: "/admin/settings",
     },
   ];
 
@@ -116,7 +72,6 @@ const OwnerSidebar = ({ showSidebar, isMobile }) => {
           </div>
 
           <div className="sidebar-menu p-2">
-            <p className="text-uppercase text-light small ms-3 mt-3 mb-2">Main Navigation</p>
             <Nav className="flex-column">
               {menuItems.map((item) => (
                 <div key={item.id} className="nav-item-container">

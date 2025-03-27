@@ -17,9 +17,9 @@ const AdminNavbar = ({ toggleSidebar }) => {
           </Button>
           <Navbar.Brand href="/admin" className="d-flex align-items-center">
             <div className="logo-circle me-2">
-              <span>ED</span>
+              <span>CN</span>
             </div>
-            <span className="fw-bold">EduAdmin</span>
+            <span className="fw-bold">CareNet</span>
           </Navbar.Brand>
         </div>
 
@@ -44,14 +44,14 @@ const AdminNavbar = ({ toggleSidebar }) => {
               style={{ cursor: "pointer" }}
             >
               <Image
-                src="https://via.placeholder.com/40"
+                src="https://i.pinimg.com/736x/13/c2/9e/13c29eee725ec2125487ddf0cf119c3c.jpg"
                 alt="User"
                 className="rounded-circle me-2"
                 width="40"
                 height="40"
               />
               <div className="d-none d-md-block">
-                <h6 className="mb-0">John Doe</h6>
+                <h6 className="mb-0">CareNet Admin</h6>
                 <small className="text-muted">Administrator</small>
               </div>
               <ChevronDown size={16} className="ms-2" />
@@ -67,7 +67,7 @@ const AdminNavbar = ({ toggleSidebar }) => {
                 Settings
               </Dropdown.Item>
               <Dropdown.Divider />
-              <Dropdown.Item href="#logout">
+              <Dropdown.Item href="/home">
                 <LogOut size={16} className="me-2" />
                 Logout
               </Dropdown.Item>

@@ -67,7 +67,7 @@ const OwnerNavbar = ({ toggleSidebar }) => {
                 Settings
               </Dropdown.Item>
               <Dropdown.Divider />
-              <Dropdown.Item href="#logout">
+              <Dropdown.Item href="/home">
                 <LogOut size={16} className="me-2" />
                 Logout
               </Dropdown.Item>

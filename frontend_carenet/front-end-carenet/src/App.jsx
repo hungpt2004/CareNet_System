@@ -20,7 +20,7 @@ import SupportRequestPage from './pages/support_page/SupportRequestPage';
 import AdminLayout from './layout/AdminLayout';
 import AdminCourses from './pages/admin_course_page/AdminCoursesPage';
 import AdminStudents from './pages/admin_students_page/AdminStudentsPage';
-import AdminSupportRequests from './pages/admin_support_page/AdminSupportRequest';
+import AdminSupportRequests from './pages/admin_students_page/admin_support_page/AdminSupportRequest';
 import AdminDashboard from './pages/admin_dashboard_page/AdminDashboardPage';
 import AdminOrganizations from './pages/admin_organization_page/admin_organization';
 import AdminVolunteerPosts from './pages/admin_posts_page/AdminPostPage';
@@ -52,7 +52,6 @@ function App() {
             <Route path="/profile-favourite" element={<ProfileFavourite />} />
             <Route path="/failed-register" element={<FailedRegister />} />
             <Route path="/success-register" element={<SuccessRegister />} />
-            <Route path="/upgrade-pro" element={<UpgradePro />} />
             <Route path='/form-register' element={<FormRegisterPage />} />
             <Route path='/event-detail' element={<EventDetail />} />
             <Route path='/feedback' element={<FeedbackManagement />} />
@@ -70,13 +69,14 @@ function App() {
             <Route path='/admin-organization' element={<AdminOrganizations />} />
             <Route path='/admin-post' element={<AdminVolunteerPosts />} />
             <Route path='/admin-attendance' element={<AdminEventAttendance />} />
-            <Route path='/admin-participant' element={<AdminEventParticipants />} />
+            <Route path="/upgrade-pro" element={<UpgradePro />} />
           </Route>
 
           <Route element={<OwnerLayout />}>
             <Route path='/owner-post' element={<OrganizationPostPage />} />
             <Route path='/owner-user' element={<OrganizationUserRequests />} />
             <Route path='/owner-attendance' element={<OrganizationEventAttendance />} />
+            <Route path='/admin-participant' element={<AdminEventParticipants />} />
           </Route>
 
 

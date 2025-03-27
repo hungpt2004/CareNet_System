@@ -24,7 +24,7 @@ const AdminSidebar = ({ showSidebar, isMobile }) => {
   const menuItems = [
     {
       id: "dashboard",
-      title: "Dashboard",
+      title: "Tổng Quan",
       icon: <Home size={20} />,
       path: "/dashboard",
     },
@@ -35,8 +35,6 @@ const AdminSidebar = ({ showSidebar, isMobile }) => {
       submenu: [
         { title: "Quản lý TNV", path: "/student" },
         { title: "Điểm danh TNV", path: "/admin-attendance" },
-        { title: "Phê duyệt TNV", path: "/admin-participant" },
-        { title: "Thành tích TNV", path: "/admin/students/records" },
       ],
     },
     {
@@ -46,50 +44,16 @@ const AdminSidebar = ({ showSidebar, isMobile }) => {
       submenu: [
         { title: "Quản Lý Tổ Chức", path: "/admin-organization" },
         { title: "Quản Lý Bài Đăng", path: "/admin-post" },
-        { title: "Departments", path: "/admin/faculty/departments" },
+
       ],
     },
     {
-      id: "schedule",
-      title: "Schedule",
-      icon: <Calendar size={20} />,
-      path: "/admin/schedule",
-    },
-    {
-      id: "communication",
-      title: "Communication",
-      icon: <MessageSquare size={20} />,
-      path: "/admin/communication",
-    },
-    {
-      id: "finance",
-      title: "Finance",
-      icon: <DollarSign size={20} />,
-      path: "/admin/finance",
-    },
-    {
-      id: "reports",
-      title: "Reports",
-      icon: <BarChart2 size={20} />,
-      path: "/admin/reports",
-    },
-    {
-      id: "resources",
-      title: "Resources",
-      icon: <Layers size={20} />,
-      path: "/admin/resources",
-    },
-    {
-      id: "support-requests",
-      title: "Support Requests",
-      icon: <MessageSquare size={20} />,
-      path: "/admin-support",
-    },
-    {
-      id: "settings",
-      title: "Settings",
-      icon: <Settings size={20} />,
-      path: "/admin/settings",
+      id: "upgrade",
+      title: "Nâng Cấp",
+      icon: <Award size={20} />,
+      submenu: [
+        { title: "Nâng cấp chức năng", path: "/upgrade-pro" },
+      ],
     },
   ];
 
@@ -101,7 +65,7 @@ const AdminSidebar = ({ showSidebar, isMobile }) => {
             <div className="d-flex align-items-center">
               <div className="avatar-container me-3">
                 <img
-                  src="https://via.placeholder.com/50"
+                  src="https://i.pinimg.com/736x/13/c2/9e/13c29eee725ec2125487ddf0cf119c3c.jpg"
                   alt="Admin User"
                   className="rounded-circle"
                   width="50"
@@ -109,14 +73,13 @@ const AdminSidebar = ({ showSidebar, isMobile }) => {
                 />
               </div>
               <div>
-                <h6 className="mb-0 text-white">John Doe</h6>
+                <h6 className="mb-0 text-white">CareNet Admin</h6>
                 <small className="text-light">Administrator</small>
               </div>
             </div>
           </div>
 
           <div className="sidebar-menu p-2">
-            <p className="text-uppercase text-light small ms-3 mt-3 mb-2">Main Navigation</p>
             <Nav className="flex-column">
               {menuItems.map((item) => (
                 <div key={item.id} className="nav-item-container">

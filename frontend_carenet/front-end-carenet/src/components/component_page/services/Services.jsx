@@ -5,23 +5,23 @@ const Services = () => {
   const services = [
     {
       id: 1,
-      title: 'Volunteer',
+      title: 'Tình Nguyện',
       icon: '01',
-      description: 'Provides skill-based, on-demand volunteer opportunities. Only give what you can, when you can.',
+      description: 'Cung cấp các cơ hội tình nguyện dựa trên kỹ năng và nhu cầu. Chỉ cần đóng góp khi bạn có thể.',
       iconColor: '#ff7a59',
     },
     {
       id: 2,
-      title: 'Support',
+      title: 'Hỗ Trợ',
       icon: '02',
-      description: 'In which an expert has a one-to-one conversation with someone seeking help on a specific problem.',
+      description: 'Một chuyên gia trò chuyện trực tiếp với người cần hỗ trợ về một vấn đề cụ thể.',
       iconColor: '#ff7a59',
     },
     {
       id: 3,
-      title: 'Research',
+      title: 'Nghiên Cứu',
       icon: '03',
-      description: 'An essential component for social challenges facing communities. Evidence-based decisions are worth making.',
+      description: 'Một phần thiết yếu cho các thách thức xã hội mà cộng đồng đang đối mặt. Quyết định dựa trên bằng chứng là đáng giá.',
       iconColor: '#ff7a59',
     },
   ];

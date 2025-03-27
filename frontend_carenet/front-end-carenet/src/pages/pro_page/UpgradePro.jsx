@@ -174,7 +174,7 @@ const UpgradePro = () => {
 
   const proFeatures = [
     "Everything in the Free plan, plus",
-    "Amazing feature one",
+    "Post event limited in month",
     "Wonderful feature two",
     "Priceless feature three",
     "Splended feature four",
@@ -211,17 +211,17 @@ const UpgradePro = () => {
           
           .btn-hover:hover {
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(139, 92, 246, 0.3);
+            box-shadow: 0 5px 15px #5DB996
           }
           
           .btn-primary:hover {
-            background-color: #7c3aed !important;
-            border-color: #7c3aed !important;
+            background-color: #5DB996 !important;
+            border-color: #5DB996 !important;
           }
           
           .btn-outline-primary:hover {
-            background-color: rgba(139, 92, 246, 0.1) !important;
-            color: #7c3aed !important;
+            background-color: #5DB996;
+            color: #5DB996!important;
           }
           
           .feature-item {
@@ -362,7 +362,7 @@ const UpgradePro = () => {
                       style={styles.buttonPro}
                       className="btn-hover"
                     >
-                      Subscribe Now
+                      Upgrade Now
                     </Button>
                   </div>
                 </Card.Body>

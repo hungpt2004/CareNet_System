@@ -44,10 +44,10 @@ const Achievements = () => {
         
         <Col md={6} className="d-flex align-items-center justify-content-center">
           <img 
-            src="/path/to/achievement-illustration.png" 
+            src="https://i.pinimg.com/736x/db/66/15/db66153cfa61bd918c9ab610f4ab401c.jpg" 
             alt="CareNet Achievements" 
-            className="img-fluid" 
-            style={{ maxHeight: '400px' }}
+            className="img-fluid rounded-4 w-50" 
+            style={{ maxHeight: '500px' }}
           />
         </Col>
       </Row>

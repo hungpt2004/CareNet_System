@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Button, Container, Nav, Navbar, Image } from "react-bootstrap";
+import { Button, Container, Nav, Navbar, Image, Row, Col } from "react-bootstrap";
+import styles from '../../css/AppColors.module.css'
 
 const CustomNavbarLogged = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -33,7 +34,7 @@ const CustomNavbarLogged = () => {
 
     window.addEventListener("scroll", handleScroll);
     document.addEventListener("mousedown", handleClickOutside);
-    
+
     return () => {
       window.removeEventListener("scroll", handleScroll);
       document.removeEventListener("mousedown", handleClickOutside);
@@ -68,7 +69,16 @@ const CustomNavbarLogged = () => {
     >
       <Container fluid>
         <Navbar.Brand href="#home" className="fw-bold">
-          <h1 style={{letterSpacing: '10px', color: '#5DB996'}} className="fw-bold">CARENET</h1>
+          <Row>
+            <Col><Image
+              src="/volunteer_img/Carenet.png"
+              alt="User"
+              className="rounded-circle me-2"
+              width="60"
+              height="60"
+            /></Col>
+            <Col><h1 style={{ letterSpacing: '10px'}} className={`fw-bold ${styles.textPrimary}`}>CARENET</h1></Col>
+          </Row>
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
@@ -79,12 +89,12 @@ const CustomNavbarLogged = () => {
             <Nav.Link href="#testimonials" className="hover-underline">Chia sẻ</Nav.Link>
             <Nav.Link href="#contact" className="hover-underline">Liên hệ</Nav.Link>
           </Nav>
-          
+
           {isLoggedIn ? (
             <div className="ms-3 position-relative" ref={dropdownRef}>
-              <div 
+              <div
                 onClick={toggleDropdown}
-                style={{ 
+                style={{
                   cursor: 'pointer',
                   width: '40px',
                   height: '40px',
@@ -93,19 +103,19 @@ const CustomNavbarLogged = () => {
                   border: '2px solid #5DB996'
                 }}
               >
-                <Image 
-                  src={userInfo.avatarUrl} 
-                  width="100%" 
-                  height="100%" 
-                  style={{ objectFit: 'cover' }} 
+                <Image
+                  src={userInfo.avatarUrl}
+                  width="100%"
+                  height="100%"
+                  style={{ objectFit: 'cover' }}
                   alt="Avatar"
                 />
               </div>
-              
+
               {dropdownOpen && (
-                <div 
+                <div
                   className="position-absolute end-0 mt-2 py-2 bg-white rounded shadow"
-                  style={{ 
+                  style={{
                     width: '220px',
                     zIndex: 1051,
                   }}
@@ -126,15 +136,15 @@ const CustomNavbarLogged = () => {
             </div>
           ) : (
             <>
-              <Button style={{backgroundColor: '#5DB996', borderColor: '#5DB996'}} className="ms-2">
+              <Button style={{ backgroundColor: '#5DB996', borderColor: '#5DB996' }} className="ms-2">
                 Đăng nhập
               </Button>
-              <Button style={{backgroundColor: '#FBF6E9', borderColor: 'grey'}} className="ms-2 text-dark">
+              <Button style={{ backgroundColor: '#FBF6E9', borderColor: 'grey' }} className="ms-2 text-dark">
                 Đăng Kí
               </Button>
             </>
           )}
-          
+
         </Navbar.Collapse>
       </Container>
     </Navbar>
