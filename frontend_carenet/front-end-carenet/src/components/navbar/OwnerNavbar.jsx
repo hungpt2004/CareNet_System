@@ -44,7 +44,7 @@ const OwnerNavbar = ({ toggleSidebar }) => {
               style={{ cursor: "pointer" }}
             >
               <Image
-                src="https://via.placeholder.com/40"
+                src="https://i.pinimg.com/736x/8a/a9/c5/8aa9c5d8429f561000f1de8e7f6d5a32.jpg"
                 alt="User"
                 className="rounded-circle me-2"
                 width="40"

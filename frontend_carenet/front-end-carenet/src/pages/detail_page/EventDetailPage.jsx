@@ -19,56 +19,57 @@ const customStyles = {
 // Mock event data
 const eventData = {
    id: 1,
-   name: "Beach Cleanup Drive",
-   location: "Coastal Beach Park, 123 Shoreline Dr",
+   name: "Chiến Dịch Dọn Rác Bãi Biển",
+   location: "Công Viên Bãi Biển Ven Biển, 123 Shoreline Dr",
    startDate: "2025-04-15T09:00:00",
    endDate: "2025-04-15T13:00:00",
-   category: "Environment",
-   description: "Join us for a community beach cleanup to protect marine life and keep our beaches beautiful. This event is suitable for all ages and abilities. We'll provide all necessary equipment including gloves, trash bags, and trash pickers. Please wear comfortable clothes and bring sunscreen, a hat, and a reusable water bottle.",
-   longDescription: "Our beaches are facing a crisis with increasing amounts of plastic and other waste washing up on our shores. This not only affects the beauty of our coastlines but also poses a serious threat to marine life and ecosystems.\n\nBy participating in this cleanup event, you'll be making a direct impact on the health of our local environment. Last year, our volunteers collected over 500 pounds of trash in just one day!\n\nThe event will begin with a brief orientation about the types of waste we commonly find and how to safely collect them. We'll then break into small teams to cover different sections of the beach. After the cleanup, we'll gather to sort and record the waste collected for environmental monitoring purposes.",
-   organizer: "Ocean Conservation Group",
+   category: "Môi Trường",
+   description: "Tham gia cùng chúng tôi trong chiến dịch dọn rác bãi biển để bảo vệ sinh vật biển và giữ cho bãi biển luôn sạch đẹp. Sự kiện phù hợp với mọi lứa tuổi và khả năng. Chúng tôi sẽ cung cấp tất cả các thiết bị cần thiết bao gồm găng tay, túi rác và dụng cụ gắp rác. Vui lòng mặc quần áo thoải mái và mang theo kem chống nắng, mũ và chai nước tái sử dụng.",
+   longDescription: "Các bãi biển của chúng ta đang phải đối mặt với vấn đề ngày càng nhiều rác thải nhựa và các loại rác khác trôi dạt vào bờ. Điều này không chỉ ảnh hưởng đến vẻ đẹp của bờ biển mà còn gây ra mối đe dọa nghiêm trọng đối với sinh vật biển và hệ sinh thái.\n\nBằng cách tham gia sự kiện dọn rác này, bạn sẽ trực tiếp góp phần cải thiện sức khỏe của môi trường địa phương. Năm ngoái, các tình nguyện viên của chúng tôi đã thu gom được hơn 500 pound rác chỉ trong một ngày!\n\nSự kiện sẽ bắt đầu với phần giới thiệu ngắn về các loại rác thường gặp và cách thu gom an toàn. Sau đó, chúng ta sẽ chia thành các nhóm nhỏ để dọn dẹp từng khu vực của bãi biển. Sau khi dọn xong, chúng ta sẽ tập trung để phân loại và ghi nhận số lượng rác thu thập được nhằm phục vụ mục đích theo dõi môi trường.",
+   organizer: "Nhóm Bảo Vệ Đại Dương",
    organizerLogo: "/placeholder.svg?height=50&width=50",
-   organizerDescription: "A non-profit organization dedicated to protecting marine ecosystems through education, advocacy, and direct action.",
+   organizerDescription: "Tổ chức phi lợi nhuận dành cho việc bảo vệ hệ sinh thái biển thông qua giáo dục, vận động và hành động trực tiếp.",
    participants: 45,
    maxParticipants: 75,
-   skills: ["No experience needed", "All ages welcome", "Physical activity: Light"],
-   whatToBring: ["Comfortable clothes", "Sunscreen", "Hat", "Reusable water bottle"],
-   whatProvided: ["Gloves", "Trash bags", "Trash pickers", "Refreshments"],
+   skills: ["Không cần kinh nghiệm", "Chào đón mọi lứa tuổi", "Hoạt động thể chất: Nhẹ nhàng"],
+   whatToBring: ["Quần áo thoải mái", "Kem chống nắng", "Mũ", "Chai nước tái sử dụng"],
+   whatProvided: ["Găng tay", "Túi rác", "Dụng cụ gắp rác", "Nước giải khát"],
    coordinates: { lat: 10.762622, lng: 106.660172 },
    image: "/placeholder.svg?height=400&width=800",
    gallery: [
-      "/placeholder.svg?height=100&width=100",
-      "/placeholder.svg?height=100&width=100",
-      "/placeholder.svg?height=100&width=100",
-      "/placeholder.svg?height=100&width=100"
+      "https://i.pinimg.com/736x/e7/04/56/e7045643b35fba6754bf68e0dcae3bb0.jpg",
+      "https://i.pinimg.com/736x/b5/7d/f5/b57df5976700b222adc77766fc0e232e.jpg",
+      "https://i.pinimg.com/736x/00/27/65/002765ee261fbc54e8d549ea4cf2cd7e.jpg",
+      "https://i.pinimg.com/736x/d0/5a/69/d05a697a30fa47e016c2fded0cf2350a.jpg"
    ],
    reviews: [
       {
          id: 1,
          user: "Sarah Johnson",
-         avatar: "/placeholder.svg?height=40&width=40",
+         avatar: "https://i.pinimg.com/736x/25/33/8f/25338f488af2c45912c15ebab325e363.jpg",
          date: "2024-03-10",
          rating: 5,
-         comment: "This was my first time volunteering for a beach cleanup and it was an amazing experience! The organizers were very friendly and everything was well planned."
+         comment: "Đây là lần đầu tiên tôi tham gia dọn rác bãi biển và đó là một trải nghiệm tuyệt vời! Những người tổ chức rất thân thiện và mọi thứ được sắp xếp rất chu đáo."
       },
       {
          id: 2,
          user: "Michael Chen",
-         avatar: "/placeholder.svg?height=40&width=40",
+         avatar: "https://i.pinimg.com/736x/8d/e6/21/8de621e960298a6c9374933bbd91a69d.jpg",
          date: "2024-03-05",
          rating: 4,
-         comment: "Great event for families. My kids learned a lot about environmental protection while having fun. Would definitely participate again."
+         comment: "Sự kiện rất phù hợp cho gia đình. Các con tôi đã học được rất nhiều về bảo vệ môi trường trong khi vẫn vui chơi. Chắc chắn sẽ tham gia lần nữa."
       },
       {
          id: 3,
          user: "Emily Rodriguez",
-         avatar: "/placeholder.svg?height=40&width=40",
+         avatar: "https://i.pinimg.com/736x/3a/7a/37/3a7a37a296e99f1709212644c9e3d141.jpg",
          date: "2024-02-28",
          rating: 5,
-         comment: "Very well organized event. I was impressed by how much trash we collected and the impact we made in just a few hours."
+         comment: "Sự kiện được tổ chức rất tốt. Tôi rất ấn tượng với lượng rác chúng tôi đã thu gom được và tác động mà chúng tôi tạo ra chỉ trong vài giờ."
       }
    ]
 }
+
 
 export default function EventDetail() {
    const [isFavorite, setIsFavorite] = useState(false)
@@ -109,6 +110,10 @@ export default function EventDetail() {
       navigate('/form-register')
    }
 
+   const handleBackBeforePage = () => {
+      navigate('/search');
+   }
+
    // Calculate average rating
    const averageRating = eventData.reviews.reduce((acc, review) => acc + review.rating, 0) / eventData.reviews.length
 
@@ -116,25 +121,24 @@ export default function EventDetail() {
    const participationPercentage = (eventData.participants / eventData.maxParticipants) * 100
 
    return (
-      <Container fluid  className={`${styles.body} py-4 min-vh-100`}>
+      <Container fluid className={`${styles.body} py-4 min-vh-100`}>
          <Container>
             {/* Back button */}
-            <Link href="/search" passHref>
-               <Button
-                  variant="link"
-                  className="mb-3 p-0"
-                  style={{ color: customStyles.primaryColor }}
-               >
-                  <ChevronLeft size={16} className="me-1" />
-                  Back to Events
-               </Button>
-            </Link>
+            <Button
+               variant="link"
+               className="mb-3 p-0"
+               onClick={() => handleBackBeforePage()}
+               style={{ color: customStyles.primaryColor }}
+            >
+               <ChevronLeft size={16} className="me-1" />
+               Trở về trang trước đó
+            </Button>
 
             {/* Event Header */}
             <Card className="border-0 shadow-sm mb-4 overflow-hidden">
                <div className="position-relative">
                   <img
-                     src={eventData.image || "/placeholder.svg"}
+                     src={"https://i.pinimg.com/736x/59/68/16/5968160f97edba47dcc44a41d89829d5.jpg"}
                      alt={eventData.name}
                      className="w-100 object-fit-cover"
                      style={{ maxHeight: '400px' }}
@@ -174,7 +178,7 @@ export default function EventDetail() {
                         <div className="d-flex align-items-center mb-4">
                            <Users size={20} className="me-2" style={{ color: customStyles.primaryColor }} />
                            <div>
-                              <strong>{eventData.participants} participants</strong>
+                              <strong>{eventData.participants} người tham gia</strong>
                               <div className="text-muted">{eventData.maxParticipants - eventData.participants} spots left</div>
                            </div>
                         </div>
@@ -193,8 +197,8 @@ export default function EventDetail() {
                               />
                            </ProgressBar>
                            <div className="d-flex justify-content-between mt-1">
-                              <small className="text-muted">{eventData.participants} joined</small>
-                              <small className="text-muted">{eventData.maxParticipants} max</small>
+                              <small className="text-muted">{eventData.participants} đã tham gia</small>
+                              <small className="text-muted">{eventData.maxParticipants} tối đa</small>
                            </div>
                         </div>
                      </Col>
@@ -207,7 +211,7 @@ export default function EventDetail() {
                               onClick={() => alert('Share functionality would go here')}
                            >
                               <Share2 size={16} className="me-1" />
-                              Share
+                              Chia sẻ
                            </Button>
                            <Button
                               variant={isFavorite ? "primary" : "outline-primary"}
@@ -233,7 +237,7 @@ export default function EventDetail() {
                                  borderColor: customStyles.primaryColor
                               }}
                            >
-                              Register Now
+                              Ghi danh ngay
                            </Button>
                         </div>
                      </Col>
@@ -247,7 +251,7 @@ export default function EventDetail() {
                   {/* Description */}
                   <Card className="border-0 shadow-sm mb-4">
                      <Card.Body className="p-4">
-                        <h3 className="mb-3">About This Event</h3>
+                        <h3 className="mb-3">Thông tin về sự kiện này</h3>
                         <p className="mb-4">{eventData.description}</p>
                         <p style={{ whiteSpace: 'pre-line' }}>{eventData.longDescription}</p>
                      </Card.Body>
@@ -256,9 +260,9 @@ export default function EventDetail() {
                   {/* What to Expect */}
                   <Card className="border-0 shadow-sm mb-4">
                      <Card.Body className="p-4">
-                        <h3 className="mb-3">What to Expect</h3>
+                        <h3 className="mb-3">Điều mong đợi ?</h3>
 
-                        <h5 className="mb-2">Skills Required</h5>
+                        <h5 className="mb-2">Kĩ năng yêu cầu</h5>
                         <div className="d-flex flex-wrap gap-2 mb-4">
                            {eventData.skills.map((skill, index) => (
                               <Badge
@@ -276,7 +280,7 @@ export default function EventDetail() {
 
                         <Row className="mb-3">
                            <Col md={6}>
-                              <h5 className="mb-2">What to Bring</h5>
+                              <h5 className="mb-2">Cần trang bị gì ?</h5>
                               <ListGroup variant="flush">
                                  {eventData.whatToBring.map((item, index) => (
                                     <ListGroup.Item key={index} className="px-0 py-2 border-0">
@@ -288,7 +292,7 @@ export default function EventDetail() {
                            </Col>
 
                            <Col md={6}>
-                              <h5 className="mb-2">What's Provided</h5>
+                              <h5 className="mb-2">Vật dụng cung cấp</h5>
                               <ListGroup variant="flush">
                                  {eventData.whatProvided.map((item, index) => (
                                     <ListGroup.Item key={index} className="px-0 py-2 border-0">
@@ -305,7 +309,7 @@ export default function EventDetail() {
                   {/* Photo Gallery */}
                   <Card className="border-0 shadow-sm mb-4">
                      <Card.Body className="p-4">
-                        <h3 className="mb-3">Photo Gallery</h3>
+                        <h3 className="mb-3">Ảnh của sự kiện</h3>
                         <div className="d-flex gap-2 flex-wrap">
                            {eventData.gallery.map((photo, index) => (
                               <img
@@ -324,7 +328,7 @@ export default function EventDetail() {
                   <Card className="border-0 shadow-sm mb-4">
                      <Card.Body className="p-4">
                         <div className="d-flex justify-content-between align-items-center mb-4">
-                           <h3 className="mb-0">Volunteer Feedback</h3>
+                           <h3 className="mb-0">Đánh giá của tình nguyện viên</h3>
                            <div className="d-flex align-items-center">
                               <div className="me-2">
                                  {[...Array(5)].map((_, i) => (
@@ -343,7 +347,7 @@ export default function EventDetail() {
 
                         {showThankYou && (
                            <Alert variant="success" className="mb-4">
-                              Thank you for your feedback! Your review has been submitted.
+                              Cảm ơn vì đã góp ý cho {eventData.name}
                            </Alert>
                         )}
 
@@ -387,7 +391,7 @@ export default function EventDetail() {
                                        borderColor: customStyles.primaryColor
                                     }}
                                  >
-                                    Submit Review
+                                    Gửi đánh giá
                                  </Button>
                               </Form>
                            </Card.Body>
@@ -498,25 +502,25 @@ export default function EventDetail() {
                   {/* Similar Events */}
                   <Card className="border-0 shadow-sm">
                      <Card.Body className="p-4">
-                        <h3 className="mb-3">Similar Events</h3>
+                        <h3 className="mb-3">Sự Kiện Tương Tự</h3>
                         <div className="d-flex flex-column gap-3">
                            {[1, 2, 3].map((item) => (
                               <div key={item} className="d-flex">
                                  <img
-                                    src="/placeholder.svg?height=60&width=60"
-                                    alt="Event thumbnail"
+                                    src="https://i.pinimg.com/736x/49/9e/14/499e14f2275c85224394c4ba8934083c.jpg"
+                                    alt="Hình thu nhỏ sự kiện"
                                     className="rounded me-3"
                                     style={{ width: '60px', height: '60px', objectFit: 'cover' }}
                                  />
                                  <div>
-                                    <h6 className="mb-1">Tree Planting Initiative</h6>
+                                    <h6 className="mb-1">Sáng Kiến Trồng Cây</h6>
                                     <div className="d-flex align-items-center text-muted small mb-1">
                                        <Calendar size={12} className="me-1" />
-                                       Apr 20, 2025
+                                       20 Tháng 4, 2025
                                     </div>
                                     <div className="d-flex align-items-center text-muted small">
                                        <MapPin size={12} className="me-1" />
-                                       Urban Forest Park
+                                       Công Viên Rừng Đô Thị
                                     </div>
                                  </div>
                               </div>
@@ -527,10 +531,11 @@ export default function EventDetail() {
                            className="w-100 mt-3 text-decoration-none"
                            style={{ color: customStyles.primaryColor }}
                         >
-                           View More Events
+                           Xem Thêm Sự Kiện
                         </Button>
                      </Card.Body>
                   </Card>
+
                </Col>
             </Row>
 

@@ -44,7 +44,7 @@ const SuccessRegister = () => {
       transitionDelay: "0.3s",
     },
     checkIcon: {
-      color: "#0E606E",
+      color: "#5db996",
       strokeWidth: 3,
       animation: "pulse 2s infinite",
     },
@@ -75,8 +75,8 @@ const SuccessRegister = () => {
     },
     confirmBtn: {
       padding: "0.5rem 1.5rem",
-      backgroundColor: "#0E606E",
-      borderColor: "#0E606E",
+      backgroundColor: "#5db996",
+      borderColor: "#5db996",
       transition: "all 0.3s ease",
     },
   };
@@ -113,8 +113,8 @@ const SuccessRegister = () => {
           }
           
           .confirm-btn:hover {
-            background-color: #0a4b56 !important;
-            border-color: #0a4b56 !important;
+            background-color: #5db996 !important;
+            border-color: #5db996 !important;
           }
         `}
       </style>

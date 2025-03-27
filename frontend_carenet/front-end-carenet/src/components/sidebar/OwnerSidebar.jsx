@@ -33,9 +33,9 @@ const OwnerSidebar = ({ showSidebar, isMobile }) => {
       title: "Tình Nguyện Viên",
       icon: <Users size={20} />,
       submenu: [
-        { title: "Quản lý TNV", path: "/student" },
-        { title: "Điểm danh TNV", path: "/admin-attendance" },
-        { title: "Phê duyệt TNV", path: "/admin-participant" },
+        { title: "Danh sách TNV", path: "/student" },
+        { title: "Điểm danh TNV", path: "/owner-attendance" },
+        { title: "Phê duyệt TNV", path: "/owner-user" },
         { title: "Thành tích TNV", path: "/admin/students/records" },
       ],
     },
@@ -101,7 +101,7 @@ const OwnerSidebar = ({ showSidebar, isMobile }) => {
             <div className="d-flex align-items-center">
               <div className="avatar-container me-3">
                 <img
-                  src="https://via.placeholder.com/50"
+                  src="https://i.pinimg.com/736x/8a/a9/c5/8aa9c5d8429f561000f1de8e7f6d5a32.jpg"
                   alt="Admin User"
                   className="rounded-circle"
                   width="50"
@@ -109,8 +109,8 @@ const OwnerSidebar = ({ showSidebar, isMobile }) => {
                 />
               </div>
               <div>
-                <h6 className="mb-0 text-white">John Doe</h6>
-                <small className="text-light">Administrator</small>
+                <h6 className="mb-0 text-white">FPT University</h6>
+                <small className="text-light">Organization</small>
               </div>
             </div>
           </div>

@@ -9,6 +9,10 @@
   --color-secondary: #02301a;
 }
 
+.backgroundPrimary {
+  background-color: var(--color-accent);
+}
+
 .body {
   background-color: var(--color-background);
   color: var(--color-primary);

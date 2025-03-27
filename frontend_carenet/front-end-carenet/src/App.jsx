@@ -29,6 +29,11 @@ import AdminEventParticipants from './pages/admin_students_page/AdminEventPartic
 import { ToastProvider } from './components/toast/ToastNotification';
 import OwnerLayout from './layout/OwnerLayout';
 import OrganizationPostPage from './pages/organization_post_page/OrganizationPostPage';
+import ProfileScore from './pages/profile_page/ProfileScore';
+import ProfileCertificate from './pages/profile_page/ProfileCertificate';
+import FeedbackPage from './pages/feedback_page/FeedbackPage';
+import OrganizationUserRequests from './pages/organization_user_page/OrganizationUserRequest';
+import OrganizationEventAttendance from './pages/organization_user_page/OrganizationUserAttendance';
 
 function App() {
   return (
@@ -70,6 +75,8 @@ function App() {
 
           <Route element={<OwnerLayout />}>
             <Route path='/owner-post' element={<OrganizationPostPage />} />
+            <Route path='/owner-user' element={<OrganizationUserRequests />} />
+            <Route path='/owner-attendance' element={<OrganizationEventAttendance />} />
           </Route>
 
 

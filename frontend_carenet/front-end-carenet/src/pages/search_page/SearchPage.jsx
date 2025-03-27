@@ -266,7 +266,7 @@ export default function VolunteerEventSearch() {
 
             <Col md={4}>
               <Form.Select name="category" value={searchFilters.category} onChange={handleInputChange}>
-                <option value="">All Categories</option>
+                <option value="">Tất cả các lĩnh vực</option>
                 {categories.map((category, index) => (
                   <option key={index} value={category}>
                     {category}
@@ -314,10 +314,10 @@ export default function VolunteerEventSearch() {
                   borderColor: customStyles.primaryColor,
                 }}
               >
-                Search Events
+                Tìm kiếm sự kiện
               </Button>
               <Button variant="outline-secondary" onClick={resetFilters}>
-                Reset
+                Tải lại
               </Button>
             </Col>
           </Row>
@@ -328,7 +328,7 @@ export default function VolunteerEventSearch() {
           <Col lg={3} className="mb-4">
             <Card className="">
               <Card.Header style={{ backgroundColor: customStyles.primaryColor, color: "white" }}>
-                <h5 className="text-center mb-0">Map Filter</h5>
+                <h5 className="text-center mb-0">Chọn từ Map</h5>
               </Card.Header>
               <Card.Body className="p-0">
                 {/* Placeholder for map - in a real implementation, you would integrate a map library here */}
@@ -385,7 +385,7 @@ export default function VolunteerEventSearch() {
             {/* Sort Options */}
             <div className="d-flex justify-content-between align-items-center mb-3">
               <p className="mb-0">
-                <strong>{filteredEvents.length}</strong> events found
+                <strong>{filteredEvents.length}</strong> sự kiện phù hợp đã tìm thấy
               </p>
 
               <Dropdown>
@@ -395,7 +395,7 @@ export default function VolunteerEventSearch() {
                   style={{ borderColor: customStyles.primaryColor, color: customStyles.primaryColor }}
                 >
                   <ArrowUpDown size={16} className="me-2" />
-                  Sort by:{" "}
+                  Sắp xếp theo:{" "}
                   {sortOption === "name"
                     ? "Name"
                     : sortOption === "startDate"
@@ -406,10 +406,10 @@ export default function VolunteerEventSearch() {
                 </Dropdown.Toggle>
 
                 <Dropdown.Menu>
-                  <Dropdown.Item onClick={() => sortEvents(undefined, "name")}>Name</Dropdown.Item>
-                  <Dropdown.Item onClick={() => sortEvents(undefined, "startDate")}>Start Date</Dropdown.Item>
-                  <Dropdown.Item onClick={() => sortEvents(undefined, "endDate")}>End Date</Dropdown.Item>
-                  <Dropdown.Item onClick={() => sortEvents(undefined, "participants")}>Popularity</Dropdown.Item>
+                  <Dropdown.Item onClick={() => sortEvents(undefined, "name")}>Tên</Dropdown.Item>
+                  <Dropdown.Item onClick={() => sortEvents(undefined, "startDate")}>Ngày bắt đầu</Dropdown.Item>
+                  <Dropdown.Item onClick={() => sortEvents(undefined, "endDate")}>Ngày kết thúc</Dropdown.Item>
+                  <Dropdown.Item onClick={() => sortEvents(undefined, "participants")}>Độ phổ biến</Dropdown.Item>
                 </Dropdown.Menu>
               </Dropdown>
             </div>
@@ -422,7 +422,8 @@ export default function VolunteerEventSearch() {
             ) : (filteredEvents.length > 0 ? (
               <div className="d-grid gap-3">
                 {filteredEvents.map((event) => (
-                  <Card key={event.id} className="hover-shadow" style={{ borderColor: "#e0e0e0" }}>
+                  <Card key={event.id} className="hover-shadow shadow mb-2 bg-white rounded" style={{ borderColor: "#e0e0e0" }}>
+                    <Card.Header className={`${styles.backgroundPrimary}`}></Card.Header>
                     <Card.Body>
                       <Row>
                         <Col md={8}>
@@ -432,7 +433,7 @@ export default function VolunteerEventSearch() {
                             {event.location}
                           </h6>
                           <p className="mb-2">{event.description}</p>
-                          <p className="mb-2 text-muted">Organized by: {event.organizer}</p>
+                          <p className="mb-2 text-muted">Được tổ chức bởi: {event.organizer}</p>
                           <Badge
                             className="me-2"
                             style={{
@@ -450,10 +451,10 @@ export default function VolunteerEventSearch() {
                                 <Calendar size={16} className="me-2" style={{ color: customStyles.primaryColor }} />
                                 <div>
                                   <div>
-                                    <strong>Start:</strong> {formatDateVN(event.startDate)}
+                                    <strong>Bắt đầu:</strong> {formatDateVN(event.startDate)}
                                   </div>
                                   <div>
-                                    <strong>End:</strong> {formatDateVN(event.endDate)}
+                                    <strong>Kết thúc:</strong> {formatDateVN(event.endDate)}
                                   </div>
                                 </div>
                               </div>
@@ -471,7 +472,7 @@ export default function VolunteerEventSearch() {
                                 borderColor: customStyles.primaryColor,
                               }}
                             >
-                              View Details
+                              Xem thông tin
                             </Button>
                           </div>
                         </Col>
@@ -483,8 +484,8 @@ export default function VolunteerEventSearch() {
             ) : (
               <div className="text-center p-5 rounded" style={{ backgroundColor: "white" }}>
                 <Filter size={48} className="mb-3 text-muted" />
-                <h4>No events match your search criteria</h4>
-                <p className="text-muted">Try adjusting your filters or search terms</p>
+                <h4>Không sự kiện phù hợp nào được tìm thấy</h4>
+                <p className="text-muted">Hãy thử tìm kiếm theo những tiêu chí khác</p>
                 <Button
                   onClick={resetFilters}
                   style={{
@@ -492,7 +493,7 @@ export default function VolunteerEventSearch() {
                     borderColor: customStyles.primaryColor,
                   }}
                 >
-                  Reset Filters
+                  Reset tìm kiếm
                 </Button>
               </div>
             ))}

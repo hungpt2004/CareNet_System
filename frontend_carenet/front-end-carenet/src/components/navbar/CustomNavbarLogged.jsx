@@ -117,7 +117,8 @@ const CustomNavbarLogged = () => {
                   <Nav className="flex-column">
                     <Nav.Link href="/profile-information" className="px-4 py-2">Thông tin cá nhân</Nav.Link>
                     <Nav.Link href="/support" className="px-4 py-2">CSKH</Nav.Link>
-                    <Nav.Link href="#settings" className="px-4 py-2">Cài đặt</Nav.Link>
+                    <Nav.Link href="/owner-post" className="px-4 py-2">Tài khoản Organization</Nav.Link>
+                    <Nav.Link href="/dashboard" className="px-4 py-2">Tài khoản Admin</Nav.Link>
                     <Nav.Link onClick={handleLogout} className="px-4 py-2 text-danger">Đăng xuất</Nav.Link>
                   </Nav>
                 </div>
