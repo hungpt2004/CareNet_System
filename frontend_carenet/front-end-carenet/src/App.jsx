@@ -15,6 +15,7 @@ function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/" element={<ProfileInformation />} />
         <Route path="/landing-page" element={<LandingPage />} />
         <Route path="/profile-information" element={<ProfileInformation />} />
         <Route path="/profile-avatar" element={<ProfileAvatar />} />
