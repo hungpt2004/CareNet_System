@@ -12,15 +12,12 @@ import UpgradePro from "./pages/pro_page/UpgradePro";
 import CustomerLayout from './layout/CustomerLayout';
 import FormRegisterPage from './pages/register_event_page/FormRegisterPage';
 import EventDetail from './pages/detail_page/EventDetailPage';
-import LoginPage from "./pages/login_page/LoginPage";
-import RegisterPage from "./pages/register_page/RegisterPage";
 import ForgotPasswordPage from "./pages/forgotpassword_page/ForgotPasswordPage";
 import FeedbackManagement from "./pages/feedbackmanagerment_page/FeedbackManagement";
 import SupportRequestPage from './pages/support_page/SupportRequestPage';
 import AdminLayout from './layout/AdminLayout';
 import AdminCourses from './pages/admin_course_page/AdminCoursesPage';
 import AdminStudents from './pages/admin_students_page/AdminStudentsPage';
-import AdminSupportRequests from './pages/admin_students_page/admin_support_page/AdminSupportRequest';
 import AdminDashboard from './pages/admin_dashboard_page/AdminDashboardPage';
 import AdminOrganizations from './pages/admin_organization_page/admin_organization';
 import AdminVolunteerPosts from './pages/admin_posts_page/AdminPostPage';
@@ -34,6 +31,8 @@ import ProfileCertificate from './pages/profile_page/ProfileCertificate';
 import FeedbackPage from './pages/feedback_page/FeedbackPage';
 import OrganizationUserRequests from './pages/organization_user_page/OrganizationUserRequest';
 import OrganizationEventAttendance from './pages/organization_user_page/OrganizationUserAttendance';
+import AdminSupportRequests from './pages/admin_support_page/AdminSupportRequest';
+import AuthenGatePage from './pages/login_page/AuthenGatePage';
 
 function App() {
   return (
@@ -80,8 +79,7 @@ function App() {
           </Route>
 
 
-          <Route path='/' element={<LoginPage />} />
-          <Route path='/register' element={<RegisterPage />} />
+          <Route path='/' element={<AuthenGatePage />} />
           <Route path='/forgotpassword' element={<ForgotPasswordPage />} />
 
         </Routes>
