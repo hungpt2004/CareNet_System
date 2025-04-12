@@ -6,11 +6,11 @@ const Schema = mongoose.Schema;
 const OrganizationSubscription = new Schema({
   _id: {type: Schema.ObjectId, ref: 'User'}, 
   organizationId: {type: Schema.ObjectId, ref: 'Organization'}, 
-  planId: {type: Schema.ObjectId, ref: 'OrganizationLevel'}, 
+  levelId: {type: Schema.ObjectId, ref: 'OrganizationLevel'}, 
   price: {type: Number},
   subscribedAt: {type: Date, default: new Date.now}, // Ngày bắt đầu dùng gói
   expiredAt:  {type: Date, default: new Date.now}, // Ngày hết hạn
-  status: {type: String, default: 'not paid', enum: ["paid"]},
+  status: {type: String, default: 'not paid', enum: ["paid","not paid"]},
 });
 
 module.exports = mongoose.model(

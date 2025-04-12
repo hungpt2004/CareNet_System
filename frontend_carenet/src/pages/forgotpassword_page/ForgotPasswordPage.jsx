@@ -55,7 +55,7 @@ const ForgotPasswordPage = () => {
             </Form>
 
             <p className="text-center text-muted mt-3">
-              <a href="/login" className="text-primary">
+              <a href="/" className="text-primary">
                 Quay lại đăng nhập
               </a>
             </p>

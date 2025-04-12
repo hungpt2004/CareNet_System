@@ -33,55 +33,119 @@ import OrganizationUserRequests from './pages/organization_user_page/Organizatio
 import OrganizationEventAttendance from './pages/organization_user_page/OrganizationUserAttendance';
 import AdminSupportRequests from './pages/admin_support_page/AdminSupportRequest';
 import AuthenGatePage from './pages/login_page/AuthenGatePage';
+import ProtectedRoute from './layout/ProtectedLayout';
+import GuestLayout from './layout/GuestLayout';
+
+const guestRoutes = [
+  { path: '/', element: <LandingPage /> },
+  { path: '/search', element: <VolunteerEventSearch /> },
+];
+
+const publicRoutes = [
+  { path: '/login', element: <AuthenGatePage /> },
+  { path: '/forgot-password', element: <ForgotPasswordPage /> },
+]
+
+const privateCustomerRoutes = [
+  { path: '/profile-information', element: <ProfileInformation /> },
+  { path: '/profile-avatar', element: <ProfileAvatar /> },
+  { path: '/profile-history', element: <ProfileHistory /> },
+  { path: '/profile-favourite', element: <ProfileFavourite /> },
+  { path: '/failed-register', element: <FailedRegister /> },
+  { path: '/success-register', element: <SuccessRegister /> },
+  { path: '/form-register', element: <FormRegisterPage /> },
+  { path: '/event-detail', element: <EventDetail /> },
+  { path: '/feedback', element: <FeedbackManagement /> },
+  { path: '/support', element: <SupportRequestPage /> },
+  { path: '/profile-score', element: <ProfileScore /> },
+  { path: '/profile-certificate', element: <ProfileCertificate /> },
+  { path: '/feedback-page', element: <FeedbackPage /> },
+];
+
+const privateAdminRoutes = [
+  { path: '/dashboard', element: <AdminDashboard /> },
+  { path: '/course', element: <AdminCourses /> },
+  { path: '/student', element: <AdminStudents /> },
+  { path: '/admin-support', element: <AdminSupportRequests /> },
+  { path: '/admin-organization', element: <AdminOrganizations /> },
+  { path: '/admin-post', element: <AdminVolunteerPosts /> },
+  { path: '/admin-attendance', element: <AdminEventAttendance /> },
+  { path: '/upgrade-pro', element: <UpgradePro /> },
+];
+
+const privateOwnerRoutes = [
+  { path: '/owner-post', element: <OrganizationPostPage /> },
+  { path: '/owner-user', element: <OrganizationUserRequests /> },
+  { path: '/owner-attendance', element: <OrganizationEventAttendance /> },
+  { path: '/admin-participant', element: <AdminEventParticipants /> },
+];
+
 
 function App() {
   return (
     <ToastProvider>
       <Router>
         <Routes>
+          {/* Public Routes */}
+          {publicRoutes.map(({ path, element }) => (
+              <Route key={path} path={path} element={element} />
+          ))}
 
-          {/* Have navbar customer */}
+
+          {/* Guest */}
+          <Route element={<GuestLayout />}>
+            {guestRoutes.map(({ path, element }) => (
+              <Route key={path} path={path} element={element} />
+            ))}
+          </Route>
+
+          {/* Customer Routes - Requires login with 'customer' role */}
           <Route element={<CustomerLayout />}>
-            <Route path='/home' element={<LandingPage />} />
-            <Route path='/search' element={<VolunteerEventSearch />} />
-            <Route path="/landing-page" element={<LandingPage />} />
-            <Route path="/profile-information" element={<ProfileInformation />} />
-            <Route path="/profile-avatar" element={<ProfileAvatar />} />
-            <Route path="/profile-history" element={<ProfileHistory />} />
-            <Route path="/profile-favourite" element={<ProfileFavourite />} />
-            <Route path="/failed-register" element={<FailedRegister />} />
-            <Route path="/success-register" element={<SuccessRegister />} />
-            <Route path='/form-register' element={<FormRegisterPage />} />
-            <Route path='/event-detail' element={<EventDetail />} />
-            <Route path='/feedback' element={<FeedbackManagement />} />
-            <Route path='/support' element={<SupportRequestPage />} />
-            <Route path="/profile-score" element={<ProfileScore />} />
-            <Route path="/profile-certificate" element={<ProfileCertificate />} />
-            <Route path="/feedback-page" element={<FeedbackPage />} />
+            {privateCustomerRoutes.map(({ path, element }) => (
+              <Route
+                key={path}
+                path={path}
+                element={
+                  <ProtectedRoute allowedRoles={['volunteer']}>
+                    {element}
+                  </ProtectedRoute>
+                }
+              />
+            ))}
           </Route>
 
+          {/* STAFF */}
+
+
+          {/* Admin Routes - Requires login with 'admin' role */}
           <Route element={<AdminLayout />}>
-            <Route path='/dashboard' element={<AdminDashboard />} />
-            <Route path='/course' element={<AdminCourses />} />
-            <Route path='/student' element={<AdminStudents />} />
-            <Route path='/admin-support' element={<AdminSupportRequests />} />
-            <Route path='/admin-organization' element={<AdminOrganizations />} />
-            <Route path='/admin-post' element={<AdminVolunteerPosts />} />
-            <Route path='/admin-attendance' element={<AdminEventAttendance />} />
-            <Route path="/upgrade-pro" element={<UpgradePro />} />
+            {privateAdminRoutes.map(({ path, element }) => (
+              <Route
+                key={path}
+                path={path}
+                element={
+                  <ProtectedRoute allowedRoles={['admin']}>
+                    {element}
+                  </ProtectedRoute>
+                }
+              />
+            ))}
           </Route>
 
+          {/* Owner Routes - Requires login with 'owner' role */}
           <Route element={<OwnerLayout />}>
-            <Route path='/owner-post' element={<OrganizationPostPage />} />
-            <Route path='/owner-user' element={<OrganizationUserRequests />} />
-            <Route path='/owner-attendance' element={<OrganizationEventAttendance />} />
-            <Route path='/admin-participant' element={<AdminEventParticipants />} />
+            {privateOwnerRoutes.map(({ path, element }) => (
+              <Route
+                key={path}
+                path={path}
+                element={
+                  <ProtectedRoute allowedRoles={['owner']}>
+                    {element}
+                  </ProtectedRoute>
+                }
+              />
+            ))}
           </Route>
-
-
-          <Route path='/' element={<AuthenGatePage />} />
-          <Route path='/forgotpassword' element={<ForgotPasswordPage />} />
-
         </Routes>
       </Router>
     </ToastProvider>

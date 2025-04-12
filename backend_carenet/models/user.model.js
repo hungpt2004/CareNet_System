@@ -5,20 +5,19 @@ const UserSchema = new Schema({
   fullname: { type: String },
   email: { type: String },
   password: { type: String },
-  role: { type: String, enum: ["volunteer", "staff", "organization", "admin"] },
+  role: { type: String, enum: ["volunteer", "staff", "organization", "admin"], default: 'volunteer'},
   cccdNumber: { type: Number },
   cccdImages: [{ type: String }], // Mã hóa ảnh để bảo mật
-  dob: {type: Date},
+  phone: { type: String },
+  dob: { type: Date },
+  avatart: { type: String },
   address: {
-    street: String, // Số nhà, tên đường (tùy chọn)
-    ward: String, // Phường/Xã
-    district: String, // Quận/Huyện
-    province: String, // Tỉnh/Thành phố
-    country: {
-      code: "VN",
-      name: "Vietnam",
-    },
-    postalCode: String, // (tùy chọn) Mã bưu chính nếu cần
+    street: { type: String }, // Số nhà, tên đường (tùy chọn)
+    ward: { type: String }, // Phường/Xã
+    district: { type: String }, // Quận/Huyện
+    province: { type: String }, // Tỉnh/Thành phố
+    country: { type: String, default: "VietNam" },
+    postalCode: { type: String }, // (tùy chọn) Mã bưu chính nếu cần
     fullAddress: { type: String },
   },
   isVerified: { type: Boolean, default: false },
