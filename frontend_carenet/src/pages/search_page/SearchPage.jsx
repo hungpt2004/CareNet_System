@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Container, Row, Col, Form, Button, Card, Dropdown, InputGroup, Badge, FormCheck, Spinner } from "react-bootstrap"
+import { Container, Row, Col, Form, Button, Card, Dropdown, InputGroup, Badge, FormCheck, Spinner, Alert } from "react-bootstrap"
 import { Search, Calendar, MapPin, Filter, ArrowUpDown, Users } from "lucide-react"
 import CustomNavbar from "../../components/navbar/CustomNavbar"
 import MapComponent from "../../components/map/MapComponent"
@@ -9,6 +9,7 @@ import { Footer } from "../../components/footer/Footer"
 import { formatDateVN } from "../../utils/FormatDateVN"
 import { useNavigate } from "react-router-dom"
 import styles from '../../css/AppColors.module.css'
+import useAuthStore from "../../hooks/authStore"
 
 // Custom CSS variables for the color scheme
 const customStyles = {
@@ -92,6 +93,10 @@ const mockEvents = [
 ]
 
 export default function VolunteerEventSearch() {
+
+  // Current user
+  const {currentUser} = useAuthStore();
+
   // State for search filters
   const [searchFilters, setSearchFilters] = useState({
     name: "",
@@ -463,7 +468,7 @@ export default function VolunteerEventSearch() {
                                 <div>{event.participants} thành viên</div>
                               </div>
                             </div>
-                            <Button
+                            {currentUser ? <Button
                               className="button w-100"
                               onClick={() => handleGoToDetail()}
                               style={{
@@ -473,7 +478,7 @@ export default function VolunteerEventSearch() {
                               }}
                             >
                               Xem thông tin
-                            </Button>
+                            </Button> : <Alert className="text-center alert alert-warning">Vui lòng đăng nhập</Alert>}
                           </div>
                         </Col>
                       </Row>

@@ -10,10 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@heroui/spinner": "^2.2.14",
     "@react-oauth/google": "^0.12.1",
     "antd": "^5.24.4",
+    "axios": "^1.8.4",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
+    "crypto-js": "^4.2.0",
+    "dotenv": "^16.5.0",
     "framer-motion": "^12.5.0",
     "front-end-carenet": "file:",
     "jwt-decode": "^4.0.0",
@@ -28,7 +32,8 @@
     "react-leaflet": "^5.0.0",
     "react-router-dom": "^7.4.0",
     "react-toastify": "^11.0.5",
-    "swiper": "^11.2.6"
+    "swiper": "^11.2.6",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",

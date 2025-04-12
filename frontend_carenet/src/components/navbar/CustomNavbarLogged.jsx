@@ -1,21 +1,29 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Button, Container, Nav, Navbar, Image, Row, Col } from "react-bootstrap";
 import styles from '../../css/AppColors.module.css'
+import useAuthStore from "../../hooks/authStore";
+import { useNavigate } from "react-router-dom";
 
 const CustomNavbarLogged = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const navigate = useNavigate();
 
   // Giả sử người dùng đã đăng nhập
   const [isLoggedIn, setIsLoggedIn] = useState(true);
-  const [userInfo, setUserInfo] = useState({
-    name: "Nguyễn Văn A",
-    email: "nguyenvana@example.com",
-    avatarUrl: "https://i.pravatar.cc/150?img=3" // URL ảnh đại diện
-  });
 
+  const currentUser = useAuthStore((state) => state.currentUser);
+
+  const {logout} = useAuthStore();
+
+  // const [userInfo, setUserInfo] = useState({
+  //   name: user?.fullname || "",  // default empty string if undefined
+  //   email: user?.email || "",
+  //   avatarUrl: user?.avatarUrl || "/default-avatar.png" // fallback to a default avatar URL if none exists
+  // });
+  
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 50) {
@@ -49,10 +57,22 @@ const CustomNavbarLogged = () => {
     setDropdownOpen(!dropdownOpen);
   };
 
-  const handleLogout = () => {
-    // Xử lý đăng xuất ở đây
+  const handleLogout = async () => {
+    await logout();
+    setTimeout(() => {
+      navigate('/login');
+    }, 0)
     setIsLoggedIn(false);
   };
+
+  const storedUser = localStorage.getItem("user");
+  if (storedUser) {
+    console.log("User object from localStorage:");
+    console.log(JSON.stringify(storedUser, null, 2));
+  } else {
+    console.log("No user data in localStorage.");
+  }
+  
 
   return (
     <Navbar
@@ -104,7 +124,7 @@ const CustomNavbarLogged = () => {
                 }}
               >
                 <Image
-                  src={userInfo.avatarUrl}
+                  src={currentUser?.avatar}
                   width="100%"
                   height="100%"
                   style={{ objectFit: 'cover' }}
@@ -121,8 +141,8 @@ const CustomNavbarLogged = () => {
                   }}
                 >
                   <div className="px-4 py-2 border-bottom">
-                    <div className="fw-bold">{userInfo.name}</div>
-                    <div className="text-muted small">{userInfo.email}</div>
+                    <div className="fw-bold">{currentUser?.fullname}</div>
+                    <div className="text-muted small">{currentUser?.email}</div>
                   </div>
                   <Nav className="flex-column">
                     <Nav.Link href="/profile-information" className="px-4 py-2">Thông tin cá nhân</Nav.Link>

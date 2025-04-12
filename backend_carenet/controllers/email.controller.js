@@ -24,3 +24,6 @@ exports.sendVerificationLink = async (
    }
 };
 
+exports.sendRequestForgotPassword = async () => {
+   
+}

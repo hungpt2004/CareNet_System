@@ -22,56 +22,66 @@ const createVerifyToken = async (payload) =>
 exports.signUpWithUsernamePassword = asyncHandler(async (req, res, next) => {
   const { fullname, email, password, phone, dob } = req.body;
 
+  console.log(req.body)
+
   if (!fullname || !email || !password || !phone || !dob) {
-    return next(
-      new AppError(
-        "Vui lòng nhập đầy đủ họ tên, email, mật khẩu, ngày sinh và số điện thoại.",
-        400
-      )
-    );
+    return res.status(500).json({
+      status: "fail",
+      message: "Vui lòng nhập đầy đủ họ tên, email, mật khẩu, ngày sinh và số điện thoại.",
+    });
   }
 
   // Kiểm tra email đã tồn tại
   const existingUser = await User.findOne({ email: email });
   if (existingUser) {
-    return next(new AppError("Email đã tồn tại trong hệ thống", 400));
+   return res.status(500).json({
+      status: "fail",
+      message: "Email đã tồn tại",
+    });
   }
 
   // Mã hóa mật khẩu
   const hashedPassword = await bcrypt.hash(password, 10);
 
   // Tạo người dùng mới
-  const newUser = new User({
-    fullname: fullname,
-    email: email,
-    password: hashedPassword,
-    phone: phone,
-    dob: dob,
-    isVerified: false,
-  });
+  try {
+    const newUser = new User({
+      fullname: fullname,
+      email: email,
+      password: hashedPassword,
+      phone: phone,
+      dob: dob,
+      isVerified: false,
+    });
 
-  // Lưu user
-  await newUser.save();
+    // Lưu user
+    await newUser.save();
 
-  // Tạo verify token
-  const verificationToken = await createVerifyToken({ newUser });
+    // Tạo verify token
+    const verificationToken = await createVerifyToken({ newUser });
 
-  // Tạo verification link
-  const verificationLink = `${process.env.SERVER_URL}/auth/verify-email?token=${verificationToken}`;
+    // Tạo verification link
+    const verificationLink = `${process.env.SERVER_URL}/auth/verify-email?token=${verificationToken}`;
 
-  console.log(verificationLink);
+    console.log(verificationLink);
 
-  // Gửi mail
-  if (verificationLink) {
-    await sendVerificationLink(verificationLink, newUser.email);
+    // Gửi mail
+    if (verificationLink) {
+      await sendVerificationLink(verificationLink, newUser.email);
+    }
+
+    // Gửi response
+    return res.status(201).json({
+      status: "success",
+      message: "Vui lòng kiểm tra email !",
+      verificationToken,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "fail",
+      message: "Đăng kí không thành công",
+    });
   }
-
-  // Gửi response
-  res.status(201).json({
-    status: "success",
-    message: "Vui lòng kiểm tra email !",
-    verificationToken,
-  });
 });
 
 // Đăng nhập
@@ -80,21 +90,36 @@ exports.signInWithUsernamePassword = asyncHandler(async (req, res, next) => {
 
   if (!email || !password) {
     // Trả về status và message ở front-end thì lấy ra bằng error.response.data.status và .message
-    return next(new AppError("Hãy nhập mật khẩu!", 400));
+    return res.status(500).json({
+      status: "fail",
+      message: 'Hãy nhập mật khẩu',
+    });
   }
 
-  const user = await User.findOne({ email }).select("+password");
-  if (!user || !(await bcrypt.compare(password, user.password))) {
-    return next(new AppError("Sai tài khoản hoặc mật khẩu", 401));
+  try {
+    const user = await User.findOne({ email }).select("+password");
+   //  const currentUser = await User.findOne({email: email});
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      return res.status(401).json({
+         status: "fail",
+         message: 'Sai tài khoản hoặc mật khẩu',
+       });
+    }
+
+    const accessToken = await createJsonToken({ user });
+
+    return res.status(200).json({
+      status: "success",
+      message: "Đăng nhập thành công",
+      user,
+      accessToken,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "fail",
+      message: error.message,
+    });
   }
-
-  const accessToken = await createJsonToken({ user });
-
-  res.status(200).json({
-    status: "success",
-    message: "Đăng nhập thành công",
-    accessToken,
-  });
 });
 
 // Xác thực
@@ -120,24 +145,35 @@ exports.verifyAccountByLink = asyncHandler(async (req, res, next) => {
 
     console.log("Đã verify thành công");
 
-
-    return res.status(200).send("Đã verify thành công");
+   //  return res.status(200).send("Đã verify thành công");
 
     // Sau khi xác thực xong thì redirect về trang login
-   //  return res.redirect(`${process.env.CLIENT_URL}`); // hoặc bất kỳ route nào bạn muốn
+     return res.redirect(`${process.env.CLIENT_URL}/login`); // hoặc bất kỳ route nào bạn muốn
   } catch (err) {
     return next(new AppError("Token đã hết hạn hoặc không hợp lệ", 401));
   }
 });
 
+// Yêu cầu quên MK
+exports.requestResetPassword = asyncHandler(async (req, res, next) => {
+  const { email } = req.body;
 
-exports.requestResetPassword = asyncHandler(async(req, res, next) => {
-   const {email} = req.body
+  if (!email) {
+    return next(new AppError("Email không tìm thấy ! Vui lòng thử lại", 404));
+  }
 
-   try {
+  try {
+    const currentUser = await User.findOne({ email: email });
 
-   } catch (error) {
-      
-   } 
+    if (!currentUser) {
+      return next(new AppError("Không tìm thấy người dùng !", 404));
+    }
 
-})
+    const requestToken = await createJsonToken(currentUser._id);
+
+    return res.status(200).json({
+      status: "success",
+      message: "Vui lòng kiểm tra mail !",
+    });
+  } catch (error) {}
+});
