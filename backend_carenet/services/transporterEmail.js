@@ -1,11 +1,13 @@
-require('dotenv').config();
+const nodemailer = require("nodemailer");
+require("dotenv").config();
 
-exports.emailTransporter = () => {
-  transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.AUTH_EMAIL,
-      pass: process.env.AUTH_PASSWORD,
-    },
-  });
-};
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USERNAME,
+    pass: process.env.EMAIL_PASSWORD,
+  },
+});
+
+// Export transporter để xài ở chỗ khác
+module.exports = transporter;

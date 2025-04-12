@@ -1,12 +1,143 @@
-const User = require('../models/user.model')
-const asyncHandler = require('../middleware/asyncHandler')
-const emailTransporter = require('../services/transporterEmail')
-require('dotenv').config();
+const User = require("../models/user.model");
+const asyncHandler = require("../middleware/asyncHandler");
+const emailTransporter = require("../services/transporterEmail");
+const jwt = require("jsonwebtoken");
+const AppError = require("../utils/appError");
+const { sendVerificationLink } = require("./email.controller");
+const { default: mongoose } = require("mongoose");
+const bcrypt = require("bcryptjs");
+require("dotenv").config();
 
-exports.signUpWithUsernamePassword = asyncHandler (async(req, res) => {
+const createJsonToken = async (payload) =>
+  jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: process.env.ACCESS_TOKEN_LIFE,
+  });
 
-})
+const createVerifyToken = async (payload) =>
+  jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: "1h",
+  });
 
-exports.signInWithUsernamePassword = asyncHandler (async(req, res) => {
+// Đăng ký
+exports.signUpWithUsernamePassword = asyncHandler(async (req, res, next) => {
+  const { fullname, email, password, phone, dob } = req.body;
+
+  if (!fullname || !email || !password || !phone || !dob) {
+    return next(
+      new AppError(
+        "Vui lòng nhập đầy đủ họ tên, email, mật khẩu, ngày sinh và số điện thoại.",
+        400
+      )
+    );
+  }
+
+  // Kiểm tra email đã tồn tại
+  const existingUser = await User.findOne({ email: email });
+  if (existingUser) {
+    return next(new AppError("Email đã tồn tại trong hệ thống", 400));
+  }
+
+  // Mã hóa mật khẩu
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  // Tạo người dùng mới
+  const newUser = new User({
+    fullname: fullname,
+    email: email,
+    password: hashedPassword,
+    phone: phone,
+    dob: dob,
+    isVerified: false,
+  });
+
+  // Lưu user
+  await newUser.save();
+
+  // Tạo verify token
+  const verificationToken = await createVerifyToken({ newUser });
+
+  // Tạo verification link
+  const verificationLink = `${process.env.SERVER_URL}/auth/verify-email?token=${verificationToken}`;
+
+  console.log(verificationLink);
+
+  // Gửi mail
+  if (verificationLink) {
+    await sendVerificationLink(verificationLink, newUser.email);
+  }
+
+  // Gửi response
+  res.status(201).json({
+    status: "success",
+    message: "Vui lòng kiểm tra email !",
+    verificationToken,
+  });
+});
+
+// Đăng nhập
+exports.signInWithUsernamePassword = asyncHandler(async (req, res, next) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    // Trả về status và message ở front-end thì lấy ra bằng error.response.data.status và .message
+    return next(new AppError("Hãy nhập mật khẩu!", 400));
+  }
+
+  const user = await User.findOne({ email }).select("+password");
+  if (!user || !(await bcrypt.compare(password, user.password))) {
+    return next(new AppError("Sai tài khoản hoặc mật khẩu", 401));
+  }
+
+  const accessToken = await createJsonToken({ user });
+
+  res.status(200).json({
+    status: "success",
+    message: "Đăng nhập thành công",
+    accessToken,
+  });
+});
+
+// Xác thực
+exports.verifyAccountByLink = asyncHandler(async (req, res, next) => {
+  const token = req.query.token;
+
+  if (!token) {
+    return next(new AppError("Token không hợp lệ hoặc đã hết hạn", 400));
+  }
+
+  try {
+    const decodedToken = await jwt.verify(
+      token,
+      process.env.ACCESS_TOKEN_SECRET
+    );
+
+    const currentUser = decodedToken.newUser;
+
+    await User.findOneAndUpdate(
+      { _id: currentUser._id },
+      { $set: { isVerified: true } }
+    );
+
+    console.log("Đã verify thành công");
+
+
+    return res.status(200).send("Đã verify thành công");
+
+    // Sau khi xác thực xong thì redirect về trang login
+   //  return res.redirect(`${process.env.CLIENT_URL}`); // hoặc bất kỳ route nào bạn muốn
+  } catch (err) {
+    return next(new AppError("Token đã hết hạn hoặc không hợp lệ", 401));
+  }
+});
+
+
+exports.requestResetPassword = asyncHandler(async(req, res, next) => {
+   const {email} = req.body
+
+   try {
+
+   } catch (error) {
+      
+   } 
 
 })

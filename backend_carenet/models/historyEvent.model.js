@@ -15,8 +15,8 @@ const historyEventSchema = new Schema({
   status: {
     type: String,
     enum: [
-      "completed",
-      "finished",
+      "completed", //duoc phep feedback
+      "finished",  //sau khi feedback
       "waiting",
       "processing",
       "approved",

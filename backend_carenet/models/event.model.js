@@ -7,7 +7,6 @@ const EventSchema = new mongoose.Schema({
   images: [{ type: String }], // URL ảnh của event
   category: { type: String },
   rating: { type: Number },
-  maxParticipants: { type: Number }, // optional, giới hạn người tham gia
   currentParticipants: { type: Number, default: 0 },
   pointReward: { type: Number, default: 0 }, // điểm cộng khi hoàn thành
   assignChecker: {type: mongoose.Schema.ObjectId, ref:'User'},
@@ -20,16 +19,16 @@ const EventSchema = new mongoose.Schema({
     required: true,
   },
 
+  skillNeeds: [
+    {type: String}
+  ],
+
   location: {
     street: { type: String, default: null }, // Số nhà, tên đường (tùy chọn)
     ward: { type: String, default: null }, // Phường/Xã
     district: { type: String, default: null }, // Quận/Huyện
     province: { type: String, default: null }, // Tỉnh/Thành phố
-    country: {
-      // Luôn là Việt Nam nhưng để chuẩn hoá
-      code: "VN",
-      name: "Vietnam",
-    },
+    country: { type: String, default: "VietNam" },
     postalCode: String, // (tùy chọn) Mã bưu chính nếu cần
     fullAddress: { type: String },
   },
@@ -70,6 +69,8 @@ const EventSchema = new mongoose.Schema({
       feedbackId: { type: mongoose.Schema.Types.ObjectId, ref: "Feedback" },
     },
   ],
+
+  // Lọc theo 
 
 });
 
