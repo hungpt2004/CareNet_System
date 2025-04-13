@@ -24,7 +24,7 @@ function AuthenGatePage() {
   const [showLoginModal, setShowLoginModal] = useState(false)
   const [showRegisterModal, setShowRegisterModal] = useState(false)
   const [stateRegiser, setStateRegister] = useState(null);
-  const { login, loading, register, error, successMessage, clearSuccess } = useAuthStore();
+  const { login, loading, register, error, successMessage, clearSuccess, currentUser} = useAuthStore();
 
   // Login form state
   const [loginData, setLoginData] = useState({
@@ -131,6 +131,8 @@ function AuthenGatePage() {
     setShowConfirmPassword(!showConfirmPassword)
   }
 
+  console.log(currentUser);
+
   // Handle login form submission
   const handleLoginSubmit = async (e) => {
     e.preventDefault()
@@ -153,14 +155,21 @@ function AuthenGatePage() {
 
     try {
       await login(loginData.email, loginData.password);
-      setTimeout(() => {
-        navigate('/')
-      }, 800)
+      console.log(loginData)
+      if(currentUser?.hobbies?.length <= 0) {
+        setTimeout(() => {
+          navigate('/onboarding')
+        }, 800)
+      } else {
+        setTimeout(() => {
+          navigate('/')
+        }, 800)
+      }
     } catch (err) {
       console.log(err.message);
     }
     // Simulate successful login
-    handleLoginModalClose()
+    // handleLoginModalClose()
   }
 
   // Validate register form

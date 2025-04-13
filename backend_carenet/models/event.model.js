@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 const EventSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String },
-  requirement: { type: String },
   images: [{ type: String }], // URL ảnh của event
   category: { type: String },
   rating: { type: Number },
@@ -12,7 +11,6 @@ const EventSchema = new mongoose.Schema({
   assignChecker: {type: mongoose.Schema.ObjectId, ref:'User'},
   startAt: { type: Date, required: true },
   endAt: { type: Date, required: true },
-
   organizationId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Organization",

@@ -25,12 +25,11 @@ const UserSchema = new Schema({
   reputationPoints: { type: Number, default: 100 },
   totalHours: { type: Number, default: 0 },
   activityPoints: { type: Number, default: 0 },
-  organizationId: { type: Schema.ObjectId, ref: "Organization" },
+  organizationId: { type: Schema.ObjectId, ref: "Organization", default: null},
   historyEvents: [{ type: Schema.ObjectId, ref: "Event" }],
   favorites: [{ type: Schema.ObjectId, ref: "Event" }],
   certificates: [{ type: Schema.ObjectId, ref: "Certificate" }],
   hobbies: [{ type: String, default: [] }],
-  position: [{ type: String, default: [] }],
 });
 
 module.exports = mongoose.model("User", UserSchema);

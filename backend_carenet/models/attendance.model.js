@@ -19,6 +19,7 @@ const AttendanceSchema = new Schema({
    },
    checkInTime: {type: Date, default:  Date.now},
    checkOutTime: {type: Date, default:  Date.now},
+   message: {type: String, default: null},
    createdAt: {
      type: Date,
      default: Date.now

@@ -35,10 +35,12 @@ import AdminSupportRequests from './pages/admin_support_page/AdminSupportRequest
 import AuthenGatePage from './pages/login_page/AuthenGatePage';
 import ProtectedRoute from './layout/ProtectedLayout';
 import GuestLayout from './layout/GuestLayout';
+import OnBoardingPage from './pages/onboarding_page/OnBoardingPage';
 
 const guestRoutes = [
   { path: '/', element: <LandingPage /> },
   { path: '/search', element: <VolunteerEventSearch /> },
+  { path: '/onboarding', element: <OnBoardingPage /> },
 ];
 
 const publicRoutes = [

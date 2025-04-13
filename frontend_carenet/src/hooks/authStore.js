@@ -1,32 +1,16 @@
 import { create } from "zustand";
 import axios from "axios";
-import CryptoJS from "crypto-js"; // Import crypto-js
 
 const BASE_URL = import.meta.env.VITE_SERVER_URL;
-const SECRET_KEY = import.meta.env.VITE_SECRET_KEY; // Key để mã hóa dữ liệu
-
-const encryptData = (data) => {
-  return CryptoJS.AES.encrypt(JSON.stringify(data), SECRET_KEY).toString();
-};
-
-const decryptData = (data) => {
-  try {
-    const bytes = CryptoJS.AES.decrypt(data, SECRET_KEY);
-    return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-  } catch (err) {
-    console.error("Error decrypting data: ", err);
-    return null; // Trả về null nếu có lỗi giải mã
-  }
-};
 
 const useAuthStore = create((set) => ({
   currentUser: (() => {
     const userData = localStorage.getItem("user");
-    return userData ? decryptData(userData) : null; // Nếu không có dữ liệu, trả về null
+    return userData ? JSON.parse(userData) : null; // Parse plain JSON data from localStorage
   })(),
   token: (() => {
     const tokenData = localStorage.getItem("token");
-    return tokenData ? decryptData(tokenData) : null; // Nếu không có token, trả về null
+    return tokenData ? tokenData : null; // Get token as plain text
   })(),
   loading: false,
   error: null,
@@ -44,17 +28,14 @@ const useAuthStore = create((set) => ({
       const token = res.data.accessToken;
       const message = res.data.message;
 
-      const encryptedUser = encryptData(user);
-      const encryptedToken = encryptData(token);
-
-      localStorage.setItem("user", encryptedUser); // Mã hóa trước khi lưu
-      localStorage.setItem("token", encryptedToken); // Mã hóa trước khi lưu
+      localStorage.setItem("user", JSON.stringify(user)); // Store user as plain JSON
+      localStorage.setItem("token", token); // Store token as plain text
 
       set({ currentUser: user, token, successMessage: message });
     } catch (err) {
-      console.log(err.response);
-      set({ error: err.response.data.message || "Đăng nhập thất bại" });
-      throw err;
+      console.log(err.response.data);
+      set({ error: err.response?.data?.message || "Đăng nhập thất bại" });
+      throw err.response.data.message;
     } finally {
       setTimeout(() => {
         set({ loading: false });
@@ -71,9 +52,7 @@ const useAuthStore = create((set) => ({
       const user = res.data.user;
       const message = res.data.message;
 
-      const encryptedUser = encryptData(user);
-
-      localStorage.setItem("user", encryptedUser);
+      localStorage.setItem("user", JSON.stringify(user)); // Store user as plain JSON
 
       set({ currentUser: user, successMessage: message });
     } catch (err) {
@@ -94,4 +73,4 @@ const useAuthStore = create((set) => ({
   clearSuccess: () => set({ successMessage: null }),
 }));
 
-export default useAuthStore;
+export default useAuthStore
