@@ -103,7 +103,7 @@ const CustomNavbarLogged = () => {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto">
-            <Nav.Link href="/home" className="hover-underline">Trang chủ</Nav.Link>
+            <Nav.Link href="/" className="hover-underline">Trang chủ</Nav.Link>
             <Nav.Link href="#features" className="hover-underline">Thành tựu</Nav.Link>
             <Nav.Link href="#how-it-works" className="hover-underline">Vận hành</Nav.Link>
             <Nav.Link href="#testimonials" className="hover-underline">Chia sẻ</Nav.Link>

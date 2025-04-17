@@ -19,6 +19,7 @@ const historyEventSchema = new Schema({
       "finished",  //sau khi feedback
       "waiting",
       "processing",
+      "rejected",
       "approved",
       "pending",
       "cancelled",

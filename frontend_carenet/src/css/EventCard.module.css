@@ -1,0 +1,241 @@
+.card {
+   position: relative;
+   border-radius: 16px;
+   overflow: hidden;
+   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+   transition: all 0.3s ease;
+   margin-bottom: 1.5rem;
+   border: 1px solid #f0f0f0;
+ }
+ 
+ .card:hover {
+   transform: translateY(-4px);
+   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+ }
+ 
+ .cardHeader {
+   height: 8px;
+   position: relative;
+ }
+ 
+ .categoryBadge {
+   position: absolute;
+   top: 16px;
+   right: 16px;
+   padding: 6px 12px;
+   border-radius: 20px;
+   background-color: white;
+   font-size: 0.75rem;
+   font-weight: 600;
+   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+   z-index: 1;
+ }
+ 
+ .cardBody {
+   padding: 24px;
+   display: flex;
+   gap: 24px;
+ }
+ 
+ @media (max-width: 768px) {
+   .cardBody {
+     flex-direction: column;
+   }
+ }
+ 
+ .mainContent {
+   flex: 2;
+ }
+ 
+ .sideContent {
+   flex: 1;
+   border-left: 1px solid rgba(0, 0, 0, 0.1);
+   padding-left: 24px;
+   display: flex;
+   flex-direction: column;
+   justify-content: space-between;
+ }
+ 
+ @media (max-width: 768px) {
+   .sideContent {
+     border-left: none;
+     padding-left: 0;
+     border-top: 1px solid rgba(0, 0, 0, 0.1);
+     padding-top: 16px;
+     margin-top: 16px;
+   }
+ }
+ 
+ .eventTitle {
+   font-size: 1.25rem;
+   font-weight: 700;
+   margin-bottom: 12px;
+   color: #111827;
+   line-height: 1.4;
+ }
+ 
+ .locationWrapper {
+   display: flex;
+   align-items: center;
+   margin-bottom: 16px;
+ }
+ 
+ .icon {
+   margin-right: 8px;
+ }
+ 
+ .location {
+   color: #4b5563;
+   font-size: 0.9rem;
+ }
+ 
+ .description {
+   color: #4b5563;
+   margin-bottom: 16px;
+   font-size: 0.95rem;
+   line-height: 1.6;
+   display: -webkit-box;
+   -webkit-line-clamp: 2;
+   -webkit-box-orient: vertical;
+   overflow: hidden;
+ }
+ 
+ .organizer {
+   display: flex;
+   align-items: center;
+   gap: 12px;
+   font-size: 0.85rem;
+   color: #6b7280;
+ }
+ 
+ .organizerAvatar {
+   width: 32px;
+   height: 32px;
+   border-radius: 50%;
+   color: white;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   font-weight: 600;
+ }
+ 
+ .infoSection {
+   display: flex;
+   flex-direction: column;
+   gap: 16px;
+ }
+ 
+ .dateInfo {
+   display: flex;
+   align-items: flex-start;
+   gap: 12px;
+ }
+ 
+ .iconWrapper {
+   width: 36px;
+   height: 36px;
+   border-radius: 8px;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+ }
+ 
+ .dateRow {
+   display: flex;
+   align-items: center;
+   gap: 6px;
+   font-size: 0.85rem;
+   color: #4b5563;
+   margin-bottom: 4px;
+ }
+ 
+ .participantsInfo {
+   display: flex;
+   align-items: flex-start;
+   gap: 12px;
+ }
+ 
+ .participants {
+   display: flex;
+   flex-direction: column;
+   gap: 8px;
+   font-size: 0.85rem;
+   color: #4b5563;
+ }
+ 
+ .avatarGroup {
+   display: flex;
+   align-items: center;
+ }
+ 
+ .participantAvatar {
+   width: 28px;
+   height: 28px;
+   border-radius: 50%;
+   color: white;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   font-size: 0.75rem;
+   font-weight: 600;
+   margin-left: -8px;
+   border: 2px solid white;
+ }
+ 
+ .participantAvatar:first-child {
+   margin-left: 0;
+ }
+ 
+ .moreParticipants {
+   width: 28px;
+   height: 28px;
+   border-radius: 50%;
+   background-color: #f3f4f6;
+   color: #4b5563;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   font-size: 0.75rem;
+   font-weight: 600;
+   margin-left: -8px;
+   border: 2px solid white;
+ }
+ 
+ .actionSection {
+   margin-top: 16px;
+ }
+ 
+ .viewButton {
+   width: 100%;
+   padding: 10px 16px;
+   border-radius: 8px;
+   font-weight: 600;
+   font-size: 0.9rem;
+   cursor: pointer;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   gap: 8px;
+   transition: all 0.2s ease;
+   border-width: 1.5px;
+   border-style: solid;
+ }
+ 
+ .arrowIcon {
+   transition: transform 0.3s ease;
+ }
+ 
+ .arrowIconAnimated {
+   transform: translateX(4px);
+ }
+ 
+ .loginAlert {
+   padding: 12px;
+   border-radius: 8px;
+   background-color: #fef3c7;
+   color: #92400e;
+   font-size: 0.85rem;
+   text-align: center;
+   border: 1px solid #fde68a;
+ }
+ 

@@ -9,6 +9,8 @@ const userIds = [
   ObjectId("67fa3d702cce68cd14c998e7"),
   ObjectId("67fa471a46145ca7c43163f1"),
   ObjectId("67fa90af4073bc8d18685877"),
+  ObjectId("67fe21fb3b596870e54360e6"),
+  ObjectId("67fe22763b596870e54360ea"),
 ];
 
 // STAFF / HR
@@ -20,6 +22,16 @@ const checkerIds = [
   ObjectId("67fba6c5c77384a09910ff4d"),
   ObjectId("67fba6d5c77384a09910ff51"),
   ObjectId("67fba6f5c77384a09910ff55"),
+];
+
+// ORGANIZATION
+const organizationUserIds = [
+  ObjectId("67fd26a93235b4c3a05f2ca8"),
+  ObjectId("67fd270b3235b4c3a05f2cad"),
+  ObjectId("67fd36d37bb49651da0e9914"),
+  ObjectId("67fd379b34e364e936dc192d"),
+  ObjectId("67fd37cf34e364e936dc1931"),
+  ObjectId("67fd385334e364e936dc1935"),
 ];
 
 // GIAY PHEP
@@ -128,6 +140,17 @@ const districts = [
   "Cẩm Lệ",
   "Liên Chiểu",
   "Hòa Vang",
+];
+
+const postCodeDaNang = [
+  "50000",
+  "55200",
+  "50217",
+  "555700",
+  "50506",
+  "557737",
+  "550000",
+  "840511",
 ];
 
 const orgNames = [
@@ -581,7 +604,7 @@ const eventDescriptions = [
   "Bảo vệ môi trường, đối phó biến đổi khí hậu cùng cộng đồng.",
 ];
 
-const skillNeeds = [
+const skillNeedsArr = [
   "Giao tiếp",
   "Lãnh đạo",
   "Làm việc nhóm",
@@ -747,6 +770,11 @@ const skillNeeds = [
 ];
 
 // Random phone number
+
+function getRandomElement(array) {
+  return array[Math.floor(Math.random() * array.length)];
+}
+
 function generateRandomPhone() {
   const prefixes = [
     "086",
@@ -768,14 +796,220 @@ function generateRandomPhone() {
   );
 }
 
+const answersArray = [
+  "Tôi muốn học hỏi thêm kỹ năng tổ chức sự kiện.",
+  "Có",
+  "Không",
+  "Giao tiếp, Tổ chức",
+  "Tôi yêu thích công việc ngoài trời và sẵn sàng tham gia.",
+  "Tôi có thể làm việc vào buổi chiều các ngày trong tuần.",
+  "Vận chuyển",
+  "Găng tay, Túi rác",
+  "Tôi muốn hỗ trợ phần hậu cần.",
+  "Tôi mong muốn thử sức với vai trò truyền thông.",
+  "Tôi có kinh nghiệm làm việc nhóm và muốn áp dụng vào hoạt động này.",
+  "Tôi muốn giúp chuẩn bị tài liệu cho sự kiện.",
+  "Có thể làm việc vào cuối tuần.",
+  "Tôi quan tâm đến việc hỗ trợ trẻ em hoặc người già.",
+  "Kỹ năng thuyết trình, Quản lý thời gian",
+  "Tôi cần thêm thông tin về lịch trình trước khi đăng ký.",
+  "Tôi có thể mang theo nước uống và dụng cụ vệ sinh.",
+  "Tôi muốn tham gia nhóm trang trí địa điểm.",
+  "Tôi thích làm việc trực tiếp với cộng đồng địa phương.",
+  "Không có kinh nghiệm nhưng rất nhiệt tình học hỏi.",
+  "Tôi có thể hỗ trợ quay video hoặc chụp ảnh.",
+  "Tôi muốn đảm nhận vai trò hướng dẫn người tham gia.",
+  "Tôi có xe máy, có thể hỗ trợ di chuyển vật dụng.",
+  "Tôi cần khẩu trang và nước rửa tay khi tham gia.",
+  "Tôi muốn học cách phối hợp với các tổ chức phi lợi nhuận.",
+  "Tôi có thể làm việc vào buổi tối thứ Tư và thứ Năm.",
+  "Tôi muốn hỗ trợ phân phát thực phẩm hoặc nhu yếu phẩm.",
+  "Kỹ năng viết lách, Thiết kế đồ họa",
+  "Tôi từng tham gia tình nguyện dọn rác bãi biển.",
+  "Tôi có thể mang theo bàn ghế nếu cần.",
+  "Tôi muốn tham gia để kết nối với những người cùng sở thích.",
+  "Tôi quan tâm đến các hoạt động bảo vệ môi trường.",
+  "Tôi có thể hỗ trợ đăng bài trên mạng xã hội.",
+  "Tôi muốn làm việc ở khu vực gần trung tâm thành phố.",
+  "Tôi có thể tham gia 2-3 buổi mỗi tuần.",
+  "Tôi cần mũ bảo hộ nếu làm việc ngoài trời lâu.",
+  "Tôi muốn hỗ trợ dạy kỹ năng cho trẻ em.",
+  "Tôi có thể giúp dịch tài liệu nếu cần.",
+  "Tôi muốn thử sức với vai trò điều phối viên.",
+  "Tôi có thể mang theo đồ ăn nhẹ cho đội tình nguyện.",
+  "Tôi thích các hoạt động liên quan đến giáo dục cộng đồng.",
+  "Tôi có kỹ năng nấu ăn, có thể chuẩn bị bữa ăn.",
+  "Tôi muốn tham gia sự kiện từ thiện cuối năm.",
+  "Tôi có thể hỗ trợ kiểm tra danh sách người tham gia.",
+  "Tôi cần giày chống trượt nếu làm việc ở khu vực ẩm ướt.",
+  "Tôi muốn học thêm về quản lý dự án tình nguyện.",
+  "Tôi có thể làm việc vào sáng thứ Bảy và Chủ nhật.",
+  "Tôi muốn hỗ trợ phân loại rác thải tái chế.",
+  "Tôi có máy chiếu, có thể mang theo nếu cần.",
+  "Tôi quan tâm đến các hoạt động gây quỹ cộng đồng.",
+  "Kỹ năng lắng nghe, Giải quyết vấn đề",
+  "Tôi muốn làm việc với các nhóm tình nguyện quốc tế.",
+  "Tôi có thể hỗ trợ thiết kế poster cho sự kiện.",
+  "Tôi cần áo phản quang nếu làm việc buổi tối.",
+  "Tôi muốn tham gia để nâng cao kỹ năng lãnh đạo.",
+  "Tôi có thể mang theo loa di động cho sự kiện ngoài trời.",
+  "Tôi thích các hoạt động liên quan đến trồng cây xanh.",
+  "Tôi có thể hỗ trợ chăm sóc người tham gia lớn tuổi.",
+  "Tôi muốn làm việc ở khu vực ngoại ô nếu có xe đưa đón.",
+  "Tôi có thể tham gia toàn thời gian trong kỳ nghỉ hè.",
+  "Tôi cần bản đồ khu vực làm việc trước khi tham gia.",
+  "Tôi muốn hỗ trợ tổ chức các trò chơi cho trẻ em.",
+  "Tôi có kỹ năng sử dụng Excel để quản lý danh sách.",
+  "Tôi muốn tham gia để hiểu thêm về văn hóa địa phương.",
+  "Tôi có thể mang theo đồ dùng học tập để tặng trẻ em.",
+  "Tôi quan tâm đến các dự án xây dựng cộng đồng bền vững.",
+  "Tôi có thể hỗ trợ viết báo cáo sau sự kiện.",
+  "Tôi muốn làm việc với đội kỹ thuật âm thanh, ánh sáng.",
+  "Tôi cần thời gian nghỉ giữa các ca làm việc.",
+  "Tôi muốn học thêm về quản lý khủng hoảng trong sự kiện.",
+  "Tôi có thể làm việc vào buổi trưa các ngày thứ Hai.",
+  "Tôi muốn hỗ trợ các hoạt động liên quan đến sức khỏe cộng đồng.",
+  "Tôi có thể mang theo dụng cụ làm vườn nếu cần.",
+  "Tôi quan tâm đến các chương trình hỗ trợ người khuyết tật.",
+  "Kỹ năng đàm phán, Làm việc nhóm",
+  "Tôi muốn tham gia để cải thiện kỹ năng giao tiếp.",
+  "Tôi có thể hỗ trợ kiểm tra thiết bị trước sự kiện.",
+  "Tôi cần thông tin về chỗ nghỉ nếu làm việc xa.",
+  "Tôi muốn làm việc với nhóm tình nguyện trẻ tuổi.",
+  "Tôi có thể mang theo máy ảnh để ghi lại hoạt động.",
+  "Tôi thích các hoạt động liên quan đến tái chế sáng tạo.",
+  "Tôi có thể hỗ trợ hướng dẫn giao thông trong sự kiện.",
+  "Tôi muốn tham gia để gặp gỡ các nhà hoạt động xã hội.",
+  "Tôi có thể làm việc vào sáng sớm các ngày trong tuần.",
+  "Tôi cần găng tay y tế nếu làm việc với rác thải nguy hại.",
+  "Tôi muốn hỗ trợ tổ chức hội thảo hoặc buổi đào tạo.",
+  "Tôi có kỹ năng biên tập video, có thể làm nội dung sau sự kiện.",
+  "Tôi muốn tham gia các hoạt động liên quan đến nghệ thuật cộng đồng.",
+  "Tôi có thể mang theo bảng trắng và bút lông nếu cần.",
+  "Tôi quan tâm đến các dự án hỗ trợ phụ nữ và trẻ em gái.",
+  "Tôi có thể hỗ trợ liên lạc với các nhà tài trợ.",
+  "Tôi muốn làm việc ở khu vực có kết nối internet ổn định.",
+  "Tôi có thể tham gia các buổi họp nhóm trước sự kiện.",
+  "Tôi cần áo mưa nếu làm việc vào mùa mưa.",
+  "Tôi muốn học thêm về lập kế hoạch sự kiện tình nguyện.",
+  "Tôi có thể làm việc vào cuối tuần và ngày lễ.",
+  "Tôi muốn hỗ trợ các hoạt động liên quan đến giáo dục môi trường.",
+  "Tôi có thể mang theo đèn pin nếu làm việc buổi tối.",
+  "Tôi quan tâm đến các chương trình hỗ trợ người vô gia cư.",
+  "Kỹ năng tổ chức, Chăm sóc khách hàng",
+  "Tôi muốn tham gia để phát triển mạng lưới quan hệ.",
+  "Tôi có thể hỗ trợ sắp xếp lịch trình cho đội tình nguyện.",
+  "Tôi cần hướng dẫn cụ thể trước khi bắt đầu công việc.",
+  "Tôi muốn làm việc với các tổ chức bảo vệ động vật.",
+  "Tôi có thể mang theo dây thừng để hỗ trợ dựng lều.",
+  "Tôi thích các hoạt động liên quan đến thể thao cộng đồng.",
+  "Tôi có thể hỗ trợ kiểm tra an toàn khu vực làm việc.",
+  "Tôi muốn tham gia để trải nghiệm các hoạt động mới.",
+  "Tôi có thể làm việc vào buổi chiều thứ Sáu.",
+  "Tôi cần bình nước cá nhân khi làm việc ngoài trời.",
+  "Tôi muốn hỗ trợ tổ chức các buổi chiếu phim cộng đồng.",
+  "Tôi có kỹ năng vẽ, có thể trang trí backdrop.",
+  "Tôi muốn tham gia các dự án hỗ trợ học sinh nghèo.",
+  "Tôi có thể mang theo ghế xếp nếu cần thêm chỗ ngồi.",
+  "Tôi quan tâm đến các hoạt động thúc đẩy bình đẳng giới.",
+  "Tôi có thể hỗ trợ ghi chép trong các buổi họp.",
+  "Tôi muốn làm việc ở khu vực gần trường học.",
+  "Tôi có thể tham gia các hoạt động kéo dài 1-2 ngày.",
+  "Tôi cần khẩu trang vải để sử dụng lâu dài.",
+  "Tôi muốn học thêm về quản lý ngân sách sự kiện.",
+  "Tôi có thể làm việc vào buổi sáng thứ Năm.",
+  "Tôi muốn hỗ trợ các hoạt động liên quan đến sức khỏe tâm lý.",
+  "Tôi có thể mang theo ô dù lớn nếu trời nắng nóng.",
+  "Tôi quan tâm đến các chương trình hỗ trợ người nhập cư.",
+  "Kỹ năng phân tích, Lập kế hoạch",
+  "Tôi muốn tham gia để nâng cao nhận thức cộng đồng.",
+  "Tôi có thể hỗ trợ kiểm tra chất lượng vật liệu trước sự kiện.",
+  "Tôi cần thông tin về phương tiện di chuyển công cộng.",
+  "Tôi muốn làm việc với các nhóm tình nguyện đa văn hóa.",
+  "Tôi có thể mang theo micro không dây nếu cần.",
+  "Tôi thích các hoạt động liên quan đến âm nhạc cộng đồng.",
+  "Tôi có thể hỗ trợ hướng dẫn người tham gia mới.",
+  "Tôi muốn tham gia để học hỏi từ các tình nguyện viên khác.",
+  "Tôi có thể làm việc vào buổi tối thứ Sáu và thứ Bảy.",
+  "Tôi cần băng keo và kéo nếu làm việc thủ công.",
+  "Tôi muốn hỗ trợ tổ chức các buổi workshop kỹ năng.",
+  "Tôi có kỹ năng chụp ảnh, có thể ghi lại khoảnh khắc.",
+  "Tôi muốn tham gia các dự án hỗ trợ người cao tuổi.",
+  "Tôi có thể mang theo bình xịt côn trùng nếu làm việc ngoài trời.",
+  "Tôi quan tâm đến các hoạt động xây dựng thư viện cộng đồng.",
+  "Tôi có thể hỗ trợ quản lý mạng xã hội trong sự kiện.",
+  "Tôi muốn làm việc ở khu vực có nhiều cây xanh.",
+  "Tôi có thể tham gia các buổi đào tạo trước sự kiện.",
+  "Tôi cần găng tay cao su nếu làm việc với nước.",
+  "Tôi muốn học thêm về quản lý tình nguyện viên.",
+  "Tôi có thể làm việc vào sáng thứ Tư và thứ Sáu.",
+  "Tôi muốn hỗ trợ các hoạt động liên quan đến dinh dưỡng cộng đồng.",
+  "Tôi có thể mang theo bảng chỉ dẫn nếu cần.",
+  "Tôi quan tâm đến các chương trình hỗ trợ trẻ mồ côi.",
+  "Kỹ năng đào tạo, Giải thích ý tưởng",
+  "Tôi muốn tham gia để tạo tác động tích cực đến xã hội.",
+  "Tôi có thể hỗ trợ dọn dẹp sau sự kiện.",
+  "Tôi cần thông tin về thời tiết trước khi tham gia.",
+  "Tôi muốn làm việc với các tổ chức giáo dục phi lợi nhuận.",
+  "Tôi có thể mang theo túi sơ cứu nếu cần.",
+  "Tôi thích các hoạt động liên quan đến văn hóa truyền thống.",
+  "Tôi có thể hỗ trợ kiểm tra vé vào cửa nếu có.",
+  "Tôi muốn tham gia để khám phá các cơ hội mới.",
+  "Tôi có thể làm việc vào buổi chiều thứ Ba.",
+  "Tôi cần khăn lau nếu làm việc với bụi bẩn.",
+  "Tôi muốn hỗ trợ tổ chức các buổi giao lưu cộng đồng.",
+  "Tôi có kỹ năng kể chuyện, có thể tương tác với trẻ em.",
+  "Tôi muốn tham gia các dự án hỗ trợ người dân tộc thiểu số.",
+  "Tôi có thể mang theo bình nước lớn cho cả đội.",
+  "Tôi quan tâm đến các hoạt động thúc đẩy du lịch bền vững.",
+  "Tôi có thể hỗ trợ phân phát quà tặng trong sự kiện.",
+  "Tôi muốn làm việc ở khu vực gần sông hoặc hồ.",
+  "Tôi có thể tham gia các hoạt động kéo dài cả ngày.",
+  "Tôi cần áo dài tay để bảo vệ khi làm việc ngoài trời.",
+  "Tôi muốn học thêm về tổ chức sự kiện cộng đồng.",
+  "Tôi có thể làm việc vào buổi tối thứ Hai.",
+  "Tôi muốn hỗ trợ các hoạt động liên quan đến an toàn thực phẩm.",
+  "Tôi có thể mang theo chổi và xẻng nhỏ nếu cần.",
+  "Tôi quan tâm đến các chương trình hỗ trợ người tị nạn.",
+  "Kỹ năng sáng tạo nội dung, Quản lý mạng xã hội",
+  "Tôi muốn tham gia để truyền cảm hứng cho người khác.",
+  "Tôi có thể hỗ trợ kiểm tra âm thanh trước sự kiện.",
+  "Tôi cần thông tin về chỗ gửi xe nếu làm việc xa.",
+  "Tôi muốn làm việc với các nhóm tình nguyện sáng tạo.",
+  "Tôi có thể mang theo bút và sổ để ghi chú.",
+  "Tôi thích các hoạt động liên quan đến khoa học cộng đồng.",
+  "Tôi có thể hỗ trợ hướng dẫn các hoạt động nhóm.",
+  "Tôi muốn tham gia để xây dựng kỹ năng tổ chức.",
+  "Tôi có thể làm việc vào sáng thứ Hai và thứ Ba.",
+  "Tôi cần chai xịt nước nếu làm việc trong thời tiết nóng.",
+  "Tôi muốn hỗ trợ tổ chức các buổi triển lãm cộng đồng.",
+  "Tôi có kỹ năng giao tiếp, có thể hỗ trợ tiếp khách.",
+  "Tôi muốn tham gia các dự án hỗ trợ học sinh vùng cao.",
+  "Tôi có thể mang theo thùng đựng rác nếu cần.",
+  "Tôi quan tâm đến các hoạt động thúc đẩy hòa bình.",
+  "Tôi có thể hỗ trợ phân phát tài liệu trong sự kiện.",
+  "Tôi muốn làm việc ở khu vực có không gian mở.",
+  "Tôi có thể tham gia các hoạt động trong 1 tuần liên tiếp.",
+  "Tôi cần mũ lưỡi trai nếu làm việc dưới nắng lâu.",
+];
+
 // Random rating from 1.0 -> 5.0
 function randomRating() {
-   // Sinh số ngẫu nhiên từ 10 đến 50 (tương ứng 1.0 đến 5.0)
-   const min = 10;
-   const max = 50;
-   const random = Math.floor(Math.random() * (max - min + 1)) + min;
-   // Chuyển về dạng số thập phân (1.0 đến 5.0)
-   return (random / 10).toFixed(1);
+  // Sinh số ngẫu nhiên từ 10 đến 50 (tương ứng 1.0 đến 5.0)
+  const min = 10;
+  const max = 50;
+  const random = Math.floor(Math.random() * (max - min + 1)) + min;
+  // Chuyển về dạng số thập phân (1.0 đến 5.0)
+  return (random / 10).toFixed(1);
+}
+
+// Random participant
+function randomParticipants() {
+  // Sinh số ngẫu nhiên từ 10 đến 50 (tương ứng 1.0 đến 5.0)
+  const min = 100;
+  const max = 250;
+  const random = Math.floor(Math.random() * (max - min + 1)) + min;
+  return random;
 }
 
 // Random date start
@@ -792,6 +1026,36 @@ function getExpiredDate(subscribedAt) {
   var expired = new Date(subscribedAt);
   expired.setMonth(expired.getMonth() + 1);
   return expired;
+}
+
+// ===== Hàm tạo ngày bắt đầu =====
+function generateStartAt(inFuture = false, maxFutureMonths = 1) {
+  var now = new Date();
+  if (!inFuture) return now;
+
+  var futureMonths = Math.floor(Math.random() * maxFutureMonths) + 1;
+  var result = new Date(now);
+  result.setMonth(now.getMonth() + futureMonths);
+  return result;
+}
+
+// ===== Hàm tạo ngày kết thúc (cách 1-2 tháng) =====
+function generateEndAt(startAt, minMonths = 1, maxMonths = 2) {
+  if (!(startAt instanceof Date) || isNaN(startAt.getTime())) {
+    throw "startAt phải là ngày hợp lệ";
+  }
+
+  var monthDiff =
+    Math.floor(Math.random() * (maxMonths - minMonths + 1)) + minMonths;
+  var result = new Date(startAt);
+  result.setMonth(result.getMonth() + monthDiff);
+  return result;
+}
+
+// Get random data in array
+function getRandomSubset(arr, size) {
+  const shuffled = [...arr].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, size);
 }
 
 const formQuestion = [
@@ -2697,36 +2961,87 @@ const formQuestion = [
   },
 ];
 
+// INSERT STAFF
+for (let i = 9; i <= 150; i++) {
+  const staff = {
+    fullname: `Staff ${i}`,
+    email: `carenetstaff${i}@gmail.com`,
+    password: "$2b$10$jIj0mCP13..EeaVPY2xXXeL/utB2tHgPAOyzHdthRgbQZG/bJZA4G",
+    role: "staff",
+    cccdImages: [],
+    phone: `098765432${i % 10}`,
+    dob: new Date(1990, 0, 1),
+    isVerified: true,
+    status: "ready",
+    reputationPoints: 100,
+    totalHours: 0,
+    activityPoints: 0,
+    historyEvents: [],
+    favorites: [],
+    certificates: [],
+    hobbies: [],
+    __v: 0,
+  };
+
+  const result = db.users.insertOne(staff);
+  checkerIds.push(result.insertedId);
+}
+
+// INSERT VOLUNTEER
+for (let i = 1; i <= 150; i++) {
+  const staff = {
+    fullname: `Volunteer ${i}`,
+    email: `volunteer${i}@gmail.com`,
+    password: "$2b$10$jIj0mCP13..EeaVPY2xXXeL/utB2tHgPAOyzHdthRgbQZG/bJZA4G",
+    role: "volunteer",
+    cccdImages: [],
+    phone: `098765432${i % 10}`,
+    dob: new Date(1990, 0, 1),
+    isVerified: true,
+    status: "ready",
+    reputationPoints: 100,
+    totalHours: 0,
+    activityPoints: 0,
+    historyEvents: [],
+    favorites: [],
+    certificates: [],
+    hobbies: [],
+    __v: 0,
+  };
+
+  const result = db.users.insertOne(staff);
+  userIds.push(result.insertedId);
+}
 
 // INSERT ORGANIZATION
+// Số lượng organization phù hợp với số lượng organization id đang có
 const organizationIds = [];
-for (let i = 0; i < orgNames.length; i++) {
-   let nameRandomIndex = i % orgNames.length; // random name org
-   let userRandomIndex = i % userIds.length;  // random user id
-   let staffRandomIndex = i % checkerIds.length;  // random member id
-   let desRandomIndex = i % orgDescriptions.length;  // random user id
-   let licenseRandomIndex = i % licenseDocumentUrl.length; // random license
-   let orgLevel = i % organizationLevelIds.length; // random level org
- 
-   let existedOrganization = db.organizations.findOne({ name: orgNames[i] });
- 
-   if (!existedOrganization) {
-     let organizations = db.organizations.insertOne({
-       user: userIds[userRandomIndex],
-       name: orgNames[nameRandomIndex],
-       description: orgDescriptions[desRandomIndex],
-       phone: generateRandomPhone(),
-       adminStatus: 'approved',
-       organizationStatus: 'active',
-       members: checkerIds[staffRandomIndex],
-       licenseDocumentUrl: licenseDocumentUrl[licenseRandomIndex],
-       rating: randomRating(),
-     }); // Lưu ID để sử dụng sau này
-     organizationIds.push(organizations.insertedId);
-   }
+for (let i = 0; i < organizationUserIds.length; i++) {
+  let nameRandomIndex = i % orgNames.length; // random name org
+  let userRandomIndex = i % organizationUserIds.length; // random user id
+  let desRandomIndex = i % orgDescriptions.length; // random user id
+  let orgLevelRandomIndex = i % organizationLevelIds.length; // random level org
+
+  let existedOrganization = db.organizations.findOne({ name: orgNames[i] });
+
+  if (!existedOrganization) {
+    let organizations = db.organizations.insertOne({
+      userId: organizationUserIds[userRandomIndex],
+      levelId: organizationLevelIds[orgLevelRandomIndex],
+      name: orgNames[nameRandomIndex],
+      description: orgDescriptions[desRandomIndex],
+      phone: generateRandomPhone(),
+      adminStatus: "approved",
+      organizationStatus: "active",
+      licenseDocumentUrl: getRandomSubset(licenseDocumentUrl, 4), // Lấy 4 ảnh random trong licenseDocumentUrl
+      rating: randomRating(),
+    }); // Lưu ID để sử dụng sau này
+    organizationIds.push(organizations.insertedId);
+  }
 }
 
 // UPDATE USER STAFF + ORGANIZATION ID
+// Làm thêm 20 staff nữa
 for (var i = 0; i < checkerIds.length; i++) {
   var staffRandomIndex = i % checkerIds.length; // Random staffId, giống nameRandomIndex
   var orgRandomIndex = i % organizationIds.length; // Random organizationId, giống userRandomIndex
@@ -2737,7 +3052,7 @@ for (var i = 0; i < checkerIds.length; i++) {
   // Kiểm tra xem user có tồn tại và role là "staff" không, tương tự existedOrganization
   var existedUser = db.users.findOne({
     _id: staffId,
-    role: "staff"
+    role: "staff",
   });
 
   if (existedUser) {
@@ -2758,11 +3073,46 @@ for (var i = 0; i < checkerIds.length; i++) {
   }
 }
 
+// UPDATE USER ORGANIZATION + ORGANIZATION ID
+// Thêm organization id vào trong organization account
+for (var i = 0; i < organizationUserIds.length; i++) {
+  var organizationUserRandomIndex = i % organizationUserIds.length; // Random staffId, giống nameRandomIndex
+  var orgRandomIndex = i % organizationIds.length; // Random organizationId, giống userRandomIndex
+
+  var organizationUserId = organizationUserIds[organizationUserRandomIndex];
+  var orgId = organizationIds[orgRandomIndex];
+
+  // Kiểm tra xem user có tồn tại và role là "organization" không, tương tự existedOrganization
+  var existedUser = db.users.findOne({
+    _id: organizationUserId,
+    role: "organization",
+  });
+
+  if (existedUser) {
+    // Cập nhật organizationId, tương tự insertOne
+    var updateResult = db.users.updateOne(
+      { _id: organizationUserId },
+      { $set: { organizationId: orgId } }
+    );
+
+    // Kiểm tra xem có cập nhật thành công không
+    if (updateResult.modifiedCount > 0) {
+      print(
+        "Updated organizationId " + orgId + " for organization: " + staffId
+      );
+    } else {
+      print("No changes for staff: " + staffId);
+    }
+  } else {
+    print("Staff not found or not a staff role: " + staffId + ", skipping...");
+  }
+}
+
 // ORGANIZATION SUBSCRIPTION
+// Mỗi organization sẽ mặc định có
 const organizationSubscriptionIds = [];
-const paymentStatus = ["not paid", "paid"]
+const paymentStatus = ["not paid", "paid"];
 for (var i = 0; i < organizationIds.length; i++) {
-  var userRandomIndex = i % userIds.length; // Random user id
   var statusRandomIndex = i % paymentStatus.length; // Random status
   var orgId = organizationIds[i]; // Lấy organizationId tuần tự
 
@@ -2782,34 +3132,573 @@ for (var i = 0; i < organizationIds.length; i++) {
 
     // Insert vào organizationsubscriptions
     var organizationSubscriptions = db.organizationsubscriptions.insertOne({
-      _id: userIds[userRandomIndex], // Dùng userId làm _id, theo schema bạn cung cấp trước đó
       organizationId: orgId,
       levelId: levelId,
       price: price,
       subscribedAt: subscribedAt,
       expiredAt: expiredAt,
-      status: paymentStatus[statusRandomIndex]
+      status: paymentStatus[statusRandomIndex],
     });
 
     // Lưu insertedId
-    organizationSubscriptionIds.push(organizationsubscriptions.insertedId);
-    print("Inserted subscription for organization: " + orgId + ", user: " + userIds[userRandomIndex]);
+    organizationSubscriptionIds.push(organizationSubscriptions.insertedId);
   } else {
-    print("Organization not found or missing levelId for: " + orgId + ", skipping...");
+    print(
+      "Organization not found or missing levelId for: " +
+        orgId +
+        ", skipping..."
+    );
   }
 }
- 
-// EVENT REGISTRATION 
 
+// EVENT
+const eventStatus = ["hiring", "processing", "completed", "cancelled"];
+
+const eventImages = [
+  "https://i.pinimg.com/736x/21/af/e9/21afe9b7d4af3209eb1b1ff13ce4ae68.jpg",
+  "https://i.pinimg.com/736x/ff/1d/07/ff1d0780dc6a7094b40521073e406150.jpg",
+  "https://i.pinimg.com/736x/61/68/71/6168710391de29f8b22d0c1d4b7ba729.jpg",
+  "https://i.pinimg.com/736x/1e/98/0f/1e980f17e4b17e899a2b730ea07285ae.jpg",
+  "https://i.pinimg.com/736x/98/81/e5/9881e5b926e5825fc82d647d16e0d4da.jpg",
+  "https://i.pinimg.com/736x/f4/a0/fd/f4a0fdecb6439e19539d97fa96a71ecb.jpg",
+  "https://i.pinimg.com/736x/1f/36/7a/1f367a27d48d58dfd668f9e0c8df4254.jpg",
+  "https://i.pinimg.com/736x/d1/87/72/d187729274fede2b5bd38c55eed501ad.jpg",
+  "https://i.pinimg.com/736x/93/c3/07/93c307d02c46087e24a1d596a45cf0e3.jpg",
+  "https://i.pinimg.com/736x/70/4c/53/704c53f486106768fcb8174070aa2a02.jpg",
+  "https://i.pinimg.com/736x/eb/f9/47/ebf9471d9ee6deadb826d5454961b3c9.jpg",
+  "https://i.pinimg.com/736x/a9/73/37/a973379baf48d0d12f6c1aca4730c5d1.jpg",
+  "https://i.pinimg.com/736x/08/da/3e/08da3ed10f6d0bfddc4889e02d4e48c1.jpg",
+  "https://i.pinimg.com/736x/cc/9e/f1/cc9ef1474faeade8ecce6242628f1dc6.jpg",
+  "https://i.pinimg.com/736x/c1/33/d9/c133d9be77dfa1784ca6fb94e70042aa.jpg",
+  "https://i.pinimg.com/736x/99/e7/f2/99e7f24b5c328cacef21205fd64c2541.jpg",
+  "https://i.pinimg.com/736x/72/fe/07/72fe07ee3945c7f09ea30ecc98ca65b2.jpg",
+  "https://i.pinimg.com/736x/2d/d3/79/2dd379968693700ec12af8f1974b491e.jpg",
+  "https://i.pinimg.com/736x/ae/96/f1/ae96f1572d810acedff0363098ebb9f2.jpg",
+  "https://i.pinimg.com/736x/d8/a8/16/d8a816495548996b07e824a9d93fc951.jpg",
+  "https://i.pinimg.com/736x/49/f5/e9/49f5e95ee672093c4c35db91f4c9310e.jpg",
+  "https://i.pinimg.com/736x/1c/d4/ea/1cd4ea832582b8edf60639ff474ddc40.jpg",
+  "https://i.pinimg.com/736x/fa/64/be/fa64beecfbdfe131fee39d8176ea594f.jpg",
+  "https://i.pinimg.com/736x/a2/b1/65/a2b165daf541f4c1939ca51315f93e0a.jpg",
+  "https://i.pinimg.com/736x/6d/3c/70/6d3c7039a05d2f0ee82f2a716846a53e.jpg",
+  "https://i.pinimg.com/736x/a6/fc/a6/a6fca61a3ce7dce76380861f2ab9434b.jpg",
+  "https://i.pinimg.com/736x/36/be/61/36be614f54d2f39fca3a446330ec3f01.jpg",
+  "https://i.pinimg.com/736x/12/d2/06/12d206d8251d624c30c05e98c64d726e.jpg",
+  "https://i.pinimg.com/736x/91/32/bd/9132bdc5b285ad7e94b5998d86caf9e1.jpg",
+  "https://i.pinimg.com/736x/07/b9/73/07b97396b95de7c61699cb3dec60c5b9.jpg",
+  "https://i.pinimg.com/736x/1d/1b/4c/1d1b4cd4363fcc806d28afe1c6017fe4.jpg",
+  "https://i.pinimg.com/736x/81/ef/08/81ef0895894c4a4e012c04439571129a.jpg",
+  "https://i.pinimg.com/736x/c4/7a/55/c47a55cf28388b1a2809bef228b5ad5c.jpg",
+  "https://i.pinimg.com/736x/1d/06/b1/1d06b127bb46d7ca04670004edbe60ad.jpg",
+  "https://i.pinimg.com/736x/0f/19/42/0f1942a694bb1cda0a30a4efd00889cb.jpg",
+  "https://i.pinimg.com/736x/bc/60/b2/bc60b2d40e88ec53d96d99dbf50a5e3b.jpg",
+  "https://i.pinimg.com/736x/35/7e/ba/357ebac31b1f319aa550b7fe46cd2223.jpg",
+  "https://i.pinimg.com/736x/d9/b6/aa/d9b6aa4be3f756a695c3302c7070fa17.jpg",
+  "https://i.pinimg.com/736x/47/92/4c/47924c52a9f6fa38d623ebc7813105bb.jpg",
+  "https://i.pinimg.com/736x/7f/7c/a5/7f7ca5edce69dcca7dbc36e515aa752e.jpg",
+  "https://i.pinimg.com/736x/cb/37/c8/cb37c8aa6453d5cbd805032c5c60643a.jpg",
+  "https://i.pinimg.com/736x/6c/ae/07/6cae0794cb32ca5a5efbeb62457c752a.jpg",
+  "https://i.pinimg.com/736x/0d/e4/a2/0de4a24d26a2bf62e0b4e7f8cbc4ce93.jpg",
+  "https://i.pinimg.com/736x/0d/02/d6/0d02d60c3ee6c2a1fc9f908842f47c94.jpg",
+  "https://i.pinimg.com/736x/40/35/14/40351430d1a259b751a38f0bf8c8e90a.jpg",
+  "https://i.pinimg.com/736x/51/ff/d0/51ffd051d53d2d5e52f27573bf371773.jpg",
+  "https://i.pinimg.com/736x/39/01/4d/39014d07906e31191eb6f7168bf413f1.jpg",
+  "https://i.pinimg.com/736x/1a/73/b8/1a73b8f20fd94a0fe57657d4d6b313df.jpg",
+  "https://i.pinimg.com/736x/d2/ca/6a/d2ca6a2b227fd396a11906b6715b6caa.jpg",
+  "https://i.pinimg.com/736x/77/19/13/7719133e8002a582765fbdb21ad2d162.jpg",
+  "https://i.pinimg.com/736x/0a/bb/a8/0abba89755f5bf73559eda060aa88d0c.jpg",
+];
+
+const eventIds = [];
+
+for (let i = 0; i < 150; i++) {
+  const titleRandomIndex = i % eventTitles.length;
+  const desRandomIndex = i % eventDescriptions.length;
+  const categoryRandomIndex = i % categories.length;
+
+  // 👉 Dùng orgNames lặp lại (6 org)
+  const orgName = orgNames[i % orgNames.length];
+  let existedOrganization = db.organizations.findOne({ name: orgName });
+
+  const currentStaffs = db.users
+    .find({
+      organizationId: existedOrganization._id,
+    })
+    .toArray(); // cần toArray để dùng map
+
+  const currentStaffIdsArray = currentStaffs.map((user) => user._id);
+  const staffRandomIndex = i % currentStaffIdsArray.length;
+  const startDate = generateStartAt(true, 1);
+  const skillNeeds = getRandomSubset(skillNeedsArr, 4);
+  const imageRandom = getRandomSubset(eventImages, 4);
+  const streetRandomIndex = i % streets.length;
+  const wardRandomIndex = i % wards.length;
+  const districtRandomIndex = i % districts.length;
+  const randomPostCodeIndex = i % postCodeDaNang.length;
+  const formDataRandomIndex = i % formQuestion.length;
+  const eventStatusRandomIndex = i % eventStatus.length;
+
+  let event = db.events.insertOne({
+    title: eventTitles[titleRandomIndex],
+    description: eventDescriptions[desRandomIndex],
+    images: imageRandom,
+    category: categories[categoryRandomIndex],
+    rating: randomRating(),
+    currentParticipants: randomParticipants(),
+    assignChecker: currentStaffIdsArray[staffRandomIndex],
+    startAt: startDate,
+    endAt: generateEndAt(startDate),
+    organizationId: existedOrganization._id,
+    skillNeeds: skillNeeds,
+    location: {
+      street: streets[streetRandomIndex],
+      ward: wards[wardRandomIndex],
+      district: districts[districtRandomIndex],
+      province: "Da Nang",
+      postalCode: postCodeDaNang[randomPostCodeIndex],
+    },
+    formData: formQuestion[formDataRandomIndex],
+    status: eventStatus[eventStatusRandomIndex],
+  });
+
+  eventIds.push(event.insertedId);
+}
+
+// EVENT REGISTRATION
+const eventRegistrationStatus = [
+  "pending",
+  "approved",
+  "rejected",
+  "cancelled",
+];
+const cancellationReasons = [
+  "Rất tiếc, mình không thể tham gia sự kiện lần này.",
+  "Cảm ơn bạn đã mời, nhưng mình đã có kế hoạch khác.",
+  "Lịch của mình đang khá bận, hẹn bạn dịp sau nhé!",
+  "Mình rất muốn tham gia nhưng hiện tại không tiện.",
+  "Xin lỗi, mình không thể sắp xếp thời gian tham gia.",
+  "Cảm ơn thông tin, nhưng lần này mình xin phép từ chối.",
+  "Mình đang có việc cá nhân nên không tham gia được.",
+  "Mình có sự kiện khác trùng ngày, xin lỗi nhé!",
+  "Mình sẽ ủng hộ từ xa, chúc chương trình thành công!",
+  "Rất tiếc vì không thể góp mặt cùng mọi người lần này.",
+  "Hẹn bạn ở những sự kiện sau nhé!",
+  "Hiện tại mình đang ở xa nên không thể tham dự.",
+  "Mình không đủ sức khỏe tham gia thời gian này.",
+  "Đợt này mình phải tập trung cho việc học/thi cử.",
+  "Rất tiếc, mình đang có việc gia đình cần giải quyết.",
+  "Cảm ơn đã liên hệ, nhưng mình xin phép không tham gia.",
+  "Mình đã đăng ký một hoạt động khác rồi.",
+  "Xin lỗi, mình không tiện di chuyển vào hôm đó.",
+  "Mình vừa mới hết thời gian nghỉ phép rồi.",
+  "Mình không đủ điều kiện sức khỏe tham gia ngoài trời.",
+  "Thật tiếc, đợt này mình đang khá stress nên không tiện.",
+  "Mình sợ không thể cam kết đúng lịch trình chương trình.",
+  "Lần này mình xin vắng mặt, nhưng rất ủng hộ tinh thần!",
+  "Mình sẽ chia sẻ sự kiện cho bạn bè nhé!",
+  "Dù không tham gia được, mình chúc mọi người thành công!",
+  "Rất tiếc vì đã không thể đồng hành cùng các bạn lần này.",
+  "Mình đang đi công tác xa, mong được tham gia lần sau!",
+  "Mình hiện không ở Việt Nam nên không thể tham dự.",
+  "Tôi xin phép không nhận thêm hoạt động thời gian này.",
+  "Thời gian không phù hợp với lịch học/làm việc của mình.",
+];
+
+const eventRegistrationIds = [];
+
+for (let i = 0; i < eventIds.length; i++) {
+  let existedEvents = db.events.findOne({ title: eventTitles[i] });
+
+  if (existedEvents) {
+    const eventId = existedEvents._id;
+    const userRandomIndex = i % userIds.length;
+    const statusRandomIndex = i % eventRegistrationStatus.length;
+    const status = eventRegistrationStatus[statusRandomIndex];
+    const answerRandom = getRandomSubset(answersArray, 4);
+    const cancelMessageRandom = i % cancellationReasons.length;
+
+    const registrationData = {
+      event: eventId,
+      user: userIds[userRandomIndex],
+      status: status,
+      answers: answerRandom,
+    };
+
+    // Thêm message nếu status là pending hoặc cancelled
+    if (status === "pending" || status === "cancelled") {
+      registrationData.message = cancellationReasons[cancelMessageRandom];
+    }
+
+    const result = db.eventregistrations.insertOne(registrationData);
+    eventRegistrationIds.push(result.insertedId);
+  }
+}
+
+// ATTENDANCE
+// Lấy thông tin từ bảng event registration
+const attendanceStatus = ["registered", "attended", "cancelled"];
+const attendanceMessage = [
+  "Chúng tôi ghi nhận bạn đã vắng mặt trong sự kiện vừa qua. Mong bạn thông báo trước nếu có lý do chính đáng.",
+  "Bạn đã không tham gia sự kiện như đã đăng ký. Vui lòng cam kết trách nhiệm hơn trong những lần tới.",
+  "Bạn đã vi phạm quy định trong sự kiện. Chúng tôi mong bạn sẽ rút kinh nghiệm để không tái diễn.",
+  "Sự kiện yêu cầu đúng giờ nhưng bạn đã đến trễ mà không thông báo. Điều này ảnh hưởng đến tổ chức chung.",
+  "Bạn đã bỏ về giữa chừng sự kiện mà không xin phép. Hành vi này không được khuyến khích.",
+  "Chúng tôi rất tiếc vì bạn không thể tham gia. Lần sau hãy báo trước để BTC sắp xếp hợp lý hơn.",
+  "Chúng tôi đã ghi nhận hành vi không phù hợp trong sự kiện. Vui lòng tuân thủ nội quy lần sau.",
+  "Bạn đã không mang đầy đủ dụng cụ cần thiết như quy định. Vui lòng chuẩn bị kỹ hơn cho lần sau.",
+  "Bạn đã không hoàn thành nhiệm vụ được giao trong sự kiện. Điều này ảnh hưởng đến kết quả chung.",
+  "Mong bạn nghiêm túc hơn khi tham gia các sự kiện sau. Vắng mặt mà không báo là hành vi không tôn trọng BTC.",
+  "Vui lòng đọc kỹ nội quy trước khi tham gia các sự kiện tiếp theo. Chúng tôi đánh giá cao tinh thần kỷ luật.",
+  "Bạn đã có lời nói không phù hợp với người khác trong sự kiện. Mong bạn giữ thái độ tích cực và tôn trọng.",
+  "Bạn đã gây ồn ào và làm gián đoạn hoạt động trong sự kiện. Vui lòng hợp tác giữ trật tự lần sau.",
+  "Hành vi bỏ về khi chưa kết thúc sự kiện không được phép. BTC rất mong bạn sẽ cam kết tham gia đầy đủ.",
+  "Chúng tôi mong bạn phản hồi lý do vắng mặt để cải thiện chất lượng sự kiện cho cộng đồng.",
+];
+
+const attendanceIds = [];
+
+for (let i = 0; i < eventRegistrationIds.length; i++) {
+  const existedEventRegistration = db.eventregistrations.findOne({
+    _id: eventRegistrationIds[i],
+  });
+
+  if (existedEventRegistration) {
+    const status = attendanceStatus[i % attendanceStatus.length];
+    const message = attendanceMessage[i % attendanceMessage.length];
+    const startDate =
+      db.events.findOne({ _id: existedEventRegistration.event })?.startDate ||
+      new Date();
+
+    const attendanceData = {
+      event: existedEventRegistration.event,
+      user: existedEventRegistration.user,
+      status: status,
+    };
+
+    if (status === "attended" || status === "cancelled") {
+      attendanceData.message = message;
+
+      // Giả lập checkOutTime sau khi sự kiện bắt đầu 2-5 tiếng
+      const randomDays = Math.floor(Math.random() * 2) + 5; // 2 hoặc 3
+      const checkOut = new Date(startDate);
+      checkOut.setDate(checkOut.getDate() + randomDays);
+      attendanceData.checkOutTime = checkOut;
+    }
+
+    const result = db.attendances.insertOne(attendanceData);
+    attendanceIds.push(result.insertedId);
+  }
+}
 
 // EVENT HISTORY
+const historyEventIds = [];
+// Các trạng thái hợp lệ theo schema
+const historyStatusList = [
+  "completed",
+  "finished",
+  "waiting",
+  "processing",
+  "approved",
+  "pending",
+  "cancelled",
+  "rejected",
+];
 
+for (let i = 0; i < eventRegistrationIds.length; i++) {
+  const eventRegistration = db.eventregistrations.findOne({
+    _id: eventRegistrationIds[i],
+  });
 
-// FEEDBACK
+  if (eventRegistration) {
+    const event = db.events.findOne({ _id: eventRegistration.event });
 
+    if (!event) continue;
 
-// CERTIFICATE 
+    const status = historyStatusList[i % historyStatusList.length];
+    const registeredAt = new Date(event.startDate);
+    registeredAt.setDate(
+      registeredAt.getDate() - Math.floor(Math.random() * 7)
+    ); // Đăng ký trước 0–6 ngày
 
+    const attendedAt = new Date(event.startDate);
+    attendedAt.setHours(8 + Math.floor(Math.random() * 5)); // Giờ ngẫu nhiên 8h–12h
+
+    const completedAt =
+      status === "completed" || status === "finished"
+        ? new Date(event.endDate)
+        : null;
+
+    const historyData = {
+      user: eventRegistration.user,
+      event: event._id,
+      status: status,
+      registeredAt: registeredAt,
+      attendedAt: attendedAt,
+      completedAt: completedAt,
+      earnedPoints:
+        status === "completed" || status === "finished"
+          ? Math.floor(Math.random() * 50 + 10)
+          : 0,
+      earnedHours:
+        status === "completed" || status === "finished"
+          ? Math.floor(Math.random() * 5 + 1)
+          : 0,
+    };
+
+    const result = db.historyevents.insertOne(historyData);
+    historyEventIds.push(result.insertedId);
+  }
+}
+
+// FEEDBACK - DONE
+const feedbackContents = [
+  "Sự kiện rất bổ ích và có ý nghĩa.",
+  "Tôi đã học hỏi được nhiều điều mới.",
+  "Tổ chức rất chuyên nghiệp, sẽ tham gia lần sau!",
+  "Rất vui khi được giúp đỡ cộng đồng.",
+  "Mọi người thân thiện và vui vẻ.",
+  "Sự kiện cần chuẩn bị kỹ hơn.",
+  "Rất tiếc vì không tham gia đầy đủ.",
+  "Không gian tổ chức hơi nhỏ, nhưng vẫn ổn.",
+  "Thời gian hơi gấp, mong sắp xếp hợp lý hơn.",
+  "Rất tuyệt vời! Mong có nhiều sự kiện như vậy nữa.",
+  "Ban tổ chức rất tận tâm và chu đáo.",
+  "Sự kiện diễn ra suôn sẻ và đúng kế hoạch.",
+  "Địa điểm dễ tìm và thuận tiện di chuyển.",
+  "Hoạt động giúp tôi gắn bó hơn với cộng đồng.",
+  "Lần đầu tham gia và trải nghiệm rất tuyệt.",
+  "Mọi người hỗ trợ lẫn nhau rất tốt.",
+  "Tôi rất tự hào khi là một phần của chương trình.",
+  "Mong chương trình được tổ chức thường xuyên hơn.",
+  "Thời tiết không thuận lợi nhưng mọi người vẫn nhiệt tình.",
+  "Thiếu nước uống trong suốt sự kiện.",
+  "Chương trình có ý nghĩa nhân văn sâu sắc.",
+  "Cảm ơn BTC đã tạo cơ hội cho chúng tôi tham gia.",
+  "Sự kiện giúp tôi mở rộng mối quan hệ xã hội.",
+  "Ban tổ chức phản hồi rất chậm.",
+  "Sự kiện có nhiều khoảnh khắc đáng nhớ.",
+  "Chất lượng âm thanh chưa tốt.",
+  "Lịch trình có sự thay đổi đột ngột.",
+  "Cảm giác rất hạnh phúc khi tham gia.",
+  "Được hỗ trợ tận tình từ BTC.",
+  "Một trải nghiệm không thể quên.",
+  "Tôi thấy bản thân trưởng thành hơn sau sự kiện.",
+  "Không khí rất sôi động và tích cực.",
+  "Cần thêm chỗ đậu xe cho người tham gia.",
+  "Tôi sẽ giới thiệu sự kiện này cho bạn bè.",
+  "Hoạt động nhóm rất thú vị.",
+  "Tôi cảm thấy được lắng nghe và trân trọng.",
+  "Sự kiện mang lại năng lượng tích cực.",
+  "Cảm ơn vì những đóng góp thầm lặng của tình nguyện viên.",
+  "Thời gian diễn ra hơi dài so với dự kiến.",
+  "Cần cải thiện phần đón tiếp ban đầu.",
+  "Hoạt động dọn dẹp rất ý nghĩa.",
+  "Tôi học được cách làm việc nhóm hiệu quả.",
+  "Chương trình diễn ra đúng giờ.",
+  "Cảm xúc rất khó tả, vui và tự hào.",
+  "Sự kiện được tổ chức bài bản.",
+  "BTC còn thiếu vài thiết bị cần thiết.",
+  "Các bạn tình nguyện viên làm việc rất tích cực.",
+  "Bài phát biểu truyền cảm hứng sâu sắc.",
+  "Thời lượng chương trình vừa đủ.",
+  "Tôi mong muốn đóng góp nhiều hơn trong tương lai.",
+  "Phần chia sẻ kinh nghiệm rất hữu ích.",
+  "Không gian hoạt động rộng rãi, thoải mái.",
+  "Chương trình gợi lại nhiều ký ức tuổi trẻ.",
+  "Cần thêm phần giao lưu để gắn kết.",
+  "Hoạt động sáng tạo và mang tính giáo dục cao.",
+  "Tôi thấy mình được sống chậm lại để yêu thương hơn.",
+  "Mọi người đều hòa đồng, vui vẻ.",
+  "Cảm giác ấm áp từ những hành động nhỏ.",
+  "Đội ngũ hỗ trợ nhanh chóng và hiệu quả.",
+  "Tôi thấy sự đoàn kết trong từng hành động.",
+  "Tham gia lần này tôi học được rất nhiều điều.",
+  "Cần thêm thời gian nghỉ giữa các hoạt động.",
+  "Sự kiện này thực sự chạm đến trái tim tôi.",
+  "Tôi đã có cơ hội giao lưu với nhiều người mới.",
+  "Sự kiện được tổ chức rất chuyên nghiệp.",
+  "Tôi hy vọng có thể góp mặt lần sau.",
+  "Chương trình nên có thêm phần hỏi đáp.",
+  "Tôi cảm nhận được tinh thần nhân ái lan tỏa.",
+  "Cảm ơn BTC vì đã lắng nghe ý kiến người tham gia.",
+  "Tôi rất ấn tượng với công tác tổ chức.",
+  "Có những giây phút khiến tôi xúc động thật sự.",
+  "Tôi thấy mình có trách nhiệm với cộng đồng hơn.",
+  "Chương trình khơi gợi nhiều cảm xúc tích cực.",
+  "Cần thêm người hỗ trợ hướng dẫn ban đầu.",
+  "Được tham gia khiến tôi thấy cuộc sống thêm ý nghĩa.",
+  "Mong chương trình tiếp tục lan tỏa điều tốt đẹp.",
+  "Tôi học được cách đồng cảm với người khác.",
+  "Hoạt động gắn liền với thực tế xã hội.",
+  "Có chút khó khăn về việc di chuyển.",
+  "Tôi cảm thấy rất được chào đón.",
+  "Tổ chức rất linh hoạt và thích nghi tốt.",
+  "Địa điểm tổ chức rất đẹp và thân thiện.",
+  "Cần bổ sung thêm vật dụng y tế dự phòng.",
+  "Tôi thấy chương trình nên có thêm trò chơi.",
+  "Cảm ơn vì những kỷ niệm khó quên.",
+  "Ban tổ chức nên khảo sát ý kiến người tham gia.",
+  "Tôi cảm thấy tự hào khi được góp sức nhỏ bé.",
+  "Sự kiện giúp tôi thay đổi tư duy tích cực hơn.",
+  "Tôi đã tìm được nhiều người bạn mới.",
+  "Mỗi hoạt động đều để lại dấu ấn riêng.",
+  "Không khí chan hòa, thân thiện.",
+  "Tôi rất hào hứng tham gia ngay từ đầu.",
+  "Phần khai mạc cần rút ngắn lại.",
+  "Cần thêm phần chia sẻ kinh nghiệm từ người đi trước.",
+  "Không gian tổ chức sạch sẽ và an toàn.",
+  "Tôi thấy trân trọng hơn những gì mình đang có.",
+  "Sự kiện mang tính giáo dục cao.",
+  "Tôi hy vọng chương trình ngày càng phát triển.",
+  "Cần cải thiện phần đăng ký ban đầu.",
+  "Mọi thứ diễn ra rất suôn sẻ.",
+  "Tôi cảm thấy mình đang góp phần thay đổi xã hội.",
+  "Sự kiện thực sự mang lại niềm vui.",
+  "Tôi có cảm giác như được tiếp thêm động lực.",
+  "Các bạn tổ chức rất nhiệt tình và thân thiện.",
+  "Tôi sẽ tiếp tục tham gia nếu có cơ hội.",
+  "Chương trình truyền cảm hứng sống đẹp.",
+  "Rất cảm ơn sự hỗ trợ từ BTC.",
+  "Tôi học được cách lắng nghe nhiều hơn.",
+  "Sự kiện rất gần gũi và thân mật.",
+  "Tôi mong được chia sẻ câu chuyện của mình lần tới.",
+  "Tôi rất biết ơn những người đã tổ chức chương trình.",
+  "Mỗi hoạt động đều mang lại giá trị khác nhau.",
+  "Tôi cảm thấy mình đang góp phần xây dựng cộng đồng.",
+  "Chương trình nên có thêm phần hướng dẫn kỹ năng.",
+  "Sự kiện rất nhân văn và đáng trân trọng.",
+  "Tôi thấy cuộc sống mình ý nghĩa hơn sau sự kiện.",
+  "Mọi người phối hợp rất ăn ý và chuyên nghiệp.",
+  "Không khí thân mật khiến tôi dễ hòa nhập.",
+  "Tôi thấy yêu đời hơn khi được tham gia.",
+  "Sự kiện giúp tôi gắn kết với cộng đồng địa phương.",
+  "Tôi nhận ra tầm quan trọng của việc cho đi.",
+  "Thời gian tổ chức rất hợp lý.",
+  "Cần chuẩn bị thêm phần hậu cần.",
+  "Tôi cảm thấy tự tin hơn sau khi tham gia.",
+  "Chương trình có sức lan tỏa lớn.",
+  "Tôi cảm thấy được truyền cảm hứng từ người khác.",
+  "Tôi mong muốn được đóng góp nhiều hơn nữa.",
+  "Cảm ơn sự hy sinh thầm lặng của các tình nguyện viên.",
+  "Sự kiện giúp tôi nhìn nhận lại bản thân.",
+  "Cần thêm hoạt động gắn kết người tham gia.",
+  "Tôi hy vọng chương trình sẽ tiếp tục phát triển.",
+  "Tôi cảm thấy có trách nhiệm với xã hội hơn.",
+  "Chương trình khơi gợi lòng nhân ái.",
+  "Tôi sẽ ghi nhớ kỷ niệm này mãi mãi.",
+  "Tôi học được giá trị của sự sẻ chia.",
+  "Không khí rất ấm áp và đầy tình người.",
+  "Mong có thêm các hoạt động tương tự.",
+  "Tôi cảm thấy mình thuộc về một cộng đồng tốt đẹp.",
+  "Một trải nghiệm khiến tôi cảm thấy sống có ích.",
+  "Tôi thấy chương trình rất thiết thực.",
+  "Chương trình truyền tải thông điệp rõ ràng.",
+  "Mọi người hợp tác rất hiệu quả.",
+  "Tôi mong sự kiện được nhân rộng.",
+  "Tôi đã học được những bài học quý báu.",
+  "Tôi thấy mình có nhiều động lực hơn.",
+  "Một hoạt động thực sự đáng tham gia.",
+  "Tôi cảm thấy tự hào về chính mình.",
+  "Cảm ơn những nụ cười và niềm vui đã nhận được.",
+  "Tôi mong muốn lan tỏa tinh thần này đến nhiều người.",
+  "Tôi cảm thấy được tiếp sức để sống tích cực hơn.",
+];
+
+const historyEvents = db.historyevents
+  .find({ status: { $in: ["completed", "finished"] } })
+  .limit(200)
+  .toArray();
+
+const feedbackIds = [];
+
+historyEvents.forEach((history, i) => {
+  const feedback = {
+    userId: history.user,
+    eventId: history.event,
+    rating: randomRating(),
+    content:
+      feedbackContents[Math.floor(Math.random() * feedbackContents.length)],
+    createdAt: new Date(
+      history.completedAt || history.attendedAt || Date.now()
+    ),
+    like: Math.floor(Math.random() * 30),
+  };
+
+  const inserted = db.feedbacks.insertOne(feedback);
+  feedbackIds.push(inserted.insertedId);
+});
+
+// CERTIFICATE
+const historyEventsGet = db.historyevents
+  .find({ status: { $in: ["completed", "finished"] } })
+  .toArray();
+
+const certificateIds = [];
+
+historyEventsGet.forEach((history, i) => {
+  const user = db.users.findOne({ _id: history.user });
+  const event = db.events.findOne({ _id: history.event });
+  const organization = db.organizations.findOne({ _id: user.organizationId });
+
+  if (user && event) {
+    const fullName = user.fullName;
+    const email = user.email;
+    const eventName = event.title;
+    const organizationName = organization.name;
+    const completionDate = history.completedAt || new Date();
+    const duration = history.earnedHours;
+
+    // Signature đơn giản
+    const signature = (organizationName + "-" + eventName + "-" + i)
+      .replace(/\s+/g, "-")
+      .toLowerCase();
+
+    const certificate = {
+      userId: user._id,
+      eventId: event._id,
+      fullName: fullName,
+      email: email,
+      eventName: eventName,
+      organizationName: organizationName,
+      completionDate: new Date(completionDate),
+      duration: duration,
+      signature: signature,
+      price: 30000,
+      certificateUrl: "certificate.url",
+    };
+
+    const inserted = db.certificates.insertOne(certificate);
+    certificateIds.push(inserted.insertedId);
+  }
+});
 
 // CERTIFICATE PURCHASE
+// Giả sử bạn đã có danh sách userIds và certificates chưa được mua
+const certificatePurchaseIds = [];
 
+// Tìm các historyEvent đã hoàn thành và có chứng chỉ (limit 5)
+const historyEvent = db.historyevents
+  .find({
+    status: { $in: ["completed", "finished"] },
+    certificateId: { $ne: null },
+  })
+  .limit(5)
+  .toArray();
+
+historyEvent.forEach((history, i) => {
+  const certificate = db.certificates.findOne({ _id: history.certificateId });
+
+  if (!certificate) return;
+
+  const purchase = {
+    userId: history.user,
+    certificateId: history.certificateId,
+    amount: certificate.price,
+    paymentMethod: "ONLINE",
+    paymentStatus: "paid",
+    paidAt: new Date(history.completedAt || Date.now()),
+    createdAt: new Date(),
+  };
+
+  const result = db.certificatepurchases.insertOne(purchase);
+  certificatePurchaseIds.push(result.insertedId);
+});
