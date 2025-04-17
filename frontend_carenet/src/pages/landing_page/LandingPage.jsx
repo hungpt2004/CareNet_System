@@ -1,5 +1,5 @@
 "use client"
-import { Container, Navbar, Nav, Button, Row, Col, Card, Form, Image } from "react-bootstrap"
+import { Container, Navbar, Nav, Button, Row, Col, Card, Form, Image, Modal } from "react-bootstrap"
 import "bootstrap/dist/css/bootstrap.min.css"
 import { motion } from "framer-motion"
 import '../../css/LandingPage.css'
@@ -8,17 +8,28 @@ import TopCommentsSlider from "../../components/component_page/top_comment/TopCo
 import { comments } from "../../components/component_page/top_comment/MockDataComment"
 import CustomNavbar from "../../components/navbar/CustomNavbar"
 import { useNavigate } from "react-router-dom"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Footer } from "../../components/footer/Footer"
 import Achievements from "../../components/component_page/achivements/Achivements"
 import Services from "../../components/component_page/services/Services"
 import styles from '../../css/AppColors.module.css'
 import { FaUserPlus, FaClipboardList, FaHandshake, FaUsers } from "react-icons/fa";
+import { IoMdClose } from "react-icons/io";
 
 function LandingPage() {
 
   // Initialize state
   const [loading, setLoading] = useState(false);
+  const [isChat, setIsChat] = useState(false);
+  const chatContainerRef = useRef(null); // Tham chiếu tới container chat
+
+  // Hàm cuộn xuống cuối khi có tin nhắn mới
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [isChat]); // Mỗi khi cửa sổ chat mở hoặc có tin nhắn mới
+
 
   // Initialize hook
   const navigate = useNavigate();
@@ -50,7 +61,7 @@ function LandingPage() {
 
 
   return (
-    <div className={`${styles.body} w-100`}>
+    <div className={`${styles.body} w-100 position-relative`}>
 
       {/* Hero Section */}
       <section id="home" className="home-section text-white py-5 position-relative" style={{ marginTop: "80px" }}>
@@ -83,18 +94,100 @@ function LandingPage() {
                   của tổ chức bạn.
                 </p>
                 <div className="d-flex flex-wrap gap-2">
-                  <Button variant="light" size="lg">
-                    Tôi Cần Giúp
-                  </Button>
-                  <Button onClick={() => handleSearchPage()} className="w-25" variant="outline-light" size="lg">
-                    {loading ? <Spinner
-                      as="span"
-                      animation="border"
-                      size="sm"
-                      role="status"
-                      aria-hidden="true"
-                    /> : "Kết nối CareNet"}
-                  </Button>
+
+                  <div className="flex-column">
+
+                    <motion.div
+                      initial={{ opacity: 0, y: 50 }}  // Hiệu ứng khởi tạo (mờ dần và trượt lên)
+                      animate={{ opacity: 1, y: 1 }}  // Hiệu ứng khi mở/đóng
+                      transition={{ duration: 1 }}  // Thời gian chuyển động
+                    >
+                      <Button variant="light" size="lg" className={`${isChat ? 'w-100' : ''}`} onClick={() => setIsChat(!isChat)}>
+                        {isChat ? 'Đóng Chat' : 'Tôi Cần Giúp'}
+                      </Button>
+                    </motion.div>
+
+                    {isChat && (
+
+                      <motion.div
+                        initial={{ opacity: 0, y: 50 }}  // Hiệu ứng khởi tạo (mờ dần và trượt lên)
+                        animate={{ opacity: isChat ? 1 : 0, y: isChat ? 0 : 50 }}  // Hiệu ứng khi mở/đóng
+                        transition={{ duration: 0.5 }}  // Thời gian chuyển động
+                        style={{
+                          position: 'absolute',
+                          top: '350px',
+                          width: '400px',  // Đặt chiều rộng của khung chat
+                        }}
+                      >
+                        <div className="p-3 mt-3 border rounded bg-secondary shadow-lg" style={{ bottom: '100px' }}>
+                          <div className="d-flex justify-content-between aligns-item-center mb-3">
+                            <h4 className={`${styles.autoText}`} style={{ letterSpacing: '2px' }}>CHAT BOX CARENET</h4>
+                            <IoMdClose size={30} onClick={() => setIsChat(!isChat)} />
+                          </div>
+                          <div
+                            ref={chatContainerRef}
+                            style={{
+                              height: '200px',
+                              overflowY: 'auto',
+                              borderBottom: '1px solid #ddd',
+                              marginBottom: '10px',
+                            }}
+                          >
+                            {/* Nội dung chat */}
+                            <div className={`${styles.messageContainer}`}>
+                              <div className={`${styles.carenetMessage}`}>
+                                <p>Chào bạn! Bạn cần giúp đỡ gì?</p>
+                              </div>
+                              <div className={`${styles.userMessage}`}>
+                                <p>Tôi cần hỗ trợ về sản phẩm.</p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Các câu hỏi có sẵn */}
+                          <div className="d-flex flex-wrap gap-2 mb-3">
+                            <Button variant="dark">Sự kiện đang diễn ra</Button>
+                            <Button variant="dark">Sự kiện gần đây</Button>
+                            <Button variant="dark">Tư vấn về CareNet</Button>
+                          </div>
+
+                          {/* Input tin nhắn */}
+                          <div className="d-flex">
+                            <div className="col-md-10">
+                              <input
+                                type="text"
+                                placeholder="Nhập tin nhắn..."
+                                className="form-control"
+                              />
+                            </div>
+                            <div className="col-md-2 mx-2">
+                              <Button className="w-100 btn btn-success text-center">Gửi</Button>
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+
+                    )}
+
+                  </div>
+                  <div>
+                    <motion.div
+                      initial={{ opacity: 0, y: 50 }}  // Hiệu ứng khởi tạo (mờ dần và trượt lên)
+                      animate={{ opacity: 1, y: 1 }}  // Hiệu ứng khi mở/đóng
+                      transition={{ duration: 1 }}  // Thời gian chuyển động
+                    >
+                      <Button onClick={() => handleSearchPage()} className="w-100" variant="outline-light" size="lg">
+                        {loading ? <Spinner
+                          as="span"
+                          animation="border"
+                          size="sm"
+                          role="status"
+                          aria-hidden="true"
+                        /> : "Kết nối CareNet"}
+                      </Button>
+                    </motion.div>
+                  </div>
+
                 </div>
               </motion.div>
             </Col>
@@ -480,7 +573,7 @@ function LandingPage() {
         </Container>
       </section>
 
-    </div>
+    </div >
   )
 }
 

@@ -50,3 +50,29 @@
   background-color: var(--color-accent-light);
   color: var(--color-primary);
 }
+
+.autoText {
+
+}
+
+.messageContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.careNetMessage {
+  background-color: #000000;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  align-self: flex-start;  /* Đưa tin nhắn CareNet vào bên trái */
+}
+
+.userMessage {
+  background-color: #28a745;  /* Màu xanh lá */
+  color: white;
+  padding: 8px 10px;
+  margin-bottom: 5px;
+  border-radius: 10px;
+  align-self: flex-end;  /* Đưa tin nhắn người dùng vào bên phải */
+}

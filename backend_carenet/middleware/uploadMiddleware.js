@@ -3,6 +3,7 @@ const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const { cloudinary } = require("../services/uploadCloundinary");
 
+
 /**
  * Tạo middleware upload cho một loại ảnh cụ thể
  * @param {Object} options - Tùy chọn của middleware
@@ -16,51 +17,51 @@ const createUploadMiddleware = (options = {}) => {
   const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
-      folder: options.folder || "uploads",
-      allowed_formats: options.allowedFormats || ["jpg", "jpeg", "png", "gif"],
-      transformation: options.transformation || [{ quality: "auto" }],
-    },
+      folder: options.folder || 'uploads',
+      allowed_formats: options.allowedFormats || ['jpg', 'jpeg', 'png', 'gif'],
+      transformation: options.transformation || [{ quality: 'auto' }]
+    }
   });
 
   // Tạo và cấu hình multer với storage
   return multer({
     storage: storage,
     limits: {
-      fileSize: options.maxFileSize || 5 * 1024 * 1024, // Mặc định 5MB
+      fileSize: options.maxFileSize || 5 * 1024 * 1024 // Mặc định 5MB
     },
     fileFilter: (req, file, cb) => {
       // Kiểm tra loại file
-      if (file.mimetype.startsWith("image/")) {
+      if (file.mimetype.startsWith('image/')) {
         cb(null, true);
       } else {
-        cb(new Error("Chỉ chấp nhận file ảnh"), false);
+        cb(new Error('Chỉ chấp nhận file ảnh'), false);
       }
-    },
+    }
   });
 };
 
 // Middleware upload avatar
 const avatarUpload = createUploadMiddleware({
-  folder: "avatars",
-  allowedFormats: ["jpg", "jpeg", "png"],
+  folder: 'avatars',
+  allowedFormats: ['jpg', 'jpeg', 'png'],
   transformation: [
-    { width: 400, height: 400, crop: "fill" },
-    { quality: "auto:best" },
+    { width: 400, height: 400, crop: 'fill' },
+    { quality: 'auto:best' }
   ],
-  maxFileSize: 2 * 1024 * 1024, // 2MB
+  maxFileSize: 2 * 1024 * 1024 // 2MB
 });
 
 // Middleware upload ảnh event
 // Được phép upload 10 ảnh
 const eventImageUpload = createUploadMiddleware({
-  folder: "posts",
-  allowedFormats: ["jpg", "jpeg", "png", "gif"],
-  transformation: [{ quality: "auto:best" }],
-  maxFileSize: 10 * 1024 * 1024, // 10MB
-}).array("images", 10);
+  folder: 'posts',
+  allowedFormats: ['jpg', 'jpeg', 'png', 'gif'],
+  transformation: [{ quality: 'auto:best' }],
+  maxFileSize: 10 * 1024 * 1024 // 10MB
+}).array('images', 10);
 
 // 1. Hàm upload ảnh lưu vào schema
-// 2. Tạo thông tin schema sau
+// 2. Tạo thông tin schema sau 
 // 2 route khác nhau, 2 lần submit
 
 // Dữ liệu trả về từ cloudinary ví dụ
@@ -82,5 +83,4 @@ const eventImageUpload = createUploadMiddleware({
 module.exports = {
   avatarUpload,
   eventImageUpload,
-  postImageUpload,
 };

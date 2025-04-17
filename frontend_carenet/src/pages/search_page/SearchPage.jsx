@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, use } from "react"
 import { Container, Row, Col, Form, Button, Card, Dropdown, InputGroup, Badge, FormCheck, Spinner, Alert } from "react-bootstrap"
 import { Search, Calendar, MapPin, Filter, ArrowUpDown, Users } from "lucide-react"
 import CustomNavbar from "../../components/navbar/CustomNavbar"
@@ -10,6 +10,14 @@ import { formatDateVN } from "../../utils/FormatDateVN"
 import { useNavigate } from "react-router-dom"
 import styles from '../../css/AppColors.module.css'
 import useAuthStore from "../../hooks/authStore"
+import { BsStarFill, BsStar } from 'react-icons/bs';
+import { Sparkles } from "lucide-react"
+import searchStyles from '../../css/SearchPage.module.css'
+import EventCard from "../../components/component_page/card/EventCard"
+import axiosInstance from "../../utils/AxiosInstance"
+import { CustomFailedToast, CustomSuccessToast } from "../../components/toast/CustomToast"
+import EventCardSlider from "../../components/component_page/card/EventCardSlider"
+import CareNetLoading from "../../components/loading/CareNetLoading"
 
 // Custom CSS variables for the color scheme
 const customStyles = {
@@ -95,7 +103,7 @@ const mockEvents = [
 export default function VolunteerEventSearch() {
 
   // Current user
-  const {currentUser} = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   // State for search filters
   const [searchFilters, setSearchFilters] = useState({
@@ -111,6 +119,30 @@ export default function VolunteerEventSearch() {
   // State for events and filtered events
   const [events, setEvents] = useState(mockEvents)
   const [filteredEvents, setFilteredEvents] = useState(mockEvents)
+  const [aiFilterEvents, setAiFilterEvents] = useState([]);
+  const [aiFilterShowed, setAiFilterShowed] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+
+  // API request event from AI
+  const geminiSuggestionRequest = async () => {
+    setAiLoading(true)
+    setAiFilterShowed(true);
+    try {
+      const response = await axiosInstance.get('/search/ai-search');
+      if (response.status && response.data.matchedEvents) {
+        setAiFilterEvents(response.data.matchedEvents);
+        CustomSuccessToast(response.data.message);
+      }
+    } catch (error) {
+      CustomFailedToast(error.response.data.message);
+    } finally {
+      setTimeout(() => {
+        setAiLoading(false);
+      }, 10000);
+    }
+  }
+
+  console.log(aiFilterEvents.length)
 
   // State for sort option
   const [sortOption, setSortOption] = useState("startDate")
@@ -225,116 +257,147 @@ export default function VolunteerEventSearch() {
     navigate('/event-detail');
   }
 
+  const handleNavigate = (path, eventId) => {
+    console.log(`Navigating to ${path} for event ${eventId}`)
+    // In a real app with React Router, you would use:
+    // navigate(path, { state: { eventId } })
+  }
+
   // Effect to filter events when search filters change
   useEffect(() => {
     filterEvents()
   }, [sortOption, mapArea])
 
-
   return (
     <>
       <Container fluid className={`py-4 p-5 mt-4`}>
-        <h1 className="mb-4 text-center" style={{ color: customStyles.primaryColor }}>
-          Tìm kiếm dịch vụ thiện nguyện
-        </h1>
+
+        {/* AI gợi ý */}
+        {
+          aiFilterShowed ? (aiLoading ? (
+            <CareNetLoading />
+          ) : aiFilterEvents.length > 0 ? (
+            <EventCardSlider
+              events={aiFilterEvents}
+              title="Sự kiện được gợi ý bởi AI CareNet"
+              subtitle="Khám phá các sự kiện phù hợp với bạn"
+              customStyles={customStyles}
+              currentUser={currentUser}
+              onNavigate={handleNavigate}
+            />
+          ) : (
+            <div className="text-center p-5 rounded" style={{ backgroundColor: "white" }}>
+                <Filter size={48} className="mb-3 text-muted" />
+                <h4>Không sự kiện phù hợp nào được tìm thấy</h4>
+                <p className="text-muted">Hãy thử tìm kiếm theo những tiêu chí khác</p>
+                <Button
+                  onClick={resetFilters}
+                  style={{
+                    backgroundColor: customStyles.primaryColor,
+                    borderColor: customStyles.primaryColor,
+                  }}
+                >
+                  Reset tìm kiếm
+                </Button>
+              </div>
+          ))
+          : null
+        }
 
         {/* Search Form */}
-        <Form onSubmit={handleSearch} className="mb-4 border-bottom-1 rounded shadow-sm" style={{ backgroundColor: "white" }}>
-          <Row className="g-3">
-            <Col md={4}>
-              <InputGroup>
-                <InputGroup.Text>
-                  <Search size={16} />
-                </InputGroup.Text>
-                <Form.Control
-                  name="name"
-                  value={searchFilters.name}
-                  onChange={handleInputChange}
-                  placeholder="Event name"
-                />
-              </InputGroup>
-            </Col>
+        <form onSubmit={handleSearch} className={searchStyles.searchForm}>
+          <div className={searchStyles.formGrid}>
+            <div className={searchStyles.inputGroup}>
+              <div className={searchStyles.iconWrapper}>
+                <Search className={searchStyles.icon} />
+              </div>
+              <input
+                type="text"
+                name="name"
+                value={searchFilters.name}
+                onChange={handleInputChange}
+                placeholder="Tên sự kiện"
+                className={searchStyles.input}
+              />
+            </div>
 
-            <Col md={4}>
-              <InputGroup>
-                <InputGroup.Text>
-                  <MapPin size={16} />
-                </InputGroup.Text>
-                <Form.Control
-                  name="location"
-                  value={searchFilters.location}
-                  onChange={handleInputChange}
-                  placeholder="Location"
-                />
-              </InputGroup>
-            </Col>
+            <div className={searchStyles.inputGroup}>
+              <div className={searchStyles.iconWrapper}>
+                <MapPin className={searchStyles.icon} />
+              </div>
+              <input
+                type="text"
+                name="location"
+                value={searchFilters.location}
+                onChange={handleInputChange}
+                placeholder="Địa điểm"
+                className={searchStyles.input}
+              />
+            </div>
 
-            <Col md={4}>
-              <Form.Select name="category" value={searchFilters.category} onChange={handleInputChange}>
+            <div className={searchStyles.selectGroup}>
+              <div className={searchStyles.iconWrapper}>
+                <Filter className={searchStyles.icon} />
+              </div>
+              <select name="category" value={searchFilters.category} onChange={handleInputChange} className={searchStyles.select}>
                 <option value="">Tất cả các lĩnh vực</option>
                 {categories.map((category, index) => (
                   <option key={index} value={category}>
                     {category}
                   </option>
                 ))}
-              </Form.Select>
-            </Col>
+              </select>
+            </div>
 
-            <Col md={3}>
-              <InputGroup>
-                <InputGroup.Text>
-                  <Calendar size={16} />
-                </InputGroup.Text>
-                <Form.Control
-                  type="date"
-                  name="startDate"
-                  value={searchFilters.startDate}
-                  onChange={handleInputChange}
-                  placeholder="Start Date"
-                />
-              </InputGroup>
-            </Col>
+            <div className={searchStyles.inputGroup}>
+              <div className={searchStyles.iconWrapper}>
+                <Calendar className={searchStyles.icon} />
+              </div>
+              <input
+                type="date"
+                name="startDate"
+                value={searchFilters.startDate}
+                onChange={handleInputChange}
+                placeholder="Ngày bắt đầu"
+                className={searchStyles.input}
+              />
+            </div>
 
-            <Col md={3}>
-              <InputGroup>
-                <InputGroup.Text>
-                  <Calendar size={16} />
-                </InputGroup.Text>
-                <Form.Control
-                  type="date"
-                  name="endDate"
-                  value={searchFilters.endDate}
-                  onChange={handleInputChange}
-                  placeholder="End Date"
-                />
-              </InputGroup>
-            </Col>
+            <div className={searchStyles.inputGroup}>
+              <div className={searchStyles.iconWrapper}>
+                <Calendar className={searchStyles.icon} />
+              </div>
+              <input
+                type="date"
+                name="endDate"
+                value={searchFilters.endDate}
+                onChange={handleInputChange}
+                placeholder="Ngày kết thúc"
+                className={searchStyles.input}
+              />
+            </div>
 
-            <Col md={6} className="d-flex gap-2">
-              <Button
-                type="submit"
-                className="flex-grow-1"
-                style={{
-                  backgroundColor: customStyles.primaryColor,
-                  borderColor: customStyles.primaryColor,
-                }}
-              >
+            <div className={searchStyles.buttonGroup}>
+              <button type="submit" className={searchStyles.searchButton}>
+                <Search className={searchStyles.buttonIcon} />
                 Tìm kiếm sự kiện
-              </Button>
-              <Button variant="outline-secondary" onClick={resetFilters}>
-                Tải lại
-              </Button>
-            </Col>
-          </Row>
-        </Form>
+              </button>
+            </div>
+
+            <div className={searchStyles.buttonGroup}>
+              <button type="button" className={searchStyles.aiButton} onClick={() => geminiSuggestionRequest()}>
+                <Sparkles className={searchStyles.buttonIcon} />
+                CareNet tìm giúp
+              </button>
+            </div>
+          </div>
+        </form>
 
         <Row>
           {/* Map Filter (Left Side) */}
           <Col lg={3} className="mb-4">
             <Card className="">
-              <Card.Header style={{ backgroundColor: customStyles.primaryColor, color: "white" }}>
-                <h5 className="text-center mb-0">Chọn từ Map</h5>
-              </Card.Header>
+
               <Card.Body className="p-0">
                 {/* Placeholder for map - in a real implementation, you would integrate a map library here */}
                 <div>
@@ -359,8 +422,93 @@ export default function VolunteerEventSearch() {
               </Card.Body>
             </Card>
 
+            {/* Rating */}
+            <Card className="mt-3 shadow">
+              <Card.Header className="text-center fw-bold fs-5">Tìm kiếm theo đánh giá</Card.Header>
+              <Card.Body>
+                {/* 5 sao */}
+                <FormCheck
+                  type="radio"
+                  id="rating-5"
+                  label={
+                    <span>
+                      {[...Array(5)].map((_, i) => (
+                        <BsStarFill key={i} color="#ffc107" />
+                      ))}
+                      <span> (5.0)</span>
+                    </span>
+                  }
+                />
+
+                {/* 4 sao trở lên */}
+                <FormCheck
+                  type="radio"
+                  id="rating-4"
+                  label={
+                    <span>
+                      {[...Array(4)].map((_, i) => (
+                        <BsStarFill key={i} color="#ffc107" />
+                      ))}
+                      <span><BsStar color="#ccc" /> (4.0 trở lên)</span>
+                    </span>
+                  }
+                />
+
+                {/* 3 sao trở lên */}
+                <FormCheck
+                  type="radio"
+                  id="rating-3"
+                  label={
+                    <span>
+                      {[...Array(3)].map((_, i) => (
+                        <BsStarFill key={i} color="#ffc107" />
+                      ))}
+                      {[...Array(2)].map((_, i) => (
+                        <BsStar key={i} color="#ccc" />
+                      ))}
+                      <span> (3.0 trở lên)</span>
+                    </span>
+                  }
+                />
+
+                {/* 2 sao trở lên */}
+                <FormCheck
+                  type="radio"
+                  id="rating-2"
+                  label={
+                    <span>
+                      {[...Array(2)].map((_, i) => (
+                        <BsStarFill key={i} color="#ffc107" />
+                      ))}
+                      {[...Array(3)].map((_, i) => (
+                        <BsStar key={i} color="#ccc" />
+                      ))}
+                      <span> (2.0 trở lên)</span>
+                    </span>
+                  }
+                />
+
+                <FormCheck
+                  type="radio"
+                  id="rating-1"
+                  label={
+                    <span>
+                      {[...Array(1)].map((_, i) => (
+                        <BsStarFill key={i} color="#ffc107" />
+                      ))}
+                      {[...Array(4)].map((_, i) => (
+                        <BsStar key={i} color="#ccc" />
+                      ))}
+                      <span> (1.0 trở lên)</span>
+                    </span>
+                  }
+                />
+              </Card.Body>
+            </Card>
+
+
             {/* Position */}
-            <Card className="mt-3">
+            <Card className="mt-3 shadow">
               <Card.Header className="text-center fw-bold fs-5">Vị trí bạn muốn </Card.Header>
               <Card.Body>
                 <FormCheck // prettier-ignore
@@ -382,6 +530,8 @@ export default function VolunteerEventSearch() {
 
               </Card.Body>
             </Card>
+
+            {/* AI gợi ý */}
 
           </Col>
 
@@ -427,63 +577,12 @@ export default function VolunteerEventSearch() {
             ) : (filteredEvents.length > 0 ? (
               <div className="d-grid gap-3">
                 {filteredEvents.map((event) => (
-                  <Card key={event.id} className="hover-shadow shadow mb-2 bg-white rounded" style={{ borderColor: "#e0e0e0" }}>
-                    <Card.Header className={`${styles.backgroundPrimary}`}></Card.Header>
-                    <Card.Body>
-                      <Row>
-                        <Col md={8}>
-                          <h5 className="card-title">{event.name}</h5>
-                          <h6 className="text-muted mb-2">
-                            <MapPin size={16} className="me-1" />
-                            {event.location}
-                          </h6>
-                          <p className="mb-2">{event.description}</p>
-                          <p className="mb-2 text-muted">Được tổ chức bởi: {event.organizer}</p>
-                          <Badge
-                            className="me-2"
-                            style={{
-                              backgroundColor: customStyles.primaryColor,
-                              color: "white",
-                            }}
-                          >
-                            {event.category}
-                          </Badge>
-                        </Col>
-                        <Col md={4} className="border-start">
-                          <div className="d-flex flex-column h-100 justify-content-between">
-                            <div>
-                              <div className="d-flex align-items-center mb-2">
-                                <Calendar size={16} className="me-2" style={{ color: customStyles.primaryColor }} />
-                                <div>
-                                  <div>
-                                    <strong>Bắt đầu:</strong> {formatDateVN(event.startDate)}
-                                  </div>
-                                  <div>
-                                    <strong>Kết thúc:</strong> {formatDateVN(event.endDate)}
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="d-flex align-items-center mb-3">
-                                <Users size={16} className="me-2" style={{ color: customStyles.primaryColor }} />
-                                <div>{event.participants} thành viên</div>
-                              </div>
-                            </div>
-                            {currentUser ? <Button
-                              className="button w-100"
-                              onClick={() => handleGoToDetail()}
-                              style={{
-                                backgroundColor: "white",
-                                color: customStyles.primaryColor,
-                                borderColor: customStyles.primaryColor,
-                              }}
-                            >
-                              Xem thông tin
-                            </Button> : <Alert className="text-center alert alert-warning">Vui lòng đăng nhập</Alert>}
-                          </div>
-                        </Col>
-                      </Row>
-                    </Card.Body>
-                  </Card>
+                  <EventCard
+                    event={event}
+                    currentUser={currentUser}
+                    customStyles={customStyles}
+                    formatDateVN={formatDateVN}
+                  />
                 ))}
               </div>
             ) : (

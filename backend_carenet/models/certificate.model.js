@@ -14,11 +14,9 @@ const CertificateSchema = new mongoose.Schema({
   duration: { type: Number, required: true },               // Tổng số giờ tham gia
 
   // Uy tín và nhận dạng
-  certificateCode: { type: String, unique: true, required: true }, // Mã định danh duy nhất
   signature: { type: String, required: true },              // Hash dựa trên org + event
 
   // Trạng thái và truy xuất
-  isPurchased: { type: Boolean, default: false },           // Có mua hay được cấp miễn phí
   price: { type: Number, default: 30000 },                  // Nếu trả phí thì bao nhiêu
   certificateUrl: { type: String },                         // Link PDF nếu có
 

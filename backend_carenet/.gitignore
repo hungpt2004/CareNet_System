@@ -1,0 +1,26 @@
+# Thư mục node_modules chứa các package được cài đặt, không cần đưa vào Git
+node_modules/
+
+# Các tệp log
+*.log
+
+# Các tệp cấu hình IDE như VSCode, JetBrains, v.v.
+.vscode/
+.idea/
+
+# Các tệp môi trường như .env chứa thông tin nhạy cảm
+.env
+
+# Các tệp tạm thời của hệ thống, ví dụ như macOS
+.DS_Store
+
+# Các tệp build của dự án (nếu có)
+dist/
+build/
+
+# Các tệp tạm thời của hệ điều hành
+Thumbs.db
+
+# Các tệp phụ trợ của editor
+*.swp
+*.swo

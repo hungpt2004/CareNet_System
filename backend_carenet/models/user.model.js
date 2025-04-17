@@ -17,7 +17,7 @@ const UserSchema = new Schema({
     street: { type: String }, // Số nhà, tên đường (tùy chọn)
     ward: { type: String }, // Phường/Xã
     district: { type: String }, // Quận/Huyện
-    province: { type: String }, // Tỉnh/Thành phố
+    province: { type: String, default: 'Da Nang'}, // Tỉnh/Thành phố
     country: { type: String, default: "VietNam" },
     postalCode: { type: String }, // (tùy chọn) Mã bưu chính nếu cần
     fullAddress: { type: String },
@@ -34,4 +34,15 @@ const UserSchema = new Schema({
   hobbies: [{ type: String, default: [] }],
 });
 
+// Lưu fulladress middleware
+UserSchema.pre("save", function (next) {
+  const parts = [this.street, this.ward, this.district, this.province].filter(
+    Boolean
+  );
+  this.fullAddress = parts.join(", ");
+  next();
+});
+
 module.exports = mongoose.model("User", UserSchema);
+
+

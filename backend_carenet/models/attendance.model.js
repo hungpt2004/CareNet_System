@@ -18,12 +18,8 @@ const AttendanceSchema = new Schema({
      default: "registered"
    },
    checkInTime: {type: Date, default:  Date.now},
-   checkOutTime: {type: Date, default:  Date.now},
+   checkOutTime: {type: Date, default:  null},
    message: {type: String, default: null},
-   createdAt: {
-     type: Date,
-     default: Date.now
-   }
 });
  
 module.exports = mongoose.model('Attendance', AttendanceSchema);

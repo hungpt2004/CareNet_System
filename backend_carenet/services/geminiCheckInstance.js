@@ -19,4 +19,9 @@ exports.checkWordByGemini = asyncHandler(async (content) => {
   }
 });
 
-exports.suggestEventByGemini = asyncHandler(async (req, res) => {});
+exports.suggestEventByGemini = asyncHandler(async (content) => {
+  
+});
+
+
+exports.chatboxWithGemini = asyncHandler(async(content) => {})
