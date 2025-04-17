@@ -10,7 +10,9 @@ const UserSchema = new Schema({
   cccdImages: [{ type: String }], // Mã hóa ảnh để bảo mật
   phone: { type: String },
   dob: { type: Date },
-  avatart: { type: String },
+  gender: { type: String },
+  avatar: { type: String },
+  avatarUrl: { type: String },
   address: {
     street: { type: String }, // Số nhà, tên đường (tùy chọn)
     ward: { type: String }, // Phường/Xã

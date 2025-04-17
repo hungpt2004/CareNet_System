@@ -5,6 +5,13 @@ import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import { motion } from "framer-motion";
 // import CustomNavbar from "../../components/navbar/CustomNavbar";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "../../utils/AxiosInstance";
+import useAuthStore from "../../hooks/authStore";
+import {
+  CustomFailedToast,
+  CustomSuccessToast,
+  CustomToast,
+} from "../../components/toast/CustomToast";
 const ProfileAvatar = () => {
   // CSS styles defined directly in the component
   const styles = {
@@ -205,7 +212,7 @@ const ProfileAvatar = () => {
   };
 
   const navigate = useNavigate();
-
+  const { currentUser } = useAuthStore();
   return (
     <>
       <Container
@@ -230,7 +237,7 @@ const ProfileAvatar = () => {
                     />
                     <div style={styles.userInfo}>
                       <h5 style={styles.userName}>Hung Pham Trong</h5>
-                      <p style={styles.accountType}>Normal Account</p>
+                      <p style={styles.accountType}>Tài Khoản Cá Nhân</p>
                     </div>
                   </div>
                   <div style={styles.menuItems}>
@@ -239,45 +246,45 @@ const ProfileAvatar = () => {
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-information")}
                     >
-                      <span>Information</span>
+                      <span>Thông Tin</span>
                     </div>
                     <div
                       className="menu-item active"
                       style={{ ...styles.menuItem, ...styles.menuItemActive }}
                       onClick={() => navigate("/profile-avatar")}
                     >
-                      <span>Update Avatar</span>
+                      <span>Cập Nhật Avatar</span>
                     </div>
                     <div
                       className="menu-item"
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-history")}
                     >
-                      <span>History Effort</span>
+                      <span>Lịch Sử Nỗ Lực</span>
                     </div>
                     <div
                       className="menu-item"
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-favourite")}
                     >
-                      <span>Favourite</span>
+                      <span>Yêu Thích</span>
                     </div>
                     <div
                       className="menu-item"
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-score")}
                     >
-                      <span>Score</span>
+                      <span>Số Điểm</span>
                     </div>
                     <div
                       className="menu-item"
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-certificate")}
                     >
-                      <span>Certificate</span>
+                      <span>Chứng Chỉ</span>
                     </div>
                     <div className="menu-item" style={styles.menuItem}>
-                      <span>Log Out</span>
+                      <span>Đăng Xuất</span>
                     </div>
                   </div>
                 </Card.Body>
@@ -292,7 +299,7 @@ const ProfileAvatar = () => {
             >
               <Card style={styles.infoCard}>
                 <Card.Header style={styles.infoHeader}>
-                  <h4 className="mb-0">UPLOAD AVATAR</h4>
+                  <h4 className="mb-0">CẬP NHẬT AVATAR</h4>
                 </Card.Header>
                 <Card.Body style={styles.infoCardBody}>
                   <img
@@ -309,7 +316,7 @@ const ProfileAvatar = () => {
                     style={styles.actionButton}
                     onClick={handleViewAvatar}
                   >
-                    View Avatar
+                    Xem Avatar
                   </Button>
 
                   <Button
@@ -317,7 +324,7 @@ const ProfileAvatar = () => {
                     style={styles.actionButton}
                     onClick={handleUploadClick}
                   >
-                    Upload File Image
+                    Tải Lên Avatar
                   </Button>
 
                   <input
@@ -329,20 +336,20 @@ const ProfileAvatar = () => {
                   />
 
                   <div style={styles.fileInfo}>
-                    <p className="mb-0">Maximum file size is 1 MB</p>
-                    <p style={styles.fileFormat}>Format: JPEG, PNG</p>
+                    <p className="mb-0">Kích thước tối đa: 1 MB</p>
+                    <p style={styles.fileFormat}>Định dạng: JPEG, PNG</p>
                   </div>
 
                   <div style={styles.buttonContainer}>
                     <Button variant="light" style={styles.cancelBtn}>
-                      Cancel
+                      Hủy 
                     </Button>
                     <Button
                       variant="primary"
                       className="save-btn"
                       style={styles.saveBtn}
                     >
-                      Save
+                      Lưu 
                     </Button>
                   </div>
                 </Card.Body>

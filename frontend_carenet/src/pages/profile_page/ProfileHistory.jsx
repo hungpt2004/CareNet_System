@@ -5,6 +5,7 @@ import { Container, Row, Col, Card, Button, Pagination } from "react-bootstrap";
 import { motion } from "framer-motion";
 // import CustomNavbar from "../../components/navbar/CustomNavbar";
 import { useNavigate } from "react-router-dom";
+
 const ProfileHistory = () => {
   // CSS styles defined directly in the component
   const styles = {
@@ -198,31 +199,31 @@ const ProfileHistory = () => {
   const effortData = [
     {
       id: "EF001",
-      eventName: "Community Park Cleanup",
-      startDate: "April 5, 2023",
-      endDate: "April 8, 2023",
-      status: "Completed",
+      eventName: "Dọn Dẹp Công Viên",
+      startDate: "5 tháng 4, 2023",
+      endDate: "8 tháng 4, 2023",
+      status: "Hoàn Thành",
     },
     {
       id: "EF002",
-      eventName: "Green Rooftop Initiative",
-      startDate: "April 10, 2023",
-      endDate: "April 15, 2023",
-      status: "Reject",
+      eventName: "Sáng Kiến Mái Nhà Xanh",
+      startDate: "10 tháng 4, 2023",
+      endDate: "15 tháng 4, 2023",
+      status: "Từ Chối",
     },
     {
       id: "EF003",
-      eventName: "Tree Planting Drive",
-      startDate: "April 18, 2023",
-      endDate: "April 19, 2023",
-      status: "Pending",
+      eventName: "Chương Trình Trồng Cây",
+      startDate: "18 tháng 4, 2023",
+      endDate: "19 tháng 4, 2023",
+      status: "Đang Xử Lý",
     },
     {
       id: "EF004",
-      eventName: "Blood Donation Camp",
-      startDate: "April 22, 2023",
-      endDate: "April 23, 2023",
-      status: "Completed",
+      eventName: "Cắm Trại Hiến Máu",
+      startDate: "22 tháng 4, 2023",
+      endDate: "23 tháng 4, 2023",
+      status: "Hoàn Thành",
     },
   ];
 
@@ -257,7 +258,7 @@ const ProfileHistory = () => {
                     />
                     <div style={styles.userInfo}>
                       <h5 style={styles.userName}>Hung Pham Trong</h5>
-                      <p style={styles.accountType}>Normal Account</p>
+                      <p style={styles.accountType}>Tài Khoản Cá Nhân</p>
                     </div>
                   </div>
                   <div style={styles.menuItems}>
@@ -266,45 +267,45 @@ const ProfileHistory = () => {
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-information")}
                     >
-                      <span>Information</span>
+                      <span>Thông Tin</span>
                     </div>
                     <div
                       className="menu-item"
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-avatar")}
                     >
-                      <span>Update Avatar</span>
+                      <span>Cập Nhật Avatar</span>
                     </div>
                     <div
                       className="menu-item active"
                       style={{ ...styles.menuItem, ...styles.menuItemActive }}
                       onClick={() => navigate("/profile-history")}
                     >
-                      <span>History Effort</span>
+                      <span>Lịch Sử Nỗ Lực</span>
                     </div>
                     <div
                       className="menu-item"
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-favourite")}
                     >
-                      <span>Favourite</span>
+                      <span>Yêu Thích</span>
                     </div>
                     <div
                       className="menu-item"
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-score")}
                     >
-                      <span>Score</span>
+                      <span>Số Điểm</span>
                     </div>
                     <div
                       className="menu-item"
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-certificate")}
                     >
-                      <span>Certificate</span>
+                      <span>Chứng Chỉ</span>
                     </div>
                     <div className="menu-item" style={styles.menuItem}>
-                      <span>Log Out</span>
+                      <span>Đăng Xuất</span>
                     </div>
                   </div>
                 </Card.Body>
@@ -319,53 +320,55 @@ const ProfileHistory = () => {
             >
               <Card style={styles.infoCard}>
                 <Card.Header style={styles.infoHeader}>
-                  <h4 className="mb-0">HISTORY EFFORT</h4>
+                  <h4 className="mb-0">LỊCH SỬ NỖ LỰC</h4>
                 </Card.Header>
                 <Card.Body style={styles.infoCardBody}>
                   <div style={styles.filterContainer}>
-                    {["ALL", "Completed", "Pending", "Reject"].map((filter) => (
-                      <Button
-                        key={filter}
-                        variant="dark"
-                        style={{
-                          ...styles.filterButton,
-                          ...(activeFilter === filter
-                            ? styles.filterButtonActive
-                            : {}),
-                        }}
-                        onClick={() => setActiveFilter(filter)}
-                      >
-                        {filter}
-                      </Button>
-                    ))}
+                    {["Tất Cả", "Đã Hoàn Thành", "Đang Xử Lí", "Từ Chối"].map(
+                      (filter) => (
+                        <Button
+                          key={filter}
+                          variant="dark"
+                          style={{
+                            ...styles.filterButton,
+                            ...(activeFilter === filter
+                              ? styles.filterButtonActive
+                              : {}),
+                          }}
+                          onClick={() => setActiveFilter(filter)}
+                        >
+                          {filter}
+                        </Button>
+                      )
+                    )}
                   </div>
 
                   <div style={styles.effortGrid}>
                     {filteredEfforts.map((effort) => (
                       <div key={effort.id} style={styles.effortCard}>
-                        <h5 style={styles.effortHeader}>Effort ID</h5>
+                        <h5 style={styles.effortHeader}>Mã Nỗ Lực</h5>
 
                         <div style={styles.effortField}>
-                          <div style={styles.effortLabel}>Event's Name:</div>
+                          <div style={styles.effortLabel}>Tên Sự Kiện:</div>
                           <div style={styles.effortValue}>
                             {effort.eventName}
                           </div>
                         </div>
 
                         <div style={styles.effortField}>
-                          <div style={styles.effortLabel}>Start Date:</div>
+                          <div style={styles.effortLabel}>Ngày Bắt Đầu:</div>
                           <div style={styles.effortValue}>
                             {effort.startDate}
                           </div>
                         </div>
 
                         <div style={styles.effortField}>
-                          <div style={styles.effortLabel}>End Date:</div>
+                          <div style={styles.effortLabel}>Ngày Kết Thúc:</div>
                           <div style={styles.effortValue}>{effort.endDate}</div>
                         </div>
 
                         <div style={styles.effortField}>
-                          <div style={styles.effortLabel}>Status:</div>
+                          <div style={styles.effortLabel}>Trạng Thái:</div>
                           <div style={styles.effortValue}>{effort.status}</div>
                         </div>
 
@@ -373,7 +376,7 @@ const ProfileHistory = () => {
                           className="feedback-btn"
                           style={styles.feedbackButton}
                         >
-                          Feedback
+                          Phản Hồi
                         </Button>
                       </div>
                     ))}

@@ -5,8 +5,9 @@ import { Container, Row, Col, Card, Pagination } from "react-bootstrap";
 import { motion } from "framer-motion";
 import { HeartFill } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
+
 const ProfileFavourite = () => {
-  // Event images
+  // Hình ảnh sự kiện
   const treeImage =
     "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80";
   const bloodImage =
@@ -188,23 +189,23 @@ const ProfileFavourite = () => {
   const [favourites, setFavourites] = useState([
     {
       id: 1,
-      name: "Tree Planting Drive",
+      name: "Chương Trình Trồng Cây",
       description:
-        "Help restore green spaces by planting trees in designated areas. This is a family-friendly event with guidance from environmental experts and all necessary tools will be provided.",
+        "Giúp phục hồi các khu vực xanh bằng cách trồng cây. Đây là một sự kiện thân thiện với gia đình, có sự hướng dẫn từ các chuyên gia môi trường và sẽ cung cấp đầy đủ công cụ cần thiết.",
       image: treeImage,
     },
     {
       id: 2,
-      name: "Blood Donation Camp",
+      name: "Trại Hiến Máu",
       description:
-        "Donate blood and save lives! This event is organized in collaboration with local hospitals and blood banks. Medical professionals will be available to ensure a safe and comfortable donation process.",
+        "Hiến máu và cứu sống nhiều người! Sự kiện này được tổ chức phối hợp với các bệnh viện và ngân hàng máu địa phương. Các chuyên gia y tế sẽ có mặt để đảm bảo quá trình hiến máu an toàn và thoải mái.",
       image: bloodImage,
     },
     {
       id: 3,
-      name: "Animal Shelter Volunteering",
+      name: "Tình Nguyện tại Trại Cứu Hộ Động Vật",
       description:
-        "Support an animal shelter by helping with feeding, cleaning, and playing with rescued animals. Volunteers will also assist in adoption events to find loving homes for pets in need.",
+        "Hỗ trợ trại cứu hộ động vật bằng cách giúp đỡ việc cho ăn, làm sạch và chơi với những con vật bị cứu hộ. Các tình nguyện viên cũng sẽ giúp tổ chức các sự kiện nhận nuôi để tìm kiếm mái ấm cho những con thú cưng cần một gia đình.",
       image: animalImage,
     },
   ]);
@@ -238,7 +239,7 @@ const ProfileFavourite = () => {
                   />
                   <div style={styles.userInfo}>
                     <h5 style={styles.userName}>Hung Pham Trong</h5>
-                    <p style={styles.accountType}>Normal Account</p>
+                    <p style={styles.accountType}>Tài Khoản Cá Nhân</p>
                   </div>
                 </div>
                 <div style={styles.menuItems}>
@@ -247,45 +248,45 @@ const ProfileFavourite = () => {
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-information")}
                   >
-                    <span>Information</span>
+                    <span>Thông Tin</span>
                   </div>
                   <div
                     className="menu-item"
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-avatar")}
                   >
-                    <span>Update Avatar</span>
+                    <span>Cập Nhật Avatar</span>
                   </div>
                   <div
                     className="menu-item"
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-history")}
                   >
-                    <span>History Effort</span>
+                    <span>Lịch Sử Nỗ Lực</span>
                   </div>
                   <div
                     className="menu-item active"
                     style={{ ...styles.menuItem, ...styles.menuItemActive }}
                     onClick={() => navigate("/profile-favourite")}
                   >
-                    <span>Favourite</span>
+                    <span>Yêu Thích</span>
                   </div>
                   <div
                     className="menu-item"
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-score")}
                   >
-                    <span>Score</span>
+                    <span>Số Điểm</span>
                   </div>
                   <div
                     className="menu-item"
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-certificate")}
                   >
-                    <span>Certificate</span>
+                    <span>Chứng Chỉ</span>
                   </div>
                   <div className="menu-item" style={styles.menuItem}>
-                    <span>Log Out</span>
+                    <span>Đăng Xuất</span>
                   </div>
                 </div>
               </Card.Body>
@@ -300,7 +301,7 @@ const ProfileFavourite = () => {
           >
             <Card style={styles.infoCard}>
               <Card.Header style={styles.infoHeader}>
-                <h4 className="mb-0">FAVOURITE</h4>
+                <h4 className="mb-0">YÊU THÍCH</h4>
               </Card.Header>
               <Card.Body style={styles.infoCardBody}>
                 <div style={styles.favouriteList}>
@@ -319,10 +320,10 @@ const ProfileFavourite = () => {
                       />
                       <div style={styles.eventContent}>
                         <h5 style={styles.eventName}>
-                          Event Name: {favourite.name}
+                          Tên Sự Kiện: {favourite.name}
                         </h5>
                         <p style={styles.eventDescription}>
-                          Description: {favourite.description}
+                          Mô Tả: {favourite.description}
                         </p>
                       </div>
                       <div style={styles.heartContainer}>

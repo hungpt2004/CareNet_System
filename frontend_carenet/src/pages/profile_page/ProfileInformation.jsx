@@ -5,7 +5,18 @@ import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
 import { motion } from "framer-motion";
 // import CustomNavbar from "../../components/navbar/CustomNavbar";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "../../utils/AxiosInstance";
+import useAuthStore from "../../hooks/authStore";
+import {
+  CustomFailedToast,
+  CustomSuccessToast,
+  CustomToast,
+} from "../../components/toast/CustomToast";
 const ProfileInfo = () => {
+  const navigate = useNavigate();
+  const { currentUser } = useAuthStore();
+  const [initialFormData, setInitialFormData] = useState({});
+
   // CSS styles defined directly in the component
   const styles = {
     root: {
@@ -199,16 +210,18 @@ const ProfileInfo = () => {
     };
   }, []);
 
+  // Data cho form
   const [formData, setFormData] = useState({
-    fullname: "Hung Pham Trong",
-    gender: "Male",
-    birthdate: "20/02/2004",
-    cmnd: "1234567891",
-    phone: "0947811575",
-    email: "hungpham1603@hcmut.edu.vn",
-    address: "123 Street ABC, DEF District, Laha City",
+    fullname: "",
+    gender: "",
+    birthdate: "",
+    cmnd: "",
+    phone: "",
+    email: "",
+    address: "",
   });
 
+  //Nhập data vào form
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -217,15 +230,123 @@ const ProfileInfo = () => {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Handle form submission
-    console.log("Form submitted:", formData);
-  };
-  const navigate = useNavigate();
+  // Xử lý nộp form qua api và cập nhật form (Data cho form)
+   const handleSubmit = (e) => {
+     e.preventDefault();
+
+     // Validate Date of Birth (dob)
+     const dob = new Date(formData.birthdate);
+     const today = new Date();
+
+     // Check if dob is a future date
+     if (dob > today) {
+       CustomFailedToast("Date of birth cannot be a future date.");
+       setFormData(initialFormData); // Reset the form to initial values
+       return; // Prevent form submission
+     }
+
+     // Optional: Check if user is at least 18 years old
+     const age = today.getFullYear() - dob.getFullYear();
+     const month = today.getMonth() - dob.getMonth();
+     if (month < 0 || (month === 0 && today.getDate() < dob.getDate())) {
+       age--;
+     }
+
+     if (age < 18) {
+       CustomFailedToast("You must be at least 18 years old.");
+       setFormData(initialFormData); // Reset the form to initial values
+       return; // Prevent form submission
+     }
+
+     // Validate Phone Number (phone)
+     const phoneRegex = /^[0-9]{10,15}$/; // Simple regex for phone numbers (10-15 digits)
+     if (!phoneRegex.test(formData.phone)) {
+       CustomFailedToast(
+         "Phone number is not valid. It must be 10 to 15 digits."
+       );
+       setFormData(initialFormData); // Reset the form to initial values
+       return; // Prevent form submission
+     }
+
+     // Convert dob to ISO string
+     const dobString = dob.toISOString();
+
+     const updatedProfileData = {
+       fullname: formData.fullname,
+       phone: formData.phone,
+       gender: formData.gender,
+       dob: dobString, // Ensure dob is an ISO string
+       address: {
+         fullAddress: formData.address, // Sending address as an object with "fullAddress"
+       },
+     };
+
+     if (currentUser) {
+       axiosInstance
+         .put(`/profile/edit-profile/${currentUser._id}`, updatedProfileData)
+         .then((response) => {
+           console.log("Profile updated successfully:", response.data);
+           if (response.data && response.data.message) {
+             CustomSuccessToast(response.data.message); // Display success message from backend
+           }
+
+           const updatedUser = response.data.user;
+
+           // Immediately update the form with the new data from the backend
+           setFormData({
+             fullname: updatedUser.fullname,
+             gender: updatedUser.gender,
+             birthdate: updatedUser.dob
+               ? new Date(updatedUser.dob).toLocaleDateString()
+               : "",
+             phone: updatedUser.phone,
+             fullAddress: updatedUser.address
+               ? updatedUser.address.fullAddress
+               : "",
+           });
+         })
+         .catch((err) => {
+           console.log("Error updating profile:", err);
+           if (err.response && err.response.data && err.response.data.message) {
+             CustomFailedToast(err.response.data.message); // Display error message from backend
+           }
+         });
+     }
+   };
+
+  // Lấy thông tin người dùng qua api (Data cho form)
+  React.useEffect(() => {
+    if (currentUser) {
+      axiosInstance
+        .get(`/profile/get-profile/${currentUser._id}`)
+        .then((response) => {
+          const user = response.data.user;
+          const initialData = {
+            fullname: user.fullname || "",
+            gender: user.gender || "",
+            birthdate: user.dob ? new Date(user.dob).toLocaleDateString() : "",
+            cmnd: user.cccdNumber || "",
+            phone: user.phone || "",
+            email: user.email || "",
+            address: user.address ? user.address.fullAddress || "" : "",
+          };
+
+          // Store initial form data
+          setInitialFormData(initialData);
+
+          // Set form data
+          setFormData(initialData);
+        })
+        .catch((err) => {
+          console.log("Error fetching user profile:", err);
+        });
+    }
+  }, [currentUser]);
+
 
   return (
     <>
+      <CustomToast />
       <Container
         className="d-flex justify-content-center align-items-center"
         style={{ ...styles.accountContainer, maxWidth: "1100px" }} // Limit max width
@@ -249,7 +370,7 @@ const ProfileInfo = () => {
                     />
                     <div style={styles.userInfo}>
                       <h5 style={styles.userName}>Hung Pham Trong</h5>
-                      <p style={styles.accountType}>Normal Account</p>
+                      <p style={styles.accountType}>Tài Khoản Cá Nhân</p>
                     </div>
                   </div>
                   <div style={styles.menuItems}>
@@ -258,45 +379,45 @@ const ProfileInfo = () => {
                       style={{ ...styles.menuItem, ...styles.menuItemActive }}
                       onClick={() => navigate("/profile-information")}
                     >
-                      <span>Information</span>
+                      <span>Thông tin </span>
                     </div>
                     <div
                       className="menu-item"
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-avatar")}
                     >
-                      <span>Update Avatar</span>
+                      <span>Cập Nhật Avatar</span>
                     </div>
                     <div
                       className="menu-item"
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-history")}
                     >
-                      <span>History Effort</span>
+                      <span>Lịch Sử Nỗ Lực</span>
                     </div>
                     <div
                       className="menu-item"
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-favourite")}
                     >
-                      <span>Favourite</span>
+                      <span>Yêu Thích</span>
                     </div>
                     <div
                       className="menu-item"
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-score")}
                     >
-                      <span>Score</span>
+                      <span>Số Điểm</span>
                     </div>
                     <div
                       className="menu-item"
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-certificate")}
                     >
-                      <span>Certificate</span>
+                      <span>Chứng Chỉ</span>
                     </div>
                     <div className="menu-item" style={styles.menuItem}>
-                      <span>Log Out</span>
+                      <span>Đăng Xuất</span>
                     </div>
                   </div>
                 </Card.Body>
@@ -311,7 +432,7 @@ const ProfileInfo = () => {
             >
               <Card style={styles.infoCard}>
                 <Card.Header style={styles.infoHeader}>
-                  <h4 className="mb-0">INFORMATION</h4>
+                  <h4 className="mb-0">THÔNG TIN</h4>
                 </Card.Header>
                 <Card.Body style={styles.infoCardBody}>
                   <Form onSubmit={handleSubmit}>
@@ -319,7 +440,7 @@ const ProfileInfo = () => {
                       <Col md={6}>
                         <Form.Group>
                           <Form.Label style={styles.formLabel}>
-                            Fullname
+                            Họ Tên
                           </Form.Label>
                           <Form.Control
                             type="text"
@@ -333,7 +454,7 @@ const ProfileInfo = () => {
                       <Col md={6}>
                         <Form.Group>
                           <Form.Label style={styles.formLabel}>
-                            Gender
+                            Giới Tính
                           </Form.Label>
                           <div>
                             <Form.Check
@@ -374,7 +495,7 @@ const ProfileInfo = () => {
                       <Col md={6}>
                         <Form.Group>
                           <Form.Label style={styles.formLabel}>
-                            Birthdate
+                            Ngày Sinh
                           </Form.Label>
                           <Form.Control
                             type="text"
@@ -394,6 +515,7 @@ const ProfileInfo = () => {
                             value={formData.cmnd}
                             onChange={handleChange}
                             style={styles.formControl}
+                            readOnly
                           />
                         </Form.Group>
                       </Col>
@@ -402,7 +524,7 @@ const ProfileInfo = () => {
                       <Col md={6}>
                         <Form.Group>
                           <Form.Label style={styles.formLabel}>
-                            Phone Number
+                            Số Điện Thoại
                           </Form.Label>
                           <Form.Control
                             type="text"
@@ -424,12 +546,13 @@ const ProfileInfo = () => {
                             value={formData.email}
                             onChange={handleChange}
                             style={styles.formControl}
+                            readOnly
                           />
                         </Form.Group>
                       </Col>
                     </Row>
                     <Form.Group className="mb-4">
-                      <Form.Label style={styles.formLabel}>Address</Form.Label>
+                      <Form.Label style={styles.formLabel}>Địa Chỉ</Form.Label>
                       <Form.Control
                         as="textarea"
                         rows={3}
@@ -440,16 +563,13 @@ const ProfileInfo = () => {
                       />
                     </Form.Group>
                     <div className="text-end">
-                      <Button variant="light" className="me-2">
-                        Cancel
-                      </Button>
                       <Button
                         variant="primary"
                         type="submit"
                         className="save-btn"
                         style={styles.saveBtn}
                       >
-                        Save
+                        Lưu
                       </Button>
                     </div>
                   </Form>

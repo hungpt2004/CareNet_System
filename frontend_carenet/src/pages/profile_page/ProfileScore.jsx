@@ -1,9 +1,17 @@
 "use client";
 
-import React from "react";
-import { Container, Row, Col, Card, ProgressBar } from "react-bootstrap";
+import React, { useState } from "react";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  ProgressBar,
+  Pagination,
+} from "react-bootstrap";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+
 const ProfileScore = () => {
   // CSS styles defined directly in the component
   const styles = {
@@ -149,6 +157,11 @@ const ProfileScore = () => {
       color: "#6c757d",
       fontSize: "0.9rem",
     },
+    paginationContainer: {
+      display: "flex",
+      justifyContent: "center",
+      marginTop: "1.5rem",
+    },
   };
 
   // Add CSS to document
@@ -201,37 +214,96 @@ const ProfileScore = () => {
     };
   }, []);
 
-  // Sample score data
+  // Sample score data - expanded to demonstrate pagination
   const scoreData = [
     {
       id: 1,
-      event: "Tree Planting Drive",
-      date: "April 19, 2023",
+      event: "Chương Trình Trồng Cây",
+      date: "19 tháng 4, 2023",
       score: 85,
       hours: 4,
     },
     {
       id: 2,
-      event: "Blood Donation Camp",
-      date: "April 23, 2023",
+      event: "Trại Hiến Máu",
+      date: "23 tháng 4, 2023",
       score: 70,
       hours: 3,
     },
     {
       id: 3,
-      event: "Animal Shelter Volunteering",
-      date: "May 5, 2023",
+      event: "Tình Nguyện tại Trại Cứu Hộ Động Vật",
+      date: "5 tháng 5, 2023",
       score: 90,
       hours: 5,
     },
     {
       id: 4,
-      event: "Community Park Cleanup",
-      date: "May 12, 2023",
+      event: "Dọn Dẹp Công Viên Cộng Đồng",
+      date: "12 tháng 5, 2023",
       score: 75,
       hours: 3.5,
     },
+    {
+      id: 5,
+      event: "Chương Trình Tình Nguyện Giúp Đỡ Học Sinh",
+      date: "3 tháng 6, 2023",
+      score: 80,
+      hours: 4.5,
+    },
+    {
+      id: 6,
+      event: "Chương Trình Thăm Hỏi Người Cao Tuổi",
+      date: "15 tháng 6, 2023",
+      score: 95,
+      hours: 6,
+    },
+    {
+      id: 7,
+      event: "Tình Nguyện tại Ngân Hàng Thực Phẩm",
+      date: "8 tháng 7, 2023",
+      score: 85,
+      hours: 5,
+    },
+    {
+      id: 8,
+      event: "Sáng Kiến Dọn Dẹp Bãi Biển",
+      date: "22 tháng 7, 2023",
+      score: 80,
+      hours: 4,
+    },
   ];
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const eventsPerPage = 3;
+
+  // Calculate total pages
+  const totalPages = Math.ceil(scoreData.length / eventsPerPage);
+
+  // Get current events
+  const indexOfLastEvent = currentPage * eventsPerPage;
+  const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
+  const currentEvents = scoreData.slice(indexOfFirstEvent, indexOfLastEvent);
+
+  // Change page
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  // Generate pagination items
+  const paginationItems = [];
+  for (let number = 1; number <= totalPages; number++) {
+    paginationItems.push(
+      <Pagination.Item
+        key={number}
+        active={number === currentPage}
+        onClick={() => handlePageChange(number)}
+      >
+        {number}
+      </Pagination.Item>
+    );
+  }
 
   // Calculate total score
   const totalScore = scoreData.reduce((sum, item) => sum + item.score, 0);
@@ -243,6 +315,7 @@ const ProfileScore = () => {
   const progressPercentage = totalScore % 100;
 
   const navigate = useNavigate();
+
   return (
     <Container
       className="d-flex justify-content-center align-items-center"
@@ -266,7 +339,7 @@ const ProfileScore = () => {
                   />
                   <div style={styles.userInfo}>
                     <h5 style={styles.userName}>Hung Pham Trong</h5>
-                    <p style={styles.accountType}>Normal Account</p>
+                    <p style={styles.accountType}>Tài Khoản Cá Nhân</p>
                   </div>
                 </div>
                 <div style={styles.menuItems}>
@@ -275,45 +348,45 @@ const ProfileScore = () => {
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-information")}
                   >
-                    <span>Information</span>
+                    <span>Thông Tin</span>
                   </div>
                   <div
                     className="menu-item"
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-avatar")}
                   >
-                    <span>Update Avatar</span>
+                    <span>Cập Nhật Avatar</span>
                   </div>
                   <div
                     className="menu-item"
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-history")}
                   >
-                    <span>History Effort</span>
+                    <span>Lịch Sử Nỗ Lực</span>
                   </div>
                   <div
                     className="menu-item"
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-favourite")}
                   >
-                    <span>Favourite</span>
+                    <span>Yêu Thích</span>
                   </div>
                   <div
                     className="menu-item active"
                     style={{ ...styles.menuItem, ...styles.menuItemActive }}
                     onClick={() => navigate("/profile-score")}
                   >
-                    <span>Score</span>
+                    <span>Số Điểm</span>
                   </div>
                   <div
                     className="menu-item"
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-certificate")}
                   >
-                    <span>Certificate</span>
+                    <span>Chứng Chỉ</span>
                   </div>
                   <div className="menu-item" style={styles.menuItem}>
-                    <span>Log Out</span>
+                    <span>Đăng Xuất</span>
                   </div>
                 </div>
               </Card.Body>
@@ -328,7 +401,7 @@ const ProfileScore = () => {
           >
             <Card style={styles.infoCard}>
               <Card.Header style={styles.infoHeader}>
-                <h4 className="mb-0">SCORE</h4>
+                <h4 className="mb-0">SỐ ĐIỂM</h4>
               </Card.Header>
               <Card.Body style={styles.infoCardBody}>
                 <motion.div
@@ -338,48 +411,48 @@ const ProfileScore = () => {
                   transition={{ duration: 0.5 }}
                 >
                   <div style={styles.totalScore}>{totalScore}</div>
-                  <div style={styles.scoreLabel}>Total Volunteer Points</div>
+                  <div style={styles.scoreLabel}>Tổng Điểm Tình Nguyện</div>
 
                   <Row className="text-center mb-3">
                     <Col>
                       <h5>{scoreData.length}</h5>
-                      <p style={styles.scoreLabel}>Events</p>
+                      <p style={styles.scoreLabel}>Sự Kiện</p>
                     </Col>
                     <Col>
                       <h5>{totalHours}</h5>
-                      <p style={styles.scoreLabel}>Hours</p>
+                      <p style={styles.scoreLabel}>Giờ</p>
                     </Col>
                     <Col>
                       <h5>{currentLevel}</h5>
-                      <p style={styles.scoreLabel}>Level</p>
+                      <p style={styles.scoreLabel}>Cấp Bậc</p>
                     </Col>
                   </Row>
 
                   <div style={styles.levelLabel}>
-                    <span>Level {currentLevel}</span>
-                    <span>Level {currentLevel + 1}</span>
+                    <span>Cấp Bậc {currentLevel}</span>
+                    <span>Cấp Bậc {currentLevel + 1}</span>
                   </div>
                   <ProgressBar
                     now={progressPercentage}
                     variant="info"
                     style={styles.levelProgress}
                   />
-                  <small>{progressPercentage}% to next level</small>
+                  <small>{progressPercentage}% đến cấp tiếp theo</small>
                 </motion.div>
 
-                <h5 className="mb-3">Event Scores</h5>
+                <h5 className="mb-3">Điểm Các Sự Kiện</h5>
 
                 <table style={styles.scoreTable}>
                   <thead>
                     <tr>
-                      <th style={styles.scoreTableHeader}>Event</th>
-                      <th style={styles.scoreTableHeader}>Date</th>
-                      <th style={styles.scoreTableHeader}>Hours</th>
-                      <th style={styles.scoreTableHeader}>Score</th>
+                      <th style={styles.scoreTableHeader}>Sự Kiện</th>
+                      <th style={styles.scoreTableHeader}>Ngày</th>
+                      <th style={styles.scoreTableHeader}>Giờ</th>
+                      <th style={styles.scoreTableHeader}>Điểm</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {scoreData.map((item, index) => (
+                    {currentEvents.map((item, index) => (
                       <motion.tr
                         key={item.id}
                         className="score-table-row"
@@ -399,7 +472,7 @@ const ProfileScore = () => {
                         <td style={styles.scoreTableCell}>
                           <span style={styles.scoreDate}>{item.date}</span>
                         </td>
-                        <td style={styles.scoreTableCell}>{item.hours} hrs</td>
+                        <td style={styles.scoreTableCell}>{item.hours} giờ</td>
                         <td
                           style={{
                             ...styles.scoreTableCell,
@@ -413,6 +486,33 @@ const ProfileScore = () => {
                     ))}
                   </tbody>
                 </table>
+
+                {/* Pagination */}
+                <div style={styles.paginationContainer}>
+                  <Pagination
+                    style={{
+                      "--bs-pagination-color": "#0E606E",
+                      "--bs-pagination-active-bg": "#0E606E",
+                      "--bs-pagination-active-border-color": "#0E606E",
+                      "--bs-pagination-hover-color": "#0E606E",
+                      "--bs-pagination-focus-color": "#0E606E",
+                    }}
+                  >
+                    <Pagination.Prev
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                      }
+                      disabled={currentPage === 1}
+                    />
+                    {paginationItems}
+                    <Pagination.Next
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                      }
+                      disabled={currentPage === totalPages}
+                    />
+                  </Pagination>
+                </div>
               </Card.Body>
             </Card>
           </motion.div>

@@ -1,10 +1,19 @@
 "use client";
 
 import React, { useState } from "react";
-import { Container, Row, Col, Card, Button, Form } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Button,
+  Modal,
+  Pagination,
+} from "react-bootstrap";
 import { motion } from "framer-motion";
-import { Download, Printer } from "react-bootstrap-icons";
+import { Download, Printer, Eye } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
+
 const ProfileCertificate = () => {
   // CSS styles defined directly in the component
   const styles = {
@@ -81,15 +90,52 @@ const ProfileCertificate = () => {
     infoCardBody: {
       padding: "1.5rem",
     },
-    certificateSelector: {
-      marginBottom: "2rem",
-    },
-    certificateContainer: {
-      border: "1px solid #ddd",
-      padding: "0.5rem",
-      backgroundColor: "white",
-      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+    certificateGrid: {
+      display: "grid",
+      gridTemplateColumns: "repeat(2, 1fr)",
+      gap: "1.5rem",
       marginBottom: "1.5rem",
+    },
+    certificateCard: {
+      border: "1px solid #ddd",
+      borderRadius: "10px",
+      padding: "1rem",
+      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
+    },
+    certificateHeader: {
+      textAlign: "center",
+      marginBottom: "1rem",
+      fontWeight: "bold",
+    },
+    certificateField: {
+      display: "flex",
+      marginBottom: "0.5rem",
+    },
+    certificateLabel: {
+      width: "100px",
+      fontWeight: "500",
+      fontSize: "0.9rem",
+    },
+    certificateValue: {
+      flex: 1,
+      border: "1px solid #ddd",
+      borderRadius: "4px",
+      padding: "0.25rem 0.5rem",
+      fontSize: "0.9rem",
+    },
+    viewButton: {
+      backgroundColor: "#0E606E",
+      border: "none",
+      width: "100%",
+      marginTop: "0.5rem",
+    },
+    paginationContainer: {
+      display: "flex",
+      justifyContent: "center",
+      marginTop: "1.5rem",
+    },
+    paginationItem: {
+      margin: "0 0.2rem",
     },
     certificate: {
       position: "relative",
@@ -113,31 +159,31 @@ const ProfileCertificate = () => {
       alignItems: "center",
       justifyContent: "space-between",
     },
-    certificateHeader: {
-      textAlign: "center",
-      marginBottom: "1.5rem",
-    },
     certificateTitle: {
       fontSize: "2rem",
       fontWeight: "bold",
       color: "#0E606E",
       marginBottom: "0.5rem",
       fontFamily: "serif",
+      textAlign: "center",
     },
     certificateSubtitle: {
       fontSize: "1.2rem",
       color: "#555",
       marginBottom: "0.5rem",
+      textAlign: "center",
     },
     certificateOrg: {
       fontSize: "1.5rem",
       fontWeight: "bold",
       marginBottom: "0.25rem",
+      textAlign: "center",
     },
     certificatePartner: {
       fontSize: "1rem",
       fontStyle: "italic",
       marginBottom: "1.5rem",
+      textAlign: "center",
     },
     certificateContent: {
       textAlign: "center",
@@ -213,7 +259,7 @@ const ProfileCertificate = () => {
       transform: "rotate(-15deg)",
       boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)",
     },
-    certificateActions: {
+    modalActions: {
       display: "flex",
       justifyContent: "flex-end",
       gap: "1rem",
@@ -225,6 +271,13 @@ const ProfileCertificate = () => {
       display: "flex",
       alignItems: "center",
       gap: "0.5rem",
+    },
+    modalBody: {
+      padding: "0",
+    },
+    modalContent: {
+      width: "90vw",
+      maxWidth: "900px",
     },
   };
 
@@ -265,6 +318,11 @@ const ProfileCertificate = () => {
         display: none;
       }
       
+      .view-btn:hover {
+        background-color: #0a4c57 !important;
+        border-color: #0a4c57 !important;
+      }
+      
       .action-btn:hover {
         background-color: #0a4c57 !important;
         border-color: #0a4c57 !important;
@@ -274,10 +332,10 @@ const ProfileCertificate = () => {
         body * {
           visibility: hidden;
         }
-        .certificate-container, .certificate-container * {
+        .certificate-to-print, .certificate-to-print * {
           visibility: visible;
         }
-        .certificate-container {
+        .certificate-to-print {
           position: absolute;
           left: 0;
           top: 0;
@@ -294,15 +352,15 @@ const ProfileCertificate = () => {
     };
   }, []);
 
-  // Sample certificate data
+  // Sample certificate data - expanded to demonstrate pagination
   const certificates = [
     {
       id: 1,
       organization: "Green Earth Foundation",
       partner: "In partnership with City Environmental Department",
-      event: "Tree Planting Drive",
-      startDate: "April 19, 2023",
-      endDate: "April 19, 2023",
+      event: "Chương Trình Trồng Cây",
+      startDate: "19 tháng 4, 2023",
+      endDate: "19 tháng 4, 2023",
       description:
         "For outstanding contribution to environmental conservation through active participation in tree planting activities, demonstrating commitment to creating a greener and more sustainable future for our community.",
       signatories: [
@@ -314,9 +372,9 @@ const ProfileCertificate = () => {
       id: 2,
       organization: "National Blood Services",
       partner: "In collaboration with City General Hospital",
-      event: "Blood Donation Camp",
-      startDate: "April 23, 2023",
-      endDate: "April 23, 2023",
+      event: "Trại Hiến Máu",
+      startDate: "23 tháng 4, 2023",
+      endDate: "23 tháng 4, 2023",
       description:
         "For the selfless act of donating blood, helping save lives and contributing to the community's health and well-being. Your generosity makes a significant difference in emergency medical care.",
       signatories: [
@@ -328,9 +386,9 @@ const ProfileCertificate = () => {
       id: 3,
       organization: "Animal Welfare Society",
       partner: "Supported by Pet Lovers Association",
-      event: "Animal Shelter Volunteering",
-      startDate: "May 5, 2023",
-      endDate: "May 5, 2023",
+      event: "Tình Nguyện tại Trại Cứu Hộ Động Vật",
+      startDate: "5 tháng 5, 2023",
+      endDate: "5 tháng 5, 2023",
       description:
         "For dedicated service to animal welfare through volunteering at our shelter, providing care, comfort, and companionship to animals in need. Your compassion has made a meaningful impact on the lives of rescued animals.",
       signatories: [
@@ -338,27 +396,106 @@ const ProfileCertificate = () => {
         { name: "Lisa Thompson", title: "Volunteer Coordinator" },
       ],
     },
+    {
+      id: 4,
+      organization: "Community Council",
+      partner: "In collaboration with City Parks Department",
+      event: "Dọn Dẹp Công Viên Cộng Đồng",
+      startDate: "12 tháng 5, 2023",
+      endDate: "12 tháng 5, 2023",
+      description:
+        "For dedicated service to the community through participation in the park cleanup initiative, helping to create cleaner, safer, and more beautiful public spaces for all residents to enjoy.",
+      signatories: [
+        { name: "David Martinez", title: "Community Coordinator" },
+        { name: "Jennifer Lee", title: "Parks Department Director" },
+      ],
+    },
+    {
+      id: 5,
+      organization: "Youth Education Foundation",
+      partner: "In partnership with City School District",
+      event: "Chương Trình Tình Nguyện Giúp Đỡ Học Sinh",
+      startDate: "3 tháng 6, 2023",
+      endDate: "10 tháng 6, 2023",
+      description:
+        "For dedicated service to youth education through participation in the literacy volunteer program, helping students develop essential reading skills and fostering a love of learning in our community.",
+      signatories: [
+        { name: "Patricia Wong", title: "Education Director" },
+        { name: "Thomas Brown", title: "School District Superintendent" },
+      ],
+    },
+    {
+      id: 6,
+      organization: "Elderly Care Association For Student",
+      partner: "Supported by Community Health Services",
+      event: "Chương Trình Thăm Hỏi Người Cao Tuổi",
+      startDate: "15 tháng 6, 2023",
+      endDate: "22 tháng 6, 2023",
+      description:
+        "For compassionate service to elderly community members through the senior companion program, providing social interaction, assistance, and emotional support to improve the quality of life for seniors.",
+      signatories: [
+        { name: "Margaret Wilson", title: "Program Coordinator" },
+        { name: "Dr. James Taylor", title: "Geriatric Care Specialist" },
+      ],
+    },
   ];
 
-  const [selectedCertificate, setSelectedCertificate] = useState(
-    certificates[0].id
+  const [showModal, setShowModal] = useState(false);
+  const [selectedCertificate, setSelectedCertificate] = useState(null);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const certificatesPerPage = 4;
+
+  // Calculate total pages
+  const totalPages = Math.ceil(certificates.length / certificatesPerPage);
+
+  // Get current certificates
+  const indexOfLastCertificate = currentPage * certificatesPerPage;
+  const indexOfFirstCertificate = indexOfLastCertificate - certificatesPerPage;
+  const currentCertificates = certificates.slice(
+    indexOfFirstCertificate,
+    indexOfLastCertificate
   );
 
-  const certificate = certificates.find(
-    (cert) => cert.id === selectedCertificate
-  );
+  // Change page
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const handleShowCertificate = (certificate) => {
+    setSelectedCertificate(certificate);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
 
   const handlePrint = () => {
     window.print();
   };
 
   const handleDownload = () => {
-    // This would typically use a library like html2canvas or jsPDF
-    // For this example, we'll just trigger a print which can be saved as PDF
     window.print();
   };
 
+  // Generate pagination items
+  const paginationItems = [];
+  for (let number = 1; number <= totalPages; number++) {
+    paginationItems.push(
+      <Pagination.Item
+        key={number}
+        active={number === currentPage}
+        onClick={() => handlePageChange(number)}
+      >
+        {number}
+      </Pagination.Item>
+    );
+  }
+
   const navigate = useNavigate();
+
   return (
     <Container
       className="d-flex justify-content-center align-items-center"
@@ -382,7 +519,7 @@ const ProfileCertificate = () => {
                   />
                   <div style={styles.userInfo}>
                     <h5 style={styles.userName}>Hung Pham Trong</h5>
-                    <p style={styles.accountType}>Normal Account</p>
+                    <p style={styles.accountType}>Tài Khoản Cá Nhân</p>
                   </div>
                 </div>
                 <div style={styles.menuItems}>
@@ -391,45 +528,45 @@ const ProfileCertificate = () => {
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-information")}
                   >
-                    <span>Information</span>
+                    <span>Thông Tin</span>
                   </div>
                   <div
                     className="menu-item"
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-avatar")}
                   >
-                    <span>Update Avatar</span>
+                    <span>Cập Nhật Avatar</span>
                   </div>
                   <div
                     className="menu-item"
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-history")}
                   >
-                    <span>History Effort</span>
+                    <span>Lịch Sử Nỗ Lực</span>
                   </div>
                   <div
                     className="menu-item"
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-favourite")}
                   >
-                    <span>Favourite</span>
+                    <span>Yêu Thích</span>
                   </div>
                   <div
                     className="menu-item"
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-score")}
                   >
-                    <span>Score</span>
+                    <span>Số Điểm</span>
                   </div>
                   <div
                     className="menu-item active"
                     style={{ ...styles.menuItem, ...styles.menuItemActive }}
                     onClick={() => navigate("/profile-certificate")}
                   >
-                    <span>Certificate</span>
+                    <span>Chứng Chỉ</span>
                   </div>
                   <div className="menu-item" style={styles.menuItem}>
-                    <span>Log Out</span>
+                    <span>Đăng Xuất</span>
                   </div>
                 </div>
               </Card.Body>
@@ -444,109 +581,183 @@ const ProfileCertificate = () => {
           >
             <Card style={styles.infoCard}>
               <Card.Header style={styles.infoHeader}>
-                <h4 className="mb-0">CERTIFICATE</h4>
+                <h4 className="mb-0">CHỨNG CHỈ</h4>
               </Card.Header>
               <Card.Body style={styles.infoCardBody}>
-                <div style={styles.certificateSelector}>
-                  <Form.Group>
-                    <Form.Label>Select Certificate</Form.Label>
-                    <Form.Select
-                      value={selectedCertificate}
-                      onChange={(e) =>
-                        setSelectedCertificate(Number(e.target.value))
-                      }
+                <div style={styles.certificateGrid}>
+                  {currentCertificates.map((certificate) => (
+                    <motion.div
+                      key={certificate.id}
+                      style={styles.certificateCard}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{
+                        duration: 0.3,
+                        delay: (certificate.id % certificatesPerPage) * 0.1,
+                      }}
                     >
-                      {certificates.map((cert) => (
-                        <option key={cert.id} value={cert.id}>
-                          {cert.event} - {cert.startDate}
-                        </option>
-                      ))}
-                    </Form.Select>
-                  </Form.Group>
-                </div>
+                      <h5 style={styles.certificateHeader}>
+                        Mã Chứng Chỉ: {certificate.id}
+                      </h5>
 
-                <div
-                  className="certificate-container"
-                  style={styles.certificateContainer}
-                >
-                  <div style={styles.certificate}>
-                    <div style={styles.certificateInner}>
-                      <div style={styles.certificateHeader}>
-                        <div style={styles.certificateTitle}>
-                          Certificate of Participation
-                        </div>
-                        <div style={styles.certificateSubtitle}>
-                          This is to certify that
-                        </div>
-                      </div>
-
-                      <div style={styles.certificateContent}>
-                        <div style={styles.certificateName}>
-                          Hung Pham Trong
-                        </div>
-                        <div style={styles.certificatePresented}>
-                          has successfully participated in
-                        </div>
-                        <div style={styles.certificateEvent}>
+                      <div style={styles.certificateField}>
+                        <div style={styles.certificateLabel}>Sự Kiện:</div>
+                        <div style={styles.certificateValue}>
                           {certificate.event}
                         </div>
-                        <div style={styles.certificateDates}>
-                          {certificate.startDate === certificate.endDate
-                            ? `on ${certificate.startDate}`
-                            : `from ${certificate.startDate} to ${certificate.endDate}`}
-                        </div>
-                        <div style={styles.certificateOrg}>
+                      </div>
+
+                      <div style={styles.certificateField}>
+                        <div style={styles.certificateLabel}>Tổ Chức:</div>
+                        <div style={styles.certificateValue}>
                           {certificate.organization}
                         </div>
-                        <div style={styles.certificatePartner}>
-                          {certificate.partner}
+                      </div>
+
+                      <div style={styles.certificateField}>
+                        <div style={styles.certificateLabel}>Ngày:</div>
+                        <div style={styles.certificateValue}>
+                          {certificate.startDate === certificate.endDate
+                            ? certificate.startDate
+                            : `${certificate.startDate} - ${certificate.endDate}`}
                         </div>
                       </div>
 
-                      <div style={styles.certificateDescription}>
-                        {certificate.description}
-                      </div>
-
-                      <div style={styles.certificateFooter}>
-                        {certificate.signatories.map((sig, index) => (
-                          <div key={index} style={styles.certificateSignature}>
-                            <div style={styles.signatureLine}></div>
-                            <div style={styles.signatureName}>{sig.name}</div>
-                            <div style={styles.signatureTitle}>{sig.title}</div>
-                          </div>
-                        ))}
-                      </div>
-
-                      <div style={styles.certificateSeal}>
-                        OFFICIAL
-                        <br />
-                        CERTIFICATE
-                      </div>
-                    </div>
-                  </div>
+                      <Button
+                        className="view-btn"
+                        style={styles.viewButton}
+                        onClick={() => handleShowCertificate(certificate)}
+                      >
+                        <Eye className="me-2" /> Xem Chứng Chỉ
+                      </Button>
+                    </motion.div>
+                  ))}
                 </div>
 
-                <div style={styles.certificateActions}>
-                  <Button
-                    className="action-btn"
-                    style={styles.actionButton}
-                    onClick={handlePrint}
+                {/* Pagination */}
+                <div style={styles.paginationContainer}>
+                  <Pagination
+                    style={{
+                      "--bs-pagination-color": "#0E606E",
+                      "--bs-pagination-active-bg": "#0E606E",
+                      "--bs-pagination-active-border-color": "#0E606E",
+                      "--bs-pagination-hover-color": "#0E606E",
+                      "--bs-pagination-focus-color": "#0E606E",
+                    }}
                   >
-                    <Printer /> Print
-                  </Button>
-                  <Button
-                    className="action-btn"
-                    style={styles.actionButton}
-                    onClick={handleDownload}
-                  >
-                    <Download /> Download
-                  </Button>
+                    <Pagination.Prev
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                      }
+                      disabled={currentPage === 1}
+                    />
+                    {paginationItems}
+                    <Pagination.Next
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                      }
+                      disabled={currentPage === totalPages}
+                    />
+                  </Pagination>
                 </div>
               </Card.Body>
             </Card>
           </motion.div>
         </Col>
       </Row>
+
+      {/* Certificate Modal */}
+      <Modal
+        show={showModal}
+        onHide={handleCloseModal}
+        size="xl"
+        centered
+        dialogClassName="modal-90w"
+        contentClassName="certificate-modal"
+      >
+        <Modal.Header
+          closeButton
+          style={{ backgroundColor: "#0E606E", color: "white" }}
+        >
+          <Modal.Title>Chứng Chỉ - {selectedCertificate?.event}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={styles.modalBody}>
+          {selectedCertificate && (
+            <div className="certificate-to-print">
+              <div style={styles.certificate}>
+                <div style={styles.certificateInner}>
+                  <div>
+                    <div style={styles.certificateTitle}>
+                      Chứng Chỉ Tham Gia
+                    </div>
+                    <div style={styles.certificateSubtitle}>
+                      Chứng nhận rằng
+                    </div>
+                  </div>
+
+                  <div style={styles.certificateContent}>
+                    <div style={styles.certificateName}>Hung Pham Trong</div>
+                    <div style={styles.certificatePresented}>
+                      đã tham gia thành công vào
+                    </div>
+                    <div style={styles.certificateEvent}>
+                      {selectedCertificate.event}
+                    </div>
+                    <div style={styles.certificateDates}>
+                      {selectedCertificate.startDate ===
+                      selectedCertificate.endDate
+                        ? `vào ${selectedCertificate.startDate}`
+                        : `từ ${selectedCertificate.startDate} đến ${selectedCertificate.endDate}`}
+                    </div>
+                    <div style={styles.certificateOrg}>
+                      {selectedCertificate.organization}
+                    </div>
+                    <div style={styles.certificatePartner}>
+                      {selectedCertificate.partner}
+                    </div>
+                  </div>
+
+                  <div style={styles.certificateDescription}>
+                    {selectedCertificate.description}
+                  </div>
+
+                  <div style={styles.certificateFooter}>
+                    {selectedCertificate.signatories.map((sig, index) => (
+                      <div key={index} style={styles.certificateSignature}>
+                        <div style={styles.signatureLine}></div>
+                        <div style={styles.signatureName}>{sig.name}</div>
+                        <div style={styles.signatureTitle}>{sig.title}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div style={styles.certificateSeal}>
+                    CHỨNG NHẬN CHÍNH THỨC
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <div style={styles.modalActions}>
+            <Button
+              className="action-btn"
+              style={styles.actionButton}
+              onClick={handlePrint}
+            >
+              <Printer className="me-1" /> In
+            </Button>
+            <Button
+              className="action-btn"
+              style={styles.actionButton}
+              onClick={handleDownload}
+            >
+              <Download className="me-1" /> Tải Xuống
+            </Button>
+          </div>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };
