@@ -2,8 +2,9 @@
 
 import React, { useState, useRef } from "react";
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
-import { motion } from "framer-motion";
-// import CustomNavbar from "../../components/navbar/CustomNavbar";
+import { motion, AnimatePresence } from "framer-motion";
+import { Modal } from "antd";
+import "antd/dist/reset.css";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../utils/AxiosInstance";
 import useAuthStore from "../../hooks/authStore";
@@ -21,6 +22,7 @@ const ProfileAvatar = () => {
     accountContainer: {
       minHeight: "100vh",
       padding: "2rem 0",
+      maxWidth: "1100px", // Limit max width
     },
     sidebarCard: {
       borderRadius: "10px",
@@ -131,6 +133,22 @@ const ProfileAvatar = () => {
     hiddenInput: {
       display: "none",
     },
+    modalAvatar: {
+      width: "100%",
+      maxWidth: "400px",
+      height: "auto",
+      borderRadius: "50%",
+      border: "6px solid #0E606E",
+      boxShadow: "0 8px 24px rgba(0, 0, 0, 0.2)",
+      margin: "0 auto",
+      display: "block",
+    },
+    modalContent: {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      padding: "20px",
+    },
   };
 
   // Add CSS to document
@@ -178,6 +196,32 @@ const ProfileAvatar = () => {
         background-color: #0a4c57 !important;
         border-color: #0a4c57 !important;
       }
+      
+      /* Ant Design Modal Customization */
+      .ant-modal-content {
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      
+      .ant-modal-header {
+        background-color: #0E606E;
+        border-bottom: none;
+        padding: 16px 24px;
+      }
+      
+      .ant-modal-title {
+        color: white;
+        font-weight: bold;
+        font-size: 18px;
+      }
+      
+      .ant-modal-close-x {
+        color: white;
+      }
+      
+      .ant-modal-footer {
+        border-top: none;
+      }
     `;
     document.head.appendChild(style);
 
@@ -188,10 +232,17 @@ const ProfileAvatar = () => {
 
   const fileInputRef = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
+  const navigate = useNavigate();
+  const { currentUser } = useAuthStore();
+  const [avatarUrl, setAvatarUrl] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
   const handleFileUpload = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setSelectedFile(URL.createObjectURL(e.target.files[0]));
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(e.target.files[0]); // Set the actual file
+      setPreviewUrl(URL.createObjectURL(file)); // Create a URL for previewing the image
     }
   };
 
@@ -199,25 +250,91 @@ const ProfileAvatar = () => {
     fileInputRef.current.click();
   };
 
-  const handleViewAvatar = () => {
-    // Open avatar in new tab or modal
+  const handleViewAvatarModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleCloseAvatarModal = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleCancelUpload = () => {
+    // Reset the selected file and preview URL
+    setSelectedFile(null);
+    setPreviewUrl(null); // Reset the preview if necessary
+
+    // Optionally close any modals or perform additional actions
+    setIsModalVisible(false); // Close the modal if you have one
+    CustomFailedToast("Avatar upload canceled."); // Inform the user that the upload was canceled
+  };
+
+  React.useEffect(() => {
+    if (currentUser) {
+      axiosInstance
+        .get(`/profile/get-avatar/${currentUser._id}`)
+        .then((response) => {
+          console.log("Avatar URL Response: ", response.data.avatarUrl); // Log the avatarUrl here
+          setAvatarUrl(response.data.avatarUrl);
+        })
+        .catch((error) => {
+          console.error("Error fetching avatar:", error);
+        });
+    }
+  }, [currentUser]);
+
+  const uploadAvatar = () => {
     if (selectedFile) {
-      window.open(selectedFile, "_blank");
+      const formData = new FormData();
+      formData.append("avatar", selectedFile); // Ensure the correct file is being appended
+
+      // Log FormData to ensure it's correct
+      console.log("FormData being sent:", formData);
+
+      // Make the API request to upload the avatar
+      axiosInstance
+        .put(`/profile/upload-avatar/${currentUser._id}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        })
+        .then((response) => {
+          console.log("Avatar URL Response: ", response.data);
+          setAvatarUrl(response.data.avatarUrl); // Update the avatar URL after a successful upload
+          if (response.data && response.data.message) {
+            CustomSuccessToast(response.data.message); // Display success message from backend
+          }
+          // Optionally, you could also re-fetch the updated avatar URL to confirm it
+          axiosInstance
+            .get(`/profile/get-avatar/${currentUser._id}`)
+            .then((response) => {
+              setAvatarUrl(response.data.avatarUrl); // Ensure the avatar URL is the latest
+            })
+            .catch((error) => {
+              console.error("Error fetching updated avatar:", error);
+            });
+        })
+        .catch((error) => {
+          console.error(
+            "Error uploading avatar:",
+            error.response?.data || error
+          );
+          if (err.response && err.response.data && err.response.data.message) {
+            CustomFailedToast(err.response.data.message); // Display error message from backend
+          }
+        });
     } else {
-      window.open(
-        "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-suTKYwhiuAHDzMequZcZHjaRpCeWdp.png",
-        "_blank"
-      );
+      console.error("No file selected for upload");
+      CustomFailedToast("No file selected. Please choose an image to upload.");
     }
   };
 
-  const navigate = useNavigate();
-  const { currentUser } = useAuthStore();
+  const avatarImage =
+    selectedFile || "https://cdn-icons-png.flaticon.com/512/6596/6596121.png";
+
   return (
     <>
+      <CustomToast />
       <Container
         className="d-flex justify-content-center align-items-center"
-        style={{ ...styles.accountContainer, maxWidth: "1100px" }} // Limit max width
+        style={styles.accountContainer}
       >
         <Row className="w-100">
           <Col md={4}>
@@ -230,7 +347,10 @@ const ProfileAvatar = () => {
                 <Card.Body className="p-0">
                   <div style={styles.userProfile}>
                     <img
-                      src="https://img.freepik.com/premium-vector/avatar-profile-icon-flat-style-female-user-profile-vector-illustration-isolated-background-women-profile-sign-business-concept_157943-38866.jpg?semt=ais_hybrid"
+                      src={
+                        avatarUrl ||
+                        "https://cdn-icons-png.flaticon.com/512/6596/6596121.png"
+                      }
                       alt="User Avatar"
                       className="avatar-img"
                       style={styles.avatar}
@@ -304,7 +424,8 @@ const ProfileAvatar = () => {
                 <Card.Body style={styles.infoCardBody}>
                   <img
                     src={
-                      selectedFile ||
+                      previewUrl ||
+                      avatarUrl ||
                       "https://cdn-icons-png.flaticon.com/512/6596/6596121.png"
                     }
                     alt="User Avatar"
@@ -314,7 +435,7 @@ const ProfileAvatar = () => {
                   <Button
                     variant="dark"
                     style={styles.actionButton}
-                    onClick={handleViewAvatar}
+                    onClick={handleViewAvatarModal}
                   >
                     Xem Avatar
                   </Button>
@@ -341,15 +462,20 @@ const ProfileAvatar = () => {
                   </div>
 
                   <div style={styles.buttonContainer}>
-                    <Button variant="light" style={styles.cancelBtn}>
-                      Hủy 
+                    <Button
+                      variant="light"
+                      style={styles.cancelBtn}
+                      onClick={handleCancelUpload}
+                    >
+                      Hủy
                     </Button>
                     <Button
                       variant="primary"
                       className="save-btn"
                       style={styles.saveBtn}
+                      onClick={uploadAvatar}
                     >
-                      Lưu 
+                      Lưu
                     </Button>
                   </div>
                 </Card.Body>
@@ -357,6 +483,40 @@ const ProfileAvatar = () => {
             </motion.div>
           </Col>
         </Row>
+
+        {/* Ant Design Modal for Avatar View */}
+        <Modal
+          title="Xem Avatar"
+          open={isModalVisible}
+          onCancel={handleCloseAvatarModal}
+          footer={null}
+          width={500}
+          centered
+        >
+          <div style={styles.modalContent}>
+            <AnimatePresence>
+              {isModalVisible && (
+                <motion.img
+                  src={
+                    avatarUrl ||
+                    "https://cdn-icons-png.flaticon.com/512/6596/6596121.png"
+                  }
+                  alt="User Avatar"
+                  style={styles.modalAvatar}
+                  initial={{ scale: 0.5, opacity: 0, rotate: -10 }}
+                  animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                  exit={{ scale: 0.5, opacity: 0, rotate: 10 }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 260,
+                    damping: 20,
+                    duration: 0.5,
+                  }}
+                />
+              )}
+            </AnimatePresence>
+          </div>
+        </Modal>
       </Container>
     </>
   );

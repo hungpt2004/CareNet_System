@@ -6,6 +6,5 @@ const profileRouter = express.Router();
 profileRouter.put("/edit-profile/:userId",authenticateToken, profileController.editProfile);
 profileRouter.get("/get-profile/:userId",authenticateToken, profileController.getProfile);
 profileRouter.put("/upload-avatar/:userId",authenticateToken, profileController.uploadAvatar);
-profileRouter.get("/view-avatar/:userId",authenticateToken, profileController.viewAvatar);
-
+profileRouter.get("/get-avatar/:userId",authenticateToken, profileController.getUploadAvatarById);
 module.exports = profileRouter;

@@ -246,7 +246,7 @@ const ProfileInfo = () => {
      }
 
      // Optional: Check if user is at least 18 years old
-     const age = today.getFullYear() - dob.getFullYear();
+     let age = today.getFullYear() - dob.getFullYear();
      const month = today.getMonth() - dob.getMonth();
      if (month < 0 || (month === 0 && today.getDate() < dob.getDate())) {
        age--;

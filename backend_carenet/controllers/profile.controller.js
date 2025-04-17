@@ -1,5 +1,5 @@
 const User = require("../models/user.model");
-const {avatarUpload}=require("../middleware/uploadMiddleware")
+const { avatarUpload } = require("../middleware/uploadMiddleware");
 
 exports.editProfile = async (req, res) => {
   const userId = req.params.userId;
@@ -7,7 +7,7 @@ exports.editProfile = async (req, res) => {
   const { fullname, dob, phone, address, gender } = req.body;
 
   // Kiểm tra xem có thay đổi thông tin gì không
-  if (!fullname  && !dob && !phone && !address && !gender) {
+  if (!fullname && !dob && !phone && !address && !gender) {
     return res
       .status(400)
       .json({ error: true, message: "Không có thay đổi nào được cung cấp." });
@@ -31,7 +31,9 @@ exports.editProfile = async (req, res) => {
 
     // Nếu không tìm thấy người dùng
     if (!updatedUser) {
-      return res.status(404).json({ error: true, message: "Người dùng không tìm thấy" });
+      return res
+        .status(404)
+        .json({ error: true, message: "Người dùng không tìm thấy" });
     }
 
     return res.status(200).json({
@@ -105,27 +107,27 @@ exports.uploadAvatar = [
         message: "Avatar uploaded successfully.",
       });
     } catch (err) {
-      return res.status(500).json({ error: true, message: "Failed to upload avatar" });
+      return res
+        .status(500)
+        .json({ error: true, message: "Failed to upload avatar" });
     }
   },
 ];
 
-exports.viewAvatar = async (req, res) => {
+exports.getUploadAvatarById = async (req, res) => {
   const userId = req.params.userId;
-  const user = req.user.user; // Get the authenticated user
-
+  const user = req.user.user;
   try {
-    // Find the user and retrieve the avatarUrl
     const foundUser = await User.findOne({ _id: userId, _id: user._id }).select(
       "avatarUrl"
     );
-
-    // If user is not found
     if (!foundUser) {
-      return res.status(404).json({ error: true, message: "User not found" });
+      return res
+        .status(404)
+        .json({ error: true, message: "User avatar not found" });
     }
+    console.log("Avatar URL:", foundUser.avatarUrl); // Log avatarUrl for debugging
 
-    // Return the avatar URL
     return res.status(200).json({
       error: false,
       avatarUrl: foundUser.avatarUrl,
