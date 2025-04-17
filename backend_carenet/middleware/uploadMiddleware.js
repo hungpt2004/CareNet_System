@@ -1,7 +1,7 @@
 // uploadMiddleware.js
 const multer = require('multer');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
-const { cloudinary } = require('../utils/cloudinaryUpload');
+const { cloudinary } = require('../services/uploadCloundinary');
 
 /**
  * Tạo middleware upload cho một loại ảnh cụ thể
@@ -45,29 +45,23 @@ const avatarUpload = createUploadMiddleware({
   allowedFormats: ['jpg', 'jpeg', 'png'],
   transformation: [
     { width: 400, height: 400, crop: 'fill' },
-    { quality: 'auto' }
+    { quality: 'auto:best' }
   ],
   maxFileSize: 2 * 1024 * 1024 // 2MB
 });
 
-// Middleware upload ảnh sản phẩm
-const productImageUpload = createUploadMiddleware({
-  folder: 'products',
-  allowedFormats: ['jpg', 'jpeg', 'png', 'webp'],
-  transformation: [
-    { width: 800, crop: 'scale' },
-    { quality: 'auto' }
-  ],
-  maxFileSize: 5 * 1024 * 1024 // 5MB
-});
-
-// Middleware upload ảnh bài viết
-const postImageUpload = createUploadMiddleware({
+// Middleware upload ảnh event
+// Được phép upload 10 ảnh
+const eventImageUpload = createUploadMiddleware({
   folder: 'posts',
   allowedFormats: ['jpg', 'jpeg', 'png', 'gif'],
-  transformation: [{ quality: 'auto' }],
+  transformation: [{ quality: 'auto:best' }],
   maxFileSize: 10 * 1024 * 1024 // 10MB
-});
+}).array('images', 10);
+
+// 1. Hàm upload ảnh lưu vào schema
+// 2. Tạo thông tin schema sau 
+// 2 route khác nhau, 2 lần submit
 
 // Dữ liệu trả về từ cloudinary ví dụ
 /*
@@ -87,6 +81,6 @@ const postImageUpload = createUploadMiddleware({
 
 module.exports = {
   avatarUpload,
-  productImageUpload,
+  eventImageUpload,
   postImageUpload
 };
