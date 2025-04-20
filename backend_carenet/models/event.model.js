@@ -6,6 +6,7 @@ const EventSchema = new mongoose.Schema({
   images: [{ type: String }], // URL ảnh của event
   category: { type: String },
   rating: { type: Number },
+  maxParticipants: {type: Number, default: 0},
   currentParticipants: { type: Number, default: 0 },
   // pointReward: { type: Number, default: 0 }, // điểm cộng khi hoàn thành
   assignChecker: { type: mongoose.Schema.ObjectId, ref: "User" },

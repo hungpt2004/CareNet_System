@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom"
 
 export default function EventCard({ event, currentUser, customStyles, formatDateVN }) {
   const [isHovered, setIsHovered] = useState(false)
+  const [location, setLocation] = useState([]); //để convert thành full address
   const navigate = useNavigate();
 
   const handleGoToDetail = () => {
@@ -66,9 +67,9 @@ export default function EventCard({ event, currentUser, customStyles, formatDate
             >
               {event.organizer.charAt(0).toUpperCase()}
             </div>
-            <span>
+            {/* <span>
               Được tổ chức bởi <strong>{event.organizer}</strong>
-            </span>
+            </span> */}
           </div>
         </div>
 

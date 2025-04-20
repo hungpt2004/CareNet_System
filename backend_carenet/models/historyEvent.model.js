@@ -17,12 +17,11 @@ const historyEventSchema = new Schema({
     enum: [
       "completed", //duoc phep feedback
       "finished",  //sau khi feedback
-      "waiting",
-      "processing",
-      "rejected",
-      "approved",
-      "pending",
-      "cancelled",
+      "processing",//sk đang diễn ra
+      "rejected",  //đã bị từ chối 
+      "approved",  //đã được chấp nhận 
+      "pending",   //yêu cầu hủy tham gia
+      "cancelled", //sau khi được duyệt hủy tham gia
     ],
     default: "waiting",
   },
