@@ -1,12 +1,15 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { MapPin, Calendar, Users, Clock, ArrowRight } from "lucide-react"
 import styles from "../../../css/EventCard.module.css"
 import { useNavigate } from "react-router-dom"
+import axios from "axios"
+import convertRatingToStars from "../../../utils/FormatRatingStar"
 
 export default function EventCard({ event, currentUser, customStyles, formatDateVN }) {
   const [isHovered, setIsHovered] = useState(false)
+  const [listCategory, setListCategory] = useState([]);
   const [location, setLocation] = useState([]); //để convert thành full address
   const navigate = useNavigate();
 
@@ -16,19 +19,26 @@ export default function EventCard({ event, currentUser, customStyles, formatDate
     // Implement your navigation logic here
   }
 
+  // Get category
+  const getAllCategory = async () => {
+    try {
+      const response = await axios.get(`http://localhost:5000/search/all-category`);
+      if (response.data && response.data.mapCategory) {
+        setListCategory(response.data.mapCategory);
+      }
+    } catch (error) {
+      console.log(error.response?.data?.message);
+    } 
+  }
+
+  useEffect(() => {
+    getAllCategory();
+  }, [])
+
   // Generate a gradient based on the category
   const getCategoryColor = (category) => {
-    const categories = {
-      "Âm nhạc": `linear-gradient(135deg, ${customStyles.primaryColor}, ${adjustColor(customStyles.primaryColor, -20)})`,
-      "Nghệ thuật": `linear-gradient(135deg, ${customStyles.primaryColor}, ${adjustColor(customStyles.primaryColor, -30)})`,
-      "Thể thao": `linear-gradient(135deg, ${customStyles.primaryColor}, ${adjustColor(customStyles.primaryColor, -10)})`,
-      "Giáo dục": `linear-gradient(135deg, ${customStyles.primaryColor}, ${adjustColor(customStyles.primaryColor, -40)})`,
-      "Công nghệ": `linear-gradient(135deg, ${customStyles.primaryColor}, ${adjustColor(customStyles.primaryColor, -25)})`,
-      "Kinh doanh": `linear-gradient(135deg, ${customStyles.primaryColor}, ${adjustColor(customStyles.primaryColor, -15)})`,
-    }
-
     return (
-      categories[category] ||
+      listCategory[category] ||
       `linear-gradient(135deg, ${customStyles.primaryColor}, ${adjustColor(customStyles.primaryColor, -20)})`
     )
   }
@@ -36,7 +46,6 @@ export default function EventCard({ event, currentUser, customStyles, formatDate
   // Helper function to darken/lighten a hex color
   function adjustColor(color, amount) {
     return color
-    // This is a simplified version - in a real app you'd implement proper color adjustment
   }
 
   return (
@@ -47,13 +56,15 @@ export default function EventCard({ event, currentUser, customStyles, formatDate
         </span>
       </div>
 
+
       <div className={styles.cardBody} style={{ backgroundColor: customStyles.secondaryColor }}>
         <div className={styles.mainContent}>
-          <h3 className={styles.eventTitle}>{event.name}</h3>
+
+          <h3 className={styles.eventTitle}>{event.title}</h3>
 
           <div className={styles.locationWrapper}>
             <MapPin size={16} className={styles.icon} style={{ color: customStyles.primaryColor }} />
-            <span className={styles.location}>{event.location}</span>
+            <span className={styles.location}>{event.location.street}, {event.location.ward}, {event.location.district}, {event.location.province}</span>
           </div>
 
           <p className={styles.description}>{event.description}</p>
@@ -65,13 +76,14 @@ export default function EventCard({ event, currentUser, customStyles, formatDate
                 background: `linear-gradient(135deg, ${customStyles.primaryColor}, ${adjustColor(customStyles.primaryColor, -20)})`,
               }}
             >
-              {event.organizer.charAt(0).toUpperCase()}
+              {event.organizationId.name.charAt(0).toUpperCase()}
             </div>
-            {/* <span>
-              Được tổ chức bởi <strong>{event.organizer}</strong>
-            </span> */}
+            <span>
+              Được tổ chức bởi <strong>{event.organizationId.name} {convertRatingToStars(event.organizationId.rating)}</strong>
+            </span>
           </div>
         </div>
+
 
         <div className={styles.sideContent}>
           <div className={styles.infoSection}>
@@ -83,13 +95,13 @@ export default function EventCard({ event, currentUser, customStyles, formatDate
                 <div className={styles.dateRow}>
                   <Clock size={14} className={styles.smallIcon} style={{ color: customStyles.primaryColor }} />
                   <span>
-                    Bắt đầu: <strong>{formatDateVN(event.startDate)}</strong>
+                    Bắt đầu: <strong>{formatDateVN(event.startAt)}</strong>
                   </span>
                 </div>
                 <div className={styles.dateRow}>
                   <Clock size={14} className={styles.smallIcon} style={{ color: customStyles.primaryColor }} />
                   <span>
-                    Kết thúc: <strong>{formatDateVN(event.endDate)}</strong>
+                    Kết thúc: <strong>{formatDateVN(event.endAt)}</strong>
                   </span>
                 </div>
               </div>
@@ -100,9 +112,9 @@ export default function EventCard({ event, currentUser, customStyles, formatDate
                 <Users size={18} className={styles.usersIcon} style={{ color: customStyles.primaryColor }} />
               </div>
               <div className={styles.participants}>
-                <span>{event.participants} thành viên tham gia</span>
+                <span>{event.currentParticipants} thành viên tham gia</span>
                 <div className={styles.avatarGroup}>
-                  {[...Array(Math.min(3, event.participants))].map((_, i) => (
+                  {[...Array(Math.min(3, event.currentParticipants))].map((_, i) => (
                     <div
                       key={i}
                       className={styles.participantAvatar}
@@ -114,7 +126,7 @@ export default function EventCard({ event, currentUser, customStyles, formatDate
                       {String.fromCharCode(65 + i)}
                     </div>
                   ))}
-                  {event.participants > 3 && <div className={styles.moreParticipants}>+{event.participants - 3}</div>}
+                  + {event.currentParticipants > 3 && <div className={styles.moreParticipants}>+{event.currentParticipants - 3}</div>}
                 </div>
               </div>
             </div>

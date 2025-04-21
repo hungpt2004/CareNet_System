@@ -14,7 +14,10 @@ const CustomNavbarLogged = () => {
   // Giả sử người dùng đã đăng nhập
   const [isLoggedIn, setIsLoggedIn] = useState(true);
 
+  // Get current user information
   const currentUser = useAuthStore((state) => state.currentUser);
+
+  console.log(currentUser._id)
 
   const {logout} = useAuthStore();
 

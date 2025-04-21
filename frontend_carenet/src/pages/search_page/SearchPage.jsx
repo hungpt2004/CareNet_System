@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, use } from "react"
+import { useState, useEffect, use, useRef } from "react"
 import { Container, Row, Col, Form, Button, Card, Dropdown, InputGroup, Badge, FormCheck, Spinner, Alert } from "react-bootstrap"
 import { Search, Calendar, MapPin, Filter, ArrowUpDown, Users } from "lucide-react"
 import CustomNavbar from "../../components/navbar/CustomNavbar"
@@ -31,18 +31,6 @@ const locationApi = axios.create({
   timeout: 5000
 })
 
-// Mock data for demonstration
-const categories = [
-  "Giáo dục",
-  "Môi trường",
-  "Y tế",
-  "Động vật",
-  "Cộng đồng",
-  "Cứu trợ thiên tai",
-  "Nghệ thuật & Văn hóa",
-  "Thể thao",
-]
-
 export default function VolunteerEventSearch() {
 
   // Current user
@@ -52,11 +40,15 @@ export default function VolunteerEventSearch() {
   const [searchFilters, setSearchFilters] = useState({
     name: "",
     province: "",
+    provinceName: "",
     district: "",
+    districtName: "",
     ward: "",
+    wardName: "",
     startDate: "",
     endDate: "",
     category: "",
+    rating: ""
   })
 
   const navigate = useNavigate();
@@ -68,10 +60,29 @@ export default function VolunteerEventSearch() {
   const [aiFilterShowed, setAiFilterShowed] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
 
+  // Use Ref
+  const searchFilterRef = useRef(searchFilters);
+
   // Location 
   const [provinces, setProvinces] = useState([])
   const [districts, setDistricts] = useState([])
   const [wards, setWards] = useState([])
+
+  // Category
+  const [categories, setCategories] = useState([])
+
+  console.log(categories.length)
+
+  const getAllCategory = async () => {
+    try {
+      const response = await axios.get(`http://localhost:5000/search/all-category`);
+      if (response.data && response.data.mapCategory) {
+        setCategories(response.data.mapCategory);
+      }
+    } catch (error) {
+      console.log(error.response?.data?.message);
+    }
+  }
 
   // API get location in VN
   const fetchProvinces = async () => {
@@ -102,6 +113,17 @@ export default function VolunteerEventSearch() {
   }
 
 
+  // Get name location
+  const extractLocationName = (fullName) => {
+    return fullName
+      .replace(/^Tỉnh\s*/i, '')
+      .replace(/^Thành phố\s*/i, '')
+      .replace(/^Quận\s*/i, '')
+      .replace(/^Huyện\s*/i, '')
+      .replace(/^Phường\s*/i, '')
+      .replace(/^Xã\s*/i, '')
+      .trim();
+  }
 
   // API request event from AI
   const geminiSuggestionRequest = async () => {
@@ -124,16 +146,6 @@ export default function VolunteerEventSearch() {
 
   console.log(JSON.stringify(searchFilters, null, 2))
 
-  // Search event 
-  const searchEventRequest = async () => {
-
-  }
-
-  // Handle search
-  const handleSearchRequest = async () => {
-
-  }
-
   console.log(aiFilterEvents.length)
 
   // State for sort option
@@ -147,12 +159,38 @@ export default function VolunteerEventSearch() {
 
   // Handle input changes
   const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setSearchFilters({
-      ...searchFilters,
-      [name]: value,
-    })
-  }
+    const { name, value } = e.target;
+
+    // Nếu là provinceName thì xử lý lại giá trị
+    if (name === "province") {
+      setSearchFilters(prev => ({
+        ...prev,
+        province: extractLocationName(value),  // Lưu tên tỉnh đã được xử lý
+        provinceName: value
+      }));
+    } else if (name === 'district') {
+      setSearchFilters(prev => ({
+        ...prev,
+        district: extractLocationName(value),  // Lưu tên tỉnh đã được xử lý
+        districtName: value
+      }));
+    } else if (name === 'ward') {
+      setSearchFilters(prev => ({
+        ...prev,
+        ward: extractLocationName(value),  // Lưu tên tỉnh đã được xử lý
+        wardName: value
+      }));
+    } else {
+      setSearchFilters(prev => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+  };
+
+  useEffect(() => {
+    getAllCategory();
+  }, [])
 
   // Handle search submission
   const handleSearch = (e) => {
@@ -175,11 +213,11 @@ export default function VolunteerEventSearch() {
       if (searchFilters.endDate) params.endDate = searchFilters.endDate;
       if (searchFilters.category) params.category = searchFilters.category;
 
-      const response = await axios.get(`${VITE_SERVER_URL}/search/e-search`, {
+      const response = await axios.get(`http://localhost:5000/search/e-search`, {
         params: params
       })
-      
-      if(response.data && response.data.events) {
+
+      if (response.data && response.data.events) {
         setFilteredEvents(response.data.events);
       }
 
@@ -222,18 +260,18 @@ export default function VolunteerEventSearch() {
     setSearchFilters({
       name: "",
       province: "",
+      provinceName: "",
       district: "",
+      districtName: "",
       ward: "",
+      wardName: "",
       startDate: "",
       endDate: "",
       category: "",
+      rating: ""
     })
     setFilteredEvents(events)
     setSortOption("startDate")
-  }
-
-  const handleGoToDetail = () => {
-    navigate('/event-detail');
   }
 
   const handleNavigate = (path, eventId) => {
@@ -242,35 +280,44 @@ export default function VolunteerEventSearch() {
     // navigate(path, { state: { eventId } })
   }
 
+
   useEffect(() => {
-    if (searchFilters.province) {
-      fetchDistricts(searchFilters.province)
-      // Reset district and ward when province changes
+    if (searchFilters.provinceName) {
+      const selectedProvince = provinces.find(p => p.name === searchFilters.provinceName);
+      if (selectedProvince) {
+        fetchDistricts(selectedProvince.code); // Gửi đúng code
+      }
+
       setSearchFilters(prev => ({
         ...prev,
         district: '',
         ward: ''
-      }))
-      setWards([])
+      }));
+      setWards([]);
     } else {
-      setDistricts([])
-      setWards([])
+      setDistricts([]);
+      setWards([]);
     }
-  }, [searchFilters.province])
+  }, [searchFilters.province, provinces]); // <-- thêm 'provinces' để đảm bảo có dữ liệu
+
 
   // Fetch wards when district changes
   useEffect(() => {
-    if (searchFilters.district) {
-      fetchWards(searchFilters.district)
-      // Reset ward when district changes
+    if (searchFilters.districtName) {
+      const selectedDistrict = districts.find(d => d.name === searchFilters.districtName);
+      if (selectedDistrict) {
+        fetchWards(selectedDistrict.code);
+      }
+
       setSearchFilters(prev => ({
         ...prev,
         ward: ''
-      }))
+      }));
     } else {
-      setWards([])
+      setWards([]);
     }
-  }, [searchFilters.district])
+  }, [searchFilters.district, districts]); // <-- thêm 'districts' để đảm bảo có dữ liệu
+
 
 
   // Effect to filter events when search filters change
@@ -282,6 +329,11 @@ export default function VolunteerEventSearch() {
   useEffect(() => {
     fetchProvinces()
   }, [])
+
+  // Cập nhật ref mỗi lần searchFilters thay đổi
+  useEffect(() => {
+    searchFilterRef.current = searchFilters;
+  }, [searchFilters]);
 
   return (
     <>
@@ -342,13 +394,13 @@ export default function VolunteerEventSearch() {
               </div>
               <select
                 name="province"
-                value={searchFilters.province}
+                value={searchFilters.provinceName}  // Đảm bảo giá trị province được lưu dưới dạng tên đã xử lý
                 onChange={handleInputChange}
                 className={searchStyles.select}
               >
                 <option value="">Thành phố / Tỉnh</option>
                 {provinces.map((province) => (
-                  <option key={province.code} value={province.code}>
+                  <option key={province.code} value={province.name}>
                     {province.name}
                   </option>
                 ))}
@@ -361,14 +413,14 @@ export default function VolunteerEventSearch() {
               </div>
               <select
                 name="district"
-                value={searchFilters.district}
+                value={searchFilters.districtName}  // Đảm bảo giá trị district được lưu dưới dạng tên đã xử lý
                 onChange={handleInputChange}
                 className={searchStyles.select}
                 disabled={!searchFilters.province}
               >
                 <option value="">Quận</option>
                 {districts.map((district) => (
-                  <option key={district.code} value={district.code}>
+                  <option key={district.code} value={district.name}>
                     {district.name}
                   </option>
                 ))}
@@ -381,20 +433,19 @@ export default function VolunteerEventSearch() {
               </div>
               <select
                 name="ward"
-                value={searchFilters.ward}
+                value={searchFilters.wardName}  // Đảm bảo giá trị ward được lưu dưới dạng tên đã xử lý
                 onChange={handleInputChange}
                 className={searchStyles.select}
                 disabled={!searchFilters.district}
               >
                 <option value="">Phường / Xã</option>
                 {wards.map((ward) => (
-                  <option key={ward.code} value={ward.code}>
+                  <option key={ward.code} value={ward.name}>
                     {ward.name}
                   </option>
                 ))}
               </select>
             </div>
-
 
             <div className={searchStyles.selectGroup}>
               <div className={searchStyles.iconWrapper}>
@@ -462,7 +513,11 @@ export default function VolunteerEventSearch() {
               <Card.Body className="p-0">
                 {/* Placeholder for map - in a real implementation, you would integrate a map library here */}
                 <div>
-                  <MapComponent />
+                  <MapComponent
+                    province={searchFilters.province}
+                    district={searchFilters.district}
+                    ward={searchFilters.ward}
+                  />
                   {/* Simplified map markers for demonstration */}
                   {filteredEvents.map((event, index) => (
                     <div
@@ -472,8 +527,6 @@ export default function VolunteerEventSearch() {
                         width: "12px",
                         height: "12px",
                         backgroundColor: customStyles.primaryColor,
-                        left: `${(event.coordinates.lng - 106.65) * 500}px`,
-                        top: `${(10.8 - event.coordinates.lat) * 500}px`,
                         cursor: "pointer",
                       }}
                       title={event.name}

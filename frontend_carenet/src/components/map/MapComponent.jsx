@@ -1,15 +1,26 @@
-import { useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaflet";
+import { useState, useEffect } from "react";
+import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { motion } from "framer-motion";
 
+// Component để update vị trí khi position thay đổi
+const RecenterMap = ({ position }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (position) {
+      map.setView(position, map.getZoom(), { animate: true });
+    }
+  }, [position, map]);
+  return null;
+};
+
+// Xử lý click trên bản đồ
 const ClickableMap = ({ setPosition, setLocationName }) => {
   useMapEvents({
     click: async (e) => {
       const { lat, lng } = e.latlng;
       setPosition([lat, lng]);
 
-      // Gọi API Nominatim để lấy tên địa điểm
       try {
         const response = await fetch(
           `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
@@ -26,9 +37,38 @@ const ClickableMap = ({ setPosition, setLocationName }) => {
   return null;
 };
 
-const MapComponent = () => {
-  const [position, setPosition] = useState([21.0285, 105.8542]); // Hà Nội, Việt Nam
+// Component chính
+const MapComponent = ({ province, district, ward }) => {
+  const [position, setPosition] = useState([21.0285, 105.8542]); // Hà Nội
   const [locationName, setLocationName] = useState("Hà Nội, Việt Nam");
+
+  useEffect(() => {
+    const fullLocation = [ward, district, province, "Việt Nam"]
+      .filter(Boolean)
+      .join(", ");
+
+    if (fullLocation !== "Việt Nam") {
+      fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+          fullLocation
+        )}&format=json`
+      )
+        .then((res) => res.json())
+        .then((data) => {
+          if (data[0]) {
+            const lat = parseFloat(data[0].lat);
+            const lon = parseFloat(data[0].lon);
+            setPosition([lat, lon]);
+            setLocationName(data[0].display_name);
+          } else {
+            console.warn("Không tìm thấy vị trí:", fullLocation);
+          }
+        })
+        .catch((err) => {
+          console.error("Lỗi lấy tọa độ từ tên địa điểm:", err);
+        });
+    }
+  }, [province, district, ward]);
 
   return (
     <motion.div
@@ -44,11 +84,8 @@ const MapComponent = () => {
         style={{ height: "100%", width: "100%", borderRadius: "16px" }}
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        
-        {/* Component xử lý click để cập nhật vị trí và lấy tên địa điểm */}
+        <RecenterMap position={position} />
         <ClickableMap setPosition={setPosition} setLocationName={setLocationName} />
-
-        {/* Marker di chuyển theo vị trí đã chọn */}
         <Marker position={position}>
           <Popup>{locationName}</Popup>
         </Marker>

@@ -1,4 +1,5 @@
 const Event = require("../models/event.model");
+const Organization = require("../models/organization.model");
 const asyncHandler = require("../middleware/asyncHandler");
 
 exports.requestSuggestByAI = asyncHandler(async (req, res) => {
@@ -70,7 +71,7 @@ exports.requestSuggestByAI = asyncHandler(async (req, res) => {
   }
 });
 
-exports.searchEvents = async (req, res) => {
+exports.searchEvents = asyncHandler(async (req, res) => {
   try {
     const {
       name = "",
@@ -83,8 +84,10 @@ exports.searchEvents = async (req, res) => {
     } = req.query;
 
     const query = {
-      status: 'hiring'
+      status: "hiring",
     };
+
+    console.log(province);
 
     // Search theo tên sự kiện
     if (name.trim()) {
@@ -119,37 +122,84 @@ exports.searchEvents = async (req, res) => {
       query.startAt = { $lte: new Date(endDate) };
     }
 
-    const events = await Event.find(query).sort({
-      startAt: 1,
-    });
+    console.log(query);
 
-    if(events.length <= 0) return res.status(500).json({status:'fail',message:"Không có sự kiện nào phù hợp"})
+    const events = await Event.find(query)
+      .sort({
+        startAt: 1,
+      })
+      .populate("organizationId", "name rating");
+
+    console.log(events[0]);
+
+    if (events.length <= 0)
+      return res
+        .status(500)
+        .json({ status: "fail", message: "Không có sự kiện nào phù hợp" });
 
     return res.status(200).json({
-      status: 'success',
-      message: 'Kết quả tìm kiếm của bạn đã có',
-      events
+      status: "success",
+      message: "Kết quả tìm kiếm của bạn đã có",
+      events,
     });
   } catch (error) {
     console.error("Lỗi search:", error);
     return res.status(500).json({ message: "Server Error" });
   }
-};
+});
 
-exports.getAllCategoryFromEvents = asyncHandler(async(req, res) => {
-
+exports.getAllCategoryFromEvents = asyncHandler(async (req, res) => {
   try {
-    
     const eventCategories = await Event.find().select("category");
+
+    const mapCategory = eventCategories.map((item) => item.category);
 
     return res.status(200).json({
       status: "success",
       message: "Lấy tất cả category",
-      eventCategories
-    })
-
+      mapCategory,
+    });
   } catch (error) {
-    
+    return res.status(500).json({
+      status: "fail",
+      message: "Lỗi khi lấy category",
+    });
   }
+});
 
-})
+exports.searchByRatingOrganization = asyncHandler(async (req, res) => {
+  const { rating } = req.query;
+
+  try {
+    const organizations = await Organization.find({
+      rating: { $gte: Number(rating) },
+    });
+
+    const organizationIds = organizations.map((org) => org._id);
+
+    if (!organizationIds.length < 0) {
+      console.log("No have any org Id");
+    }
+
+    const mapEvents = await Event.find({
+      organizationId: { $in: organizationIds },
+    });
+
+    if (mapEvents.length <= 0) {
+      return res.status(500).json({
+        status: "fail",
+        message: "Không tìm thấy event phù hợp",
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      message: "Đây là kết quả tìm kiếm",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "fail",
+      message: "Lỗi tìm kiếm",
+    });
+  }
+});
