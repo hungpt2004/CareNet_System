@@ -17,7 +17,6 @@ const historyEventSchema = new Schema({
     enum: [
       "completed", //duoc phep feedback
       "finished",  //sau khi feedback
-      "waiting",
       "processing",
       "rejected",
       "approved",

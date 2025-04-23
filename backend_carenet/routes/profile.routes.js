@@ -3,8 +3,7 @@ const express = require("express");
 const {authenticateToken} = require("../middleware/isAuthenticate");
 const profileRouter = express.Router();
 
-profileRouter.put("/edit-profile/:userId",authenticateToken, profileController.editProfile);
-profileRouter.get("/get-profile/:userId",authenticateToken, profileController.getProfile);
-profileRouter.put("/upload-avatar/:userId",authenticateToken, profileController.uploadAvatar);
-profileRouter.get("/get-avatar/:userId",authenticateToken, profileController.getUploadAvatarById);
+profileRouter.put("/edit-profile",authenticateToken, profileController.editProfile);
+profileRouter.put("/upload-avatar/",authenticateToken, profileController.uploadAvatar);
+profileRouter.post("/send-feedback-history-events/:eventId",authenticateToken, profileController.sendFeedbackHistoryEvents);
 module.exports = profileRouter;

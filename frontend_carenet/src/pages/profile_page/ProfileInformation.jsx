@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
 import { motion } from "framer-motion";
-// import CustomNavbar from "../../components/navbar/CustomNavbar";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../utils/AxiosInstance";
 import useAuthStore from "../../hooks/authStore";
@@ -13,10 +12,6 @@ import {
   CustomToast,
 } from "../../components/toast/CustomToast";
 const ProfileInfo = () => {
-  const navigate = useNavigate();
-  const { currentUser } = useAuthStore();
-  const [initialFormData, setInitialFormData] = useState({});
-
   // CSS styles defined directly in the component
   const styles = {
     root: {
@@ -210,18 +205,27 @@ const ProfileInfo = () => {
     };
   }, []);
 
-  // Data cho form
+  // Lấy người dùng hiện tại
+  const currentUser = useAuthStore((state) => state.currentUser);
+  // Lấy người dùng sau khi cập nhật thông tin 
+  const { updateUser } = useAuthStore();
+  const navigate = useNavigate();
+  
+  
+  // Khởi tạo form
   const [formData, setFormData] = useState({
-    fullname: "",
-    gender: "",
-    birthdate: "",
-    cmnd: "",
-    phone: "",
-    email: "",
-    address: "",
+    fullname: currentUser.fullname,
+    gender: currentUser.gender,
+    dob: currentUser.dob
+      ? new Date(currentUser.dob).toLocaleDateString("en-GB")
+      : "",
+    cccdNumber: currentUser.cccdNumber,
+    phone: currentUser.phone,
+    email: currentUser.email,
+    address: currentUser.address.country,
   });
 
-  //Nhập data vào form
+  // Nhập data vào form
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -230,119 +234,72 @@ const ProfileInfo = () => {
     });
   };
 
-  // Xử lý nộp form qua api và cập nhật form (Data cho form)
-   const handleSubmit = (e) => {
-     e.preventDefault();
+  // Xử lí nộp form và cập nhật form
+ const handleSubmit = async (e) => {
+   e.preventDefault();
 
-     // Validate Date of Birth (dob)
-     const dob = new Date(formData.birthdate);
-     const today = new Date();
+   // Convert the date to "yyyy-mm-dd" format if it's in "dd/mm/yyyy" format
+   const formattedDob = formData.dob.split("/").reverse().join("-");
+   const dobDate = new Date(formattedDob);
 
-     // Check if dob is a future date
-     if (dob > today) {
-       CustomFailedToast("Date of birth cannot be a future date.");
-       setFormData(initialFormData); // Reset the form to initial values
-       return; // Prevent form submission
-     }
+   // Validate phone number using regex (example for a 10-digit phone number)
+   const phoneRegex = /^[0-9]{10}$/; // Modify based on the expected phone number format
+   if (!phoneRegex.test(formData.phone)) {
+     CustomFailedToast(
+       "Invalid phone number. Please enter a valid 10-digit phone number."
+     );
+     return;
+   }
 
-     // Optional: Check if user is at least 18 years old
-     let age = today.getFullYear() - dob.getFullYear();
-     const month = today.getMonth() - dob.getMonth();
-     if (month < 0 || (month === 0 && today.getDate() < dob.getDate())) {
-       age--;
-     }
+   // Check if the user is at least 18 years old
+   const today = new Date();
+   let age = today.getFullYear() - dobDate.getFullYear();
+   const m = today.getMonth() - dobDate.getMonth();
+   if (m < 0 || (m === 0 && today.getDate() < dobDate.getDate())) {
+     age--;
+   }
 
-     if (age < 18) {
-       CustomFailedToast("You must be at least 18 years old.");
-       setFormData(initialFormData); // Reset the form to initial values
-       return; // Prevent form submission
-     }
+   if (age < 18) {
+     CustomFailedToast("You must be at least 18 years old.");
+     return;
+   }
 
-     // Validate Phone Number (phone)
-     const phoneRegex = /^[0-9]{10,15}$/; // Simple regex for phone numbers (10-15 digits)
-     if (!phoneRegex.test(formData.phone)) {
-       CustomFailedToast(
-         "Phone number is not valid. It must be 10 to 15 digits."
-       );
-       setFormData(initialFormData); // Reset the form to initial values
-       return; // Prevent form submission
-     }
-
-     // Convert dob to ISO string
-     const dobString = dob.toISOString();
-
-     const updatedProfileData = {
-       fullname: formData.fullname,
-       phone: formData.phone,
-       gender: formData.gender,
-       dob: dobString, // Ensure dob is an ISO string
-       address: {
-         fullAddress: formData.address, // Sending address as an object with "fullAddress"
-       },
-     };
-
-     if (currentUser) {
-       axiosInstance
-         .put(`/profile/edit-profile/${currentUser._id}`, updatedProfileData)
-         .then((response) => {
-           console.log("Profile updated successfully:", response.data);
-           if (response.data && response.data.message) {
-             CustomSuccessToast(response.data.message); // Display success message from backend
-           }
-
-           const updatedUser = response.data.user;
-
-           // Immediately update the form with the new data from the backend
-           setFormData({
-             fullname: updatedUser.fullname,
-             gender: updatedUser.gender,
-             birthdate: updatedUser.dob
-               ? new Date(updatedUser.dob).toLocaleDateString()
-               : "",
-             phone: updatedUser.phone,
-             fullAddress: updatedUser.address
-               ? updatedUser.address.fullAddress
-               : "",
-           });
-         })
-         .catch((err) => {
-           console.log("Error updating profile:", err);
-           if (err.response && err.response.data && err.response.data.message) {
-             CustomFailedToast(err.response.data.message); // Display error message from backend
-           }
-         });
-     }
+   // Create updated profile data
+   const updatedProfileData = {
+     fullname: formData.fullname,
+     dob: dobDate.toISOString(), // Format dob to ISO string
+     phone: formData.phone,
+     gender: formData.gender,
+     address: {
+       country: formData.address,
+     },
    };
 
-  // Lấy thông tin người dùng qua api (Data cho form)
-  React.useEffect(() => {
-    if (currentUser) {
-      axiosInstance
-        .get(`/profile/get-profile/${currentUser._id}`)
-        .then((response) => {
-          const user = response.data.user;
-          const initialData = {
-            fullname: user.fullname || "",
-            gender: user.gender || "",
-            birthdate: user.dob ? new Date(user.dob).toLocaleDateString() : "",
-            cmnd: user.cccdNumber || "",
-            phone: user.phone || "",
-            email: user.email || "",
-            address: user.address ? user.address.fullAddress || "" : "",
-          };
+   // Ensure currentUser exists before making the request
+   if (currentUser) {
+     try {
+       const res = await axiosInstance.put(
+         "/profile/edit-profile",
+         updatedProfileData
+       );
+       console.log("Profile updated successfully:", res.data);
+       if (res.data && res.data.message) {
+         CustomSuccessToast(res.data.message);
+       }
 
-          // Store initial form data
-          setInitialFormData(initialData);
+       // Update user in zustand and localStorage (if needed)
+       const updatedUser = res.data.user;
+       updateUser(updatedUser);
 
-          // Set form data
-          setFormData(initialData);
-        })
-        .catch((err) => {
-          console.log("Error fetching user profile:", err);
-        });
-    }
-  }, [currentUser]);
-
+       navigate("/profile-information");
+     } catch (err) {
+       console.error("Profile update failed:", err);
+       if (err.response && err.response.data && err.response.data.message) {
+         CustomFailedToast(err.response.data.message);
+       } 
+     }
+   }
+ };
 
   return (
     <>
@@ -370,7 +327,7 @@ const ProfileInfo = () => {
                     />
                     <div style={styles.userInfo}>
                       <h5 style={styles.userName}>Hung Pham Trong</h5>
-                      <p style={styles.accountType}>Tài Khoản Cá Nhân</p>
+                      <p style={styles.accountType}>Normal Account</p>
                     </div>
                   </div>
                   <div style={styles.menuItems}>
@@ -379,45 +336,45 @@ const ProfileInfo = () => {
                       style={{ ...styles.menuItem, ...styles.menuItemActive }}
                       onClick={() => navigate("/profile-information")}
                     >
-                      <span>Thông tin </span>
+                      <span>Information</span>
                     </div>
                     <div
                       className="menu-item"
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-avatar")}
                     >
-                      <span>Cập Nhật Avatar</span>
+                      <span>Update Avatar</span>
                     </div>
                     <div
                       className="menu-item"
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-history")}
                     >
-                      <span>Lịch Sử Nỗ Lực</span>
+                      <span>History Effort</span>
                     </div>
                     <div
                       className="menu-item"
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-favourite")}
                     >
-                      <span>Yêu Thích</span>
+                      <span>Favourite</span>
                     </div>
                     <div
                       className="menu-item"
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-score")}
                     >
-                      <span>Số Điểm</span>
+                      <span>Score</span>
                     </div>
                     <div
                       className="menu-item"
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-certificate")}
                     >
-                      <span>Chứng Chỉ</span>
+                      <span>Certificate</span>
                     </div>
                     <div className="menu-item" style={styles.menuItem}>
-                      <span>Đăng Xuất</span>
+                      <span>Log Out</span>
                     </div>
                   </div>
                 </Card.Body>
@@ -432,7 +389,7 @@ const ProfileInfo = () => {
             >
               <Card style={styles.infoCard}>
                 <Card.Header style={styles.infoHeader}>
-                  <h4 className="mb-0">THÔNG TIN</h4>
+                  <h4 className="mb-0">INFORMATION</h4>
                 </Card.Header>
                 <Card.Body style={styles.infoCardBody}>
                   <Form onSubmit={handleSubmit}>
@@ -440,7 +397,7 @@ const ProfileInfo = () => {
                       <Col md={6}>
                         <Form.Group>
                           <Form.Label style={styles.formLabel}>
-                            Họ Tên
+                            Fullname
                           </Form.Label>
                           <Form.Control
                             type="text"
@@ -454,7 +411,7 @@ const ProfileInfo = () => {
                       <Col md={6}>
                         <Form.Group>
                           <Form.Label style={styles.formLabel}>
-                            Giới Tính
+                            Gender
                           </Form.Label>
                           <div>
                             <Form.Check
@@ -495,12 +452,12 @@ const ProfileInfo = () => {
                       <Col md={6}>
                         <Form.Group>
                           <Form.Label style={styles.formLabel}>
-                            Ngày Sinh
+                            Birthdate
                           </Form.Label>
                           <Form.Control
                             type="text"
-                            name="birthdate"
-                            value={formData.birthdate}
+                            name="dob"
+                            value={formData.dob}
                             onChange={handleChange}
                             style={styles.formControl}
                           />
@@ -511,8 +468,8 @@ const ProfileInfo = () => {
                           <Form.Label style={styles.formLabel}>CMND</Form.Label>
                           <Form.Control
                             type="text"
-                            name="cmnd"
-                            value={formData.cmnd}
+                            name="cccdNumber"
+                            value={formData.cccdNumber}
                             onChange={handleChange}
                             style={styles.formControl}
                             readOnly
@@ -524,7 +481,7 @@ const ProfileInfo = () => {
                       <Col md={6}>
                         <Form.Group>
                           <Form.Label style={styles.formLabel}>
-                            Số Điện Thoại
+                            Phone Number
                           </Form.Label>
                           <Form.Control
                             type="text"
@@ -552,7 +509,7 @@ const ProfileInfo = () => {
                       </Col>
                     </Row>
                     <Form.Group className="mb-4">
-                      <Form.Label style={styles.formLabel}>Địa Chỉ</Form.Label>
+                      <Form.Label style={styles.formLabel}>Address</Form.Label>
                       <Form.Control
                         as="textarea"
                         rows={3}
@@ -563,13 +520,16 @@ const ProfileInfo = () => {
                       />
                     </Form.Group>
                     <div className="text-end">
+                      <Button variant="light" className="me-2">
+                        Cancel
+                      </Button>
                       <Button
                         variant="primary"
                         type="submit"
                         className="save-btn"
                         style={styles.saveBtn}
                       >
-                        Lưu
+                        Save
                       </Button>
                     </div>
                   </Form>

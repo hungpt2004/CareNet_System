@@ -62,6 +62,10 @@ const useAuthStore = create((set) => ({
       set({ loading: false });
     }
   },
+  updateUser: (updatedUser) => {
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+    set({ currentUser: updatedUser });
+  },
 
   logout: () => {
     localStorage.removeItem("user");
@@ -72,5 +76,7 @@ const useAuthStore = create((set) => ({
   clearError: () => set({ error: null }),
   clearSuccess: () => set({ successMessage: null }),
 }));
+
+  
 
 export default useAuthStore

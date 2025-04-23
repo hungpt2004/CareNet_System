@@ -1,9 +1,13 @@
 const User = require("../models/user.model");
 const { avatarUpload } = require("../middleware/uploadMiddleware");
+const HistoryEvent = require("../models/historyEvent.model");
+const Feedback = require("../models/feedback.model");
 
+// backend for profile-information
 exports.editProfile = async (req, res) => {
-  const userId = req.params.userId;
+  
   const user = req.user.user;
+  const userId = user._id;
   const { fullname, dob, phone, address, gender } = req.body;
 
   // Kiểm tra xem có thay đổi thông tin gì không
@@ -23,7 +27,7 @@ exports.editProfile = async (req, res) => {
           dob: dob,
           phone: phone,
           gender: gender,
-          "address.fullAddress": address.fullAddress, // Cập nhật fullAddress trong address
+          "address.country": address.country, // Cập nhật country trong address
         },
       },
       { new: true }
@@ -48,40 +52,12 @@ exports.editProfile = async (req, res) => {
   }
 };
 
-exports.getProfile = async (req, res) => {
-  const userId = req.params.userId;
-  const user = req.user.user;
-
-  try {
-    // Tìm người dùng trong cơ sở dữ liệu bằng userId
-    const foundUser = await User.findOne({ _id: userId, _id: user._id }).select(
-      "fullname cccdNumber dob phone gender email address.fullAddress"
-    );
-
-    // Nếu không tìm thấy người dùng
-    if (!foundUser) {
-      return res.status(404).json({ error: true, message: "User not found" });
-    }
-
-    // Trả về thông tin người dùng
-    return res.status(200).json({
-      error: false,
-      user: foundUser,
-      message: "Profile retrieved successfully",
-    });
-  } catch (err) {
-    return res
-      .status(500)
-      .json({ error: true, message: "Failed to retrieve profile" });
-  }
-};
-
-// Middleware for avatar upload
+// backend for profile-avatar
 exports.uploadAvatar = [
   avatarUpload.single("avatar"), // "avatar" is the field name in the request
   async (req, res) => {
-    const userId = req.params.userId;
-    const user = req.user.user; // Get the authenticated user
+    const user = req.user.user;
+    const userId = user._id; 
 
     if (!req.file) {
       return res.status(400).json({ error: true, message: "No file uploaded" });
@@ -114,28 +90,61 @@ exports.uploadAvatar = [
   },
 ];
 
-exports.getUploadAvatarById = async (req, res) => {
-  const userId = req.params.userId;
+//backend for profile-history
+exports.sendFeedbackHistoryEvents = async (req, res) => {
   const user = req.user.user;
+  const userId = user._id;
+  const eventId = req.params.eventId; // Getting the eventId from route parameters
+  
+  const { rating, content } = req.body;
+
+
   try {
-    const foundUser = await User.findOne({ _id: userId, _id: user._id }).select(
-      "avatarUrl"
-    );
-    if (!foundUser) {
-      return res
-        .status(404)
-        .json({ error: true, message: "User avatar not found" });
+    if (userId !== user._id.toString()) {
+      return res.status(403).json({ error: true, message: "Unauthorized." });
     }
-    console.log("Avatar URL:", foundUser.avatarUrl); // Log avatarUrl for debugging
+
+    // Check if the user has completed or finished the event
+    const history = await HistoryEvent.findOne({
+      user: user._id,
+      event: eventId,
+      status: { $in: ["completed", "finished"] }, // allow both statuses
+    });
+
+    if (!history) {
+      return res.status(400).json({
+        error: true,
+        message: "You are not eligible to send feedback for this event.",
+      });
+    }
+
+    // Either update existing feedback or create new
+    const feedback = await Feedback.findOneAndUpdate(
+      { userId: user._id, eventId: eventId },
+      {
+        rating,
+        content,
+        createdAt: new Date(),
+      },
+      { new: true, upsert: true } // create if not exists
+    );
+
+    // If history is still "completed", update it to "finished"
+    if (history.status === "completed") {
+      history.status = "finished";
+      await history.save();
+    }
 
     return res.status(200).json({
       error: false,
-      avatarUrl: foundUser.avatarUrl,
-      message: "Avatar retrieved successfully",
+      feedback,
+      message: "Feedback submitted successfully.",
     });
   } catch (err) {
-    return res
-      .status(500)
-      .json({ error: true, message: "Failed to retrieve avatar" });
+    console.error(err);
+    return res.status(500).json({
+      error: true,
+      message: "Failed to submit or update feedback.",
+    });
   }
 };

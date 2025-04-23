@@ -13,6 +13,7 @@ import {
   CustomSuccessToast,
   CustomToast,
 } from "../../components/toast/CustomToast";
+import defaultAvatar from "../../assets/defaultAvatar.png";
 const ProfileAvatar = () => {
   // CSS styles defined directly in the component
   const styles = {
@@ -235,8 +236,13 @@ const ProfileAvatar = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const navigate = useNavigate();
-  const { currentUser } = useAuthStore();
-  const [avatarUrl, setAvatarUrl] = useState(null);
+  // Lấy người dùng hiện tại
+  const currentUser = useAuthStore((state) => state.currentUser);
+  // Lấy người dùng sau khi cập nhật thông tin
+  const { updateUser } = useAuthStore();
+  const [avatarUrl, setAvatarUrl] = useState(
+    currentUser.avatarUrl || defaultAvatar
+  );
   const [previewUrl, setPreviewUrl] = useState(null);
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
@@ -268,66 +274,46 @@ const ProfileAvatar = () => {
     CustomFailedToast("Avatar upload canceled."); // Inform the user that the upload was canceled
   };
 
-  React.useEffect(() => {
-    if (currentUser) {
-      axiosInstance
-        .get(`/profile/get-avatar/${currentUser._id}`)
-        .then((response) => {
-          console.log("Avatar URL Response: ", response.data.avatarUrl); // Log the avatarUrl here
-          setAvatarUrl(response.data.avatarUrl);
-        })
-        .catch((error) => {
-          console.error("Error fetching avatar:", error);
-        });
-    }
-  }, [currentUser]);
-
-  const uploadAvatar = () => {
+  // When uploading or updating the avatar, set the new URL
+  const uploadAvatar = async () => {
     if (selectedFile) {
       const formData = new FormData();
-      formData.append("avatar", selectedFile); // Ensure the correct file is being appended
+      formData.append("avatar", selectedFile);
 
-      // Log FormData to ensure it's correct
-      console.log("FormData being sent:", formData);
+      try {
+        const res = await axiosInstance.put(
+          "/profile/upload-avatar",
+          formData,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+          }
+        );
+        
+        // Check if avatarUrl is available in the response
+        if (res.data && res.data.avatarUrl) {
+          setAvatarUrl(res.data.avatarUrl); // Update the avatarUrl state
+        console.log("Avatar updated successfully:", res.data);
 
-      // Make the API request to upload the avatar
-      axiosInstance
-        .put(`/profile/upload-avatar/${currentUser._id}`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        })
-        .then((response) => {
-          console.log("Avatar URL Response: ", response.data);
-          setAvatarUrl(response.data.avatarUrl); // Update the avatar URL after a successful upload
-          if (response.data && response.data.message) {
-            CustomSuccessToast(response.data.message); // Display success message from backend
+          if (res.data && res.data.message) {
+            console.log(res.data.message);
+            CustomSuccessToast(res.data.message);
           }
-          // Optionally, you could also re-fetch the updated avatar URL to confirm it
-          axiosInstance
-            .get(`/profile/get-avatar/${currentUser._id}`)
-            .then((response) => {
-              setAvatarUrl(response.data.avatarUrl); // Ensure the avatar URL is the latest
-            })
-            .catch((error) => {
-              console.error("Error fetching updated avatar:", error);
-            });
-        })
-        .catch((error) => {
-          console.error(
-            "Error uploading avatar:",
-            error.response?.data || error
-          );
-          if (err.response && err.response.data && err.response.data.message) {
-            CustomFailedToast(err.response.data.message); // Display error message from backend
-          }
-        });
-    } else {
-      console.error("No file selected for upload");
-      CustomFailedToast("No file selected. Please choose an image to upload.");
-    }
+
+          // Update user information in Zustand and localStorage
+          const updatedUser = res.data.user;
+          updateUser(updatedUser);
+
+          // Navigate to the profile page
+          navigate("/profile-avatar");
+        }
+      } catch (err) {
+        console.error("Error uploading avatar:", err);
+        if (err.res && err.res.data && err.res.data.message) {
+          CustomFailedToast(err.res.data.message);
+        } 
+      }
+    } 
   };
-
-  const avatarImage =
-    selectedFile || "https://cdn-icons-png.flaticon.com/512/6596/6596121.png";
 
   return (
     <>
@@ -347,10 +333,7 @@ const ProfileAvatar = () => {
                 <Card.Body className="p-0">
                   <div style={styles.userProfile}>
                     <img
-                      src={
-                        avatarUrl ||
-                        "https://cdn-icons-png.flaticon.com/512/6596/6596121.png"
-                      }
+                      src={avatarUrl || "defaultAvatar"}
                       alt="User Avatar"
                       className="avatar-img"
                       style={styles.avatar}
@@ -423,11 +406,7 @@ const ProfileAvatar = () => {
                 </Card.Header>
                 <Card.Body style={styles.infoCardBody}>
                   <img
-                    src={
-                      previewUrl ||
-                      avatarUrl ||
-                      "https://cdn-icons-png.flaticon.com/512/6596/6596121.png"
-                    }
+                    src={previewUrl || avatarUrl || defaultAvatar}
                     alt="User Avatar"
                     style={styles.largeAvatar}
                   />
@@ -473,7 +452,7 @@ const ProfileAvatar = () => {
                       variant="primary"
                       className="save-btn"
                       style={styles.saveBtn}
-                      onClick={uploadAvatar}
+                      onClick={() => uploadAvatar()}
                     >
                       Lưu
                     </Button>
@@ -497,10 +476,7 @@ const ProfileAvatar = () => {
             <AnimatePresence>
               {isModalVisible && (
                 <motion.img
-                  src={
-                    avatarUrl ||
-                    "https://cdn-icons-png.flaticon.com/512/6596/6596121.png"
-                  }
+                  src={avatarUrl || defaultAvatar}
                   alt="User Avatar"
                   style={styles.modalAvatar}
                   initial={{ scale: 0.5, opacity: 0, rotate: -10 }}
