@@ -205,13 +205,10 @@ const ProfileInfo = () => {
     };
   }, []);
 
-  // Lấy người dùng hiện tại
   const currentUser = useAuthStore((state) => state.currentUser);
-  // Lấy người dùng sau khi cập nhật thông tin 
   const { updateUser } = useAuthStore();
   const navigate = useNavigate();
-  
-  
+
   // Khởi tạo form
   const [formData, setFormData] = useState({
     fullname: currentUser.fullname,
@@ -235,71 +232,71 @@ const ProfileInfo = () => {
   };
 
   // Xử lí nộp form và cập nhật form
- const handleSubmit = async (e) => {
-   e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-   // Convert the date to "yyyy-mm-dd" format if it's in "dd/mm/yyyy" format
-   const formattedDob = formData.dob.split("/").reverse().join("-");
-   const dobDate = new Date(formattedDob);
+    // Convert the date to "yyyy-mm-dd" format if it's in "dd/mm/yyyy" format
+    const formattedDob = formData.dob.split("/").reverse().join("-");
+    const dobDate = new Date(formattedDob);
 
-   // Validate phone number using regex (example for a 10-digit phone number)
-   const phoneRegex = /^[0-9]{10}$/; // Modify based on the expected phone number format
-   if (!phoneRegex.test(formData.phone)) {
-     CustomFailedToast(
-       "Invalid phone number. Please enter a valid 10-digit phone number."
-     );
-     return;
-   }
+    // Validate phone number using regex (example for a 10-digit phone number)
+    const phoneRegex = /^[0-9]{10}$/; // Modify based on the expected phone number format
+    if (!phoneRegex.test(formData.phone)) {
+      CustomFailedToast(
+        "Invalid phone number. Please enter a valid 10-digit phone number."
+      );
+      return;
+    }
 
-   // Check if the user is at least 18 years old
-   const today = new Date();
-   let age = today.getFullYear() - dobDate.getFullYear();
-   const m = today.getMonth() - dobDate.getMonth();
-   if (m < 0 || (m === 0 && today.getDate() < dobDate.getDate())) {
-     age--;
-   }
+    // Check if the user is at least 18 years old
+    const today = new Date();
+    let age = today.getFullYear() - dobDate.getFullYear();
+    const m = today.getMonth() - dobDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < dobDate.getDate())) {
+      age--;
+    }
 
-   if (age < 18) {
-     CustomFailedToast("You must be at least 18 years old.");
-     return;
-   }
+    if (age < 18) {
+      CustomFailedToast("You must be at least 18 years old.");
+      return;
+    }
 
-   // Create updated profile data
-   const updatedProfileData = {
-     fullname: formData.fullname,
-     dob: dobDate.toISOString(), // Format dob to ISO string
-     phone: formData.phone,
-     gender: formData.gender,
-     address: {
-       country: formData.address,
-     },
-   };
+    // Create updated profile data
+    const updatedProfileData = {
+      fullname: formData.fullname,
+      dob: dobDate.toISOString(), // Format dob to ISO string
+      phone: formData.phone,
+      gender: formData.gender,
+      address: {
+        country: formData.address,
+      },
+    };
 
-   // Ensure currentUser exists before making the request
-   if (currentUser) {
-     try {
-       const res = await axiosInstance.put(
-         "/profile/edit-profile",
-         updatedProfileData
-       );
-       console.log("Profile updated successfully:", res.data);
-       if (res.data && res.data.message) {
-         CustomSuccessToast(res.data.message);
-       }
+    // Ensure currentUser exists before making the request
+    if (currentUser) {
+      try {
+        const res = await axiosInstance.put(
+          "/profile/edit-profile",
+          updatedProfileData
+        );
+        console.log("Profile updated successfully:", res.data);
+        if (res.data && res.data.message) {
+          CustomSuccessToast(res.data.message);
+        }
 
-       // Update user in zustand and localStorage (if needed)
-       const updatedUser = res.data.user;
-       updateUser(updatedUser);
+        // Update user in zustand and localStorage (if needed)
+        const updatedUser = res.data.user;
+        updateUser(updatedUser);
 
-       navigate("/profile-information");
-     } catch (err) {
-       console.error("Profile update failed:", err);
-       if (err.response && err.response.data && err.response.data.message) {
-         CustomFailedToast(err.response.data.message);
-       } 
-     }
-   }
- };
+        navigate("/profile-information");
+      } catch (err) {
+        console.error("Profile update failed:", err);
+        if (err.response && err.response.data && err.response.data.message) {
+          CustomFailedToast(err.response.data.message);
+        }
+      }
+    }
+  };
 
   return (
     <>

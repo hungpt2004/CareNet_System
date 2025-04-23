@@ -234,16 +234,12 @@ const ProfileAvatar = () => {
   const fileInputRef = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
-
-  const navigate = useNavigate();
-  // Lấy người dùng hiện tại
-  const currentUser = useAuthStore((state) => state.currentUser);
-  // Lấy người dùng sau khi cập nhật thông tin
-  const { updateUser } = useAuthStore();
-  const [avatarUrl, setAvatarUrl] = useState(
-    currentUser.avatarUrl || defaultAvatar
-  );
+  const [avatarUrl, setAvatarUrl] = useState(currentUser.avatarUrl);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const navigate = useNavigate();
+  const currentUser = useAuthStore((state) => state.currentUser);
+  const { updateUser } = useAuthStore();
+
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -274,7 +270,7 @@ const ProfileAvatar = () => {
     CustomFailedToast("Avatar upload canceled."); // Inform the user that the upload was canceled
   };
 
-  // When uploading or updating the avatar, set the new URL
+  // Xử lí upload avatar và cập nhật avatar 
   const uploadAvatar = async () => {
     if (selectedFile) {
       const formData = new FormData();
@@ -288,11 +284,11 @@ const ProfileAvatar = () => {
             headers: { "Content-Type": "multipart/form-data" },
           }
         );
-        
+
         // Check if avatarUrl is available in the response
         if (res.data && res.data.avatarUrl) {
           setAvatarUrl(res.data.avatarUrl); // Update the avatarUrl state
-        console.log("Avatar updated successfully:", res.data);
+          console.log("Avatar updated successfully:", res.data);
 
           if (res.data && res.data.message) {
             console.log(res.data.message);
@@ -310,9 +306,9 @@ const ProfileAvatar = () => {
         console.error("Error uploading avatar:", err);
         if (err.res && err.res.data && err.res.data.message) {
           CustomFailedToast(err.res.data.message);
-        } 
+        }
       }
-    } 
+    }
   };
 
   return (
