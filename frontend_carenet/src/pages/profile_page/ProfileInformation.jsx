@@ -1,7 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
-import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Form,
+  Button,
+  Spinner,
+} from "react-bootstrap";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../utils/AxiosInstance";
@@ -11,6 +19,8 @@ import {
   CustomSuccessToast,
   CustomToast,
 } from "../../components/toast/CustomToast";
+import defaultAvatar from "../../assets/defaultAvatar.png";
+
 const ProfileInfo = () => {
   // CSS styles defined directly in the component
   const styles = {
@@ -208,6 +218,7 @@ const ProfileInfo = () => {
   const currentUser = useAuthStore((state) => state.currentUser);
   const { updateUser } = useAuthStore();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   // Khởi tạo form
   const [formData, setFormData] = useState({
@@ -234,7 +245,7 @@ const ProfileInfo = () => {
   // Xử lí nộp form và cập nhật form
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setLoading(true);
     // Convert the date to "yyyy-mm-dd" format if it's in "dd/mm/yyyy" format
     const formattedDob = formData.dob.split("/").reverse().join("-");
     const dobDate = new Date(formattedDob);
@@ -242,8 +253,9 @@ const ProfileInfo = () => {
     // Validate phone number using regex (example for a 10-digit phone number)
     const phoneRegex = /^[0-9]{10}$/; // Modify based on the expected phone number format
     if (!phoneRegex.test(formData.phone)) {
+      setLoading(false);
       CustomFailedToast(
-        "Invalid phone number. Please enter a valid 10-digit phone number."
+        "Số điện thoại không hợp lệ. Vui lòng nhập số điện thoại hợp lệ gồm 10 chữ số."
       );
       return;
     }
@@ -257,7 +269,8 @@ const ProfileInfo = () => {
     }
 
     if (age < 18) {
-      CustomFailedToast("You must be at least 18 years old.");
+      setLoading(false);
+      CustomFailedToast("Bạn phải ít nhất 18 tuổi.");
       return;
     }
 
@@ -281,17 +294,17 @@ const ProfileInfo = () => {
         );
         console.log("Profile updated successfully:", res.data);
         if (res.data && res.data.message) {
+          setLoading(false);
           CustomSuccessToast(res.data.message);
         }
 
         // Update user in zustand and localStorage (if needed)
         const updatedUser = res.data.user;
         updateUser(updatedUser);
-
-        navigate("/profile-information");
       } catch (err) {
         console.error("Profile update failed:", err);
         if (err.response && err.response.data && err.response.data.message) {
+          setLoading(false);
           CustomFailedToast(err.response.data.message);
         }
       }
@@ -317,14 +330,14 @@ const ProfileInfo = () => {
                 <Card.Body className="p-0">
                   <div style={styles.userProfile}>
                     <img
-                      src="https://img.freepik.com/premium-vector/avatar-profile-icon-flat-style-female-user-profile-vector-illustration-isolated-background-women-profile-sign-business-concept_157943-38866.jpg?semt=ais_hybrid"
+                      src={defaultAvatar}
                       alt="User Avatar"
                       className="avatar-img"
                       style={styles.avatar}
                     />
                     <div style={styles.userInfo}>
                       <h5 style={styles.userName}>Hung Pham Trong</h5>
-                      <p style={styles.accountType}>Normal Account</p>
+                      <p style={styles.accountType}>Tài Khoản cá nhân</p>
                     </div>
                   </div>
                   <div style={styles.menuItems}>
@@ -333,45 +346,45 @@ const ProfileInfo = () => {
                       style={{ ...styles.menuItem, ...styles.menuItemActive }}
                       onClick={() => navigate("/profile-information")}
                     >
-                      <span>Information</span>
+                      <span>Thông tin </span>
                     </div>
                     <div
                       className="menu-item"
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-avatar")}
                     >
-                      <span>Update Avatar</span>
+                      <span>Cập Nhật Avatar </span>
                     </div>
                     <div
                       className="menu-item"
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-history")}
                     >
-                      <span>History Effort</span>
+                      <span>Lịch sử nỗ lực</span>
                     </div>
                     <div
                       className="menu-item"
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-favourite")}
                     >
-                      <span>Favourite</span>
+                      <span>Yêu Thích</span>
                     </div>
                     <div
                       className="menu-item"
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-score")}
                     >
-                      <span>Score</span>
+                      <span>Số Điểm</span>
                     </div>
                     <div
                       className="menu-item"
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-certificate")}
                     >
-                      <span>Certificate</span>
+                      <span>Chứng Chỉ </span>
                     </div>
                     <div className="menu-item" style={styles.menuItem}>
-                      <span>Log Out</span>
+                      <span>Đăng Xuất</span>
                     </div>
                   </div>
                 </Card.Body>
@@ -386,7 +399,7 @@ const ProfileInfo = () => {
             >
               <Card style={styles.infoCard}>
                 <Card.Header style={styles.infoHeader}>
-                  <h4 className="mb-0">INFORMATION</h4>
+                  <h4 className="mb-0">THÔNG TIN</h4>
                 </Card.Header>
                 <Card.Body style={styles.infoCardBody}>
                   <Form onSubmit={handleSubmit}>
@@ -394,7 +407,7 @@ const ProfileInfo = () => {
                       <Col md={6}>
                         <Form.Group>
                           <Form.Label style={styles.formLabel}>
-                            Fullname
+                            Họ và tên
                           </Form.Label>
                           <Form.Control
                             type="text"
@@ -408,7 +421,7 @@ const ProfileInfo = () => {
                       <Col md={6}>
                         <Form.Group>
                           <Form.Label style={styles.formLabel}>
-                            Gender
+                            Giới tính
                           </Form.Label>
                           <div>
                             <Form.Check
@@ -449,7 +462,7 @@ const ProfileInfo = () => {
                       <Col md={6}>
                         <Form.Group>
                           <Form.Label style={styles.formLabel}>
-                            Birthdate
+                            Ngày sinh
                           </Form.Label>
                           <Form.Control
                             type="text"
@@ -478,7 +491,7 @@ const ProfileInfo = () => {
                       <Col md={6}>
                         <Form.Group>
                           <Form.Label style={styles.formLabel}>
-                            Phone Number
+                            Số điện thoại
                           </Form.Label>
                           <Form.Control
                             type="text"
@@ -506,7 +519,7 @@ const ProfileInfo = () => {
                       </Col>
                     </Row>
                     <Form.Group className="mb-4">
-                      <Form.Label style={styles.formLabel}>Address</Form.Label>
+                      <Form.Label style={styles.formLabel}>Địa chỉ</Form.Label>
                       <Form.Control
                         as="textarea"
                         rows={3}
@@ -517,16 +530,20 @@ const ProfileInfo = () => {
                       />
                     </Form.Group>
                     <div className="text-end">
-                      <Button variant="light" className="me-2">
+                      {/* <Button variant="light" className="me-2">
                         Cancel
-                      </Button>
+                      </Button> */}
                       <Button
                         variant="primary"
                         type="submit"
                         className="save-btn"
                         style={styles.saveBtn}
                       >
-                        Save
+                        {loading ? (
+                          <Spinner animation="border" size="sm" /> // Hiển thị loading spinner khi đang tải
+                        ) : (
+                          "Lưu" // Hiển thị chữ 'Lưu' khi không có loading
+                        )}
                       </Button>
                     </div>
                   </Form>

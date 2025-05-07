@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import { Container, Row, Col, Card, Button } from "react-bootstrap";
+import React, { useState, useRef, useEffect } from "react";
+import { Container, Row, Col, Card, Button, Spinner } from "react-bootstrap";
 import { motion, AnimatePresence } from "framer-motion";
 import { Modal } from "antd";
 import "antd/dist/reset.css";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../utils/AxiosInstance";
-import useAuthStore from "../../hooks/authStore";
 import {
   CustomFailedToast,
   CustomSuccessToast,
@@ -231,14 +230,19 @@ const ProfileAvatar = () => {
     };
   }, []);
 
+  // Xử lí hiện data (Cần phải có)
+  useEffect(() => {
+    getCurrentUserForProfileAvatar();
+  }, []);
+
   const fileInputRef = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [avatarUrl, setAvatarUrl] = useState(currentUser.avatarUrl);
+  const [user, setUser] = useState(null);
+  const [avatarUrl, setAvatarUrl] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const currentUser = useAuthStore((state) => state.currentUser);
-  const { updateUser } = useAuthStore();
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
@@ -250,6 +254,27 @@ const ProfileAvatar = () => {
 
   const handleUploadClick = () => {
     fileInputRef.current.click();
+  };
+
+  //Xử lí load lại trang, không cần logout để câp nhật avatar (cần phải có)
+  const getCurrentUserForProfileAvatar = async () => {
+    const userFromStorage = localStorage.getItem("user");
+    if (userFromStorage) {
+      const user = JSON.parse(userFromStorage);
+      setUser(user); // Cập nhật state với thông tin từ localStorage
+      setAvatarUrl(user.avatarUrl); // Cập nhật avatar từ localStorage
+    } else {
+      // Nếu không có thông tin trong localStorage, gọi API để lấy thông tin người dùng
+      try {
+        const res = await axiosInstance.get("/profile/get-current-user-for-profile-avatar");
+        if (res.data && res.data.user) {
+          setUser(res.data.user);
+          setAvatarUrl(res.data.user.avatarUrl);
+        }
+      } catch (error) {
+        console.log("Error fetching current user:", error);
+      }
+    }
   };
 
   const handleViewAvatarModal = () => {
@@ -270,46 +295,42 @@ const ProfileAvatar = () => {
     CustomFailedToast("Avatar upload canceled."); // Inform the user that the upload was canceled
   };
 
-  // Xử lí upload avatar và cập nhật avatar 
+  // Xử lí upload avatar
   const uploadAvatar = async () => {
-    if (selectedFile) {
-      const formData = new FormData();
-      formData.append("avatar", selectedFile);
+    if (!selectedFile) {
+      CustomFailedToast("Please select a file before uploading.");
+      return;
+    }
 
-      try {
-        const res = await axiosInstance.put(
-          "/profile/upload-avatar",
-          formData,
-          {
-            headers: { "Content-Type": "multipart/form-data" },
-          }
+    const formData = new FormData();
+    formData.append("avatar", selectedFile); // Append the selected file
+    setLoading(true);
+    try {
+      const res = await axiosInstance.put("/profile/upload-avatar", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      if (res.data && res.data.user && res.data.image) {
+        console.log(
+          `After upload user: ${JSON.stringify(res.data.user, null, 2)}`
         );
+        setUser(res.data.user); // Update user state with new data
+        setAvatarUrl(res.data.image); // Update avatarUrl
 
-        // Check if avatarUrl is available in the response
-        if (res.data && res.data.avatarUrl) {
-          setAvatarUrl(res.data.avatarUrl); // Update the avatarUrl state
-          console.log("Avatar updated successfully:", res.data);
-
-          if (res.data && res.data.message) {
-            console.log(res.data.message);
-            CustomSuccessToast(res.data.message);
-          }
-
-          // Update user information in Zustand and localStorage
-          const updatedUser = res.data.user;
-          updateUser(updatedUser);
-
-          // Navigate to the profile page
-          navigate("/profile-avatar");
-        }
-      } catch (err) {
-        console.error("Error uploading avatar:", err);
-        if (err.res && err.res.data && err.res.data.message) {
-          CustomFailedToast(err.res.data.message);
-        }
+        // Cập nhật lại localStorage với thông tin người dùng mới
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+        setLoading(false);
+        CustomSuccessToast(res.data.message);
       }
+    } catch (err) {
+      console.error("Error uploading avatar:", err);
+      setLoading(false);
+      CustomFailedToast("Failed to upload avatar.");
     }
   };
+
+  console.log(`Before upload user: ${JSON.stringify(user, null, 2)}`);
+  console.log(`Avatar URL: ${avatarUrl}`);
 
   return (
     <>
@@ -329,7 +350,7 @@ const ProfileAvatar = () => {
                 <Card.Body className="p-0">
                   <div style={styles.userProfile}>
                     <img
-                      src={avatarUrl || "defaultAvatar"}
+                      src={avatarUrl || defaultAvatar}
                       alt="User Avatar"
                       className="avatar-img"
                       style={styles.avatar}
@@ -448,9 +469,13 @@ const ProfileAvatar = () => {
                       variant="primary"
                       className="save-btn"
                       style={styles.saveBtn}
-                      onClick={() => uploadAvatar()}
+                      onClick={uploadAvatar}
                     >
-                      Lưu
+                      {loading ? (
+                        <Spinner animation="border" size="sm" /> // Hiển thị loading spinner khi đang tải
+                      ) : (
+                        "Lưu" // Hiển thị chữ 'Lưu' khi không có loading
+                      )}
                     </Button>
                   </div>
                 </Card.Body>
@@ -472,7 +497,7 @@ const ProfileAvatar = () => {
             <AnimatePresence>
               {isModalVisible && (
                 <motion.img
-                  src={avatarUrl || defaultAvatar}
+                  src={previewUrl || avatarUrl || defaultAvatar}
                   alt="User Avatar"
                   style={styles.modalAvatar}
                   initial={{ scale: 0.5, opacity: 0, rotate: -10 }}
