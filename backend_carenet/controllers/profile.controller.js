@@ -6,7 +6,7 @@ const asyncHandler = require("../middleware/asyncHandler");
 const checkWordByGemini = require("../services/geminiCheckInstance");
 
 // backend for profile-information
-exports.editProfile = async (req, res) => {
+exports.editProfile = asyncHandler(async (req, res) => {
   const user = req.user.user;
   const userId = user._id;
   const { fullname, dob, phone, address, gender } = req.body;
@@ -18,40 +18,33 @@ exports.editProfile = async (req, res) => {
       .json({ error: true, message: "Không có thay đổi nào được cung cấp." });
   }
 
-  try {
-    // Cập nhật thông tin người dùng
-    const updatedUser = await User.findOneAndUpdate(
-      { _id: userId, _id: user._id }, // Chỉ cho phép người dùng cập nhật chính mình
-      {
-        $set: {
-          fullname: fullname,
-          dob: dob,
-          phone: phone,
-          gender: gender,
-          "address.country": address.country, // Cập nhật country trong address
-        },
+  // Cập nhật thông tin người dùng
+  const updatedUser = await User.findOneAndUpdate(
+    { _id: userId }, // Không cần `_id: user._id` 2 lần
+    {
+      $set: {
+        fullname: fullname,
+        dob: dob,
+        phone: phone,
+        gender: gender,
+        "address.country": address?.country, // dùng optional chaining để tránh lỗi nếu address là undefined
       },
-      { new: true }
-    );
+    },
+    { new: true }
+  );
 
-    // Nếu không tìm thấy người dùng
-    if (!updatedUser) {
-      return res
-        .status(404)
-        .json({ error: true, message: "Người dùng không tìm thấy" });
-    }
-
-    return res.status(200).json({
-      error: false,
-      user: updatedUser,
-      message: "Hồ sơ đã được cập nhật thành công.",
-    });
-  } catch (err) {
+  if (!updatedUser) {
     return res
-      .status(500)
-      .json({ error: true, message: "Cập nhật hồ sơ thất bại" });
+      .status(404)
+      .json({ error: true, message: "Người dùng không tìm thấy" });
   }
-};
+
+  return res.status(200).json({
+    error: false,
+    user: updatedUser,
+    message: "Hồ sơ đã được cập nhật thành công.",
+  });
+});
 
 // backend for profile-avatar
 exports.uploadAvatar = [
@@ -97,7 +90,10 @@ exports.uploadAvatar = [
       console.error("Error:", err);
       return res
         .status(500)
-        .json({ error: true, message: "Tải ảnh đại diện lên không thành công." });
+        .json({
+          error: true,
+          message: "Tải ảnh đại diện lên không thành công.",
+        });
     }
   },
 ];
@@ -114,22 +110,34 @@ exports.getCurrentUserForProfileAvatar = asyncHandler(async (req, res) => {
 
 //backend for profile-history
 exports.getHistoryEventById = asyncHandler(async (req, res) => {
-    const id = "67fe2ef4edac0fe2989b88b7";
-    const historyEvent = await HistoryEvent.findById(id).populate(
-      "event"
-    );
+  const id = "67fe2ef4edac0fe2989b88b7";
+  const historyEvent = await HistoryEvent.findById(id).populate("event");
 
-    console.log(historyEvent.event.title);
-    console.log(historyEvent.event.startAt);
-    console.log(historyEvent.status);
+  console.log(historyEvent.event.title);
+  console.log(historyEvent.event.startAt);
+  console.log(historyEvent.status);
 
-    return res.status(200).json({ status: 'success', message: 'Get history event successfully', historyEvent: historyEvent });
+  return res
+    .status(200)
+    .json({
+      status: "success",
+      message: "Get history event successfully",
+      historyEvent: historyEvent,
+    });
 });
 
 exports.getAllHistoryEvent = asyncHandler(async (req, res) => {
-    const user = req.user.user;
-    const historyEvents = await HistoryEvent.find({user: user._id}).populate("event"); //return array
-    return res.status(200).json({ status: 'success', message: 'Get all history event successfully', historyEvents: historyEvents });
+  const user = req.user.user;
+  const historyEvents = await HistoryEvent.find({ user: user._id }).populate(
+    "event"
+  ); //return array
+  return res
+    .status(200)
+    .json({
+      status: "success",
+      message: "Get all history event successfully",
+      historyEvents: historyEvents,
+    });
 });
 
 exports.sendFeedbackHistoryEvents = async (req, res) => {
