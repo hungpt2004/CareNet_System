@@ -130,12 +130,17 @@ exports.searchEvents = asyncHandler(async (req, res) => {
       })
       .populate("organizationId", "name rating");
 
-    console.log(events[0]);
+    console.log(`Length Event List: ${events.length}`);
+    const addressArray = events.map((item) => item.location.province);
+    console.log(`List address: ${JSON.stringify(addressArray,null,2)}`)
 
-    if (events.length <= 0)
-      return res
-        .status(500)
-        .json({ status: "fail", message: "Không có sự kiện nào phù hợp" });
+    if (events.length === 0) {
+      return res.status(200).json({
+        status: "success",
+        message: "Không có sự kiện nào phù hợp",
+        events: [],
+      });
+    }
 
     return res.status(200).json({
       status: "success",
@@ -144,7 +149,11 @@ exports.searchEvents = asyncHandler(async (req, res) => {
     });
   } catch (error) {
     console.error("Lỗi search:", error);
-    return res.status(500).json({ message: "Server Error" });
+    return res.status(500).json({
+      status: 'fail',
+      message: 'Kết quả tìm kiếm của bạn đã có',
+      events: []
+    });
   }
 });
 
@@ -168,22 +177,30 @@ exports.getAllCategoryFromEvents = asyncHandler(async (req, res) => {
 });
 
 exports.searchByRatingOrganization = asyncHandler(async (req, res) => {
-  const { rating } = req.query;
+
+  const searchRating  = req.query;
+
+  console.log(`Rating finding: ${searchRating.rating}`);
 
   try {
     const organizations = await Organization.find({
-      rating: { $gte: Number(rating) },
+      rating: { $gte: Number(searchRating.rating) },
     });
 
     const organizationIds = organizations.map((org) => org._id);
 
-    if (!organizationIds.length < 0) {
+    console.log(typeof Number(searchRating.rating))
+
+    if (organizationIds.length <= 0) {
       console.log("No have any org Id");
     }
 
     const mapEvents = await Event.find({
       organizationId: { $in: organizationIds },
-    });
+      status: 'hiring'
+    }).populate("organizationId", "name rating");
+
+    console.log(mapEvents.length);
 
     if (mapEvents.length <= 0) {
       return res.status(500).json({
@@ -195,6 +212,7 @@ exports.searchByRatingOrganization = asyncHandler(async (req, res) => {
     return res.status(200).json({
       status: "success",
       message: "Đây là kết quả tìm kiếm",
+      mapEvents
     });
   } catch (error) {
     return res.status(500).json({

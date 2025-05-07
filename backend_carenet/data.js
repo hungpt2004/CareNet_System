@@ -1,3 +1,5 @@
+const { db } = require("./models/event.model");
+
 // LEVEL ORGANIZATION
 const organizationLevelIds = [
   ObjectId("67fa6d0994cb16b77d0f20df"),
@@ -2995,6 +2997,7 @@ for (let i = 1; i <= 150; i++) {
     password: "$2b$10$jIj0mCP13..EeaVPY2xXXeL/utB2tHgPAOyzHdthRgbQZG/bJZA4G",
     role: "volunteer",
     cccdImages: [],
+    cccdNumber: 123456789,
     phone: `098765432${i % 10}`,
     dob: new Date(1990, 0, 1),
     isVerified: true,
@@ -3034,7 +3037,7 @@ for (let i = 0; i < organizationUserIds.length; i++) {
       adminStatus: "approved",
       organizationStatus: "active",
       licenseDocumentUrl: getRandomSubset(licenseDocumentUrl, 4), // Lấy 4 ảnh random trong licenseDocumentUrl
-      rating: randomRating(),
+      rating: Number(randomRating()),
     }); // Lưu ID để sử dụng sau này
     organizationIds.push(organizations.insertedId);
   }
@@ -3222,11 +3225,16 @@ for (let i = 0; i < 150; i++) {
   const currentStaffs = db.users
     .find({
       organizationId: existedOrganization._id,
+      status: 'ready'
     })
     .toArray(); // cần toArray để dùng map
 
+  if (currentStaffIdsArray.length === 0) continue;
+
   const currentStaffIdsArray = currentStaffs.map((user) => user._id);
   const staffRandomIndex = i % currentStaffIdsArray.length;
+  const selectedStaffId = currentStaffIdsArray[staffRandomIndex];
+
   const startDate = generateStartAt(true, 1);
   const skillNeeds = getRandomSubset(skillNeedsArr, 4);
   const imageRandom = getRandomSubset(eventImages, 4);
@@ -3237,30 +3245,40 @@ for (let i = 0; i < 150; i++) {
   const formDataRandomIndex = i % formQuestion.length;
   const eventStatusRandomIndex = i % eventStatus.length;
 
-  let event = db.events.insertOne({
-    title: eventTitles[titleRandomIndex],
-    description: eventDescriptions[desRandomIndex],
-    images: imageRandom,
-    category: categories[categoryRandomIndex],
-    rating: randomRating(),
-    currentParticipants: randomParticipants(),
-    assignChecker: currentStaffIdsArray[staffRandomIndex],
-    startAt: startDate,
-    endAt: generateEndAt(startDate),
-    organizationId: existedOrganization._id,
-    skillNeeds: skillNeeds,
-    location: {
-      street: streets[streetRandomIndex],
-      ward: wards[wardRandomIndex],
-      district: districts[districtRandomIndex],
-      province: "Da Nang",
-      postalCode: postCodeDaNang[randomPostCodeIndex],
-    },
-    formData: formQuestion[formDataRandomIndex],
-    status: eventStatus[eventStatusRandomIndex],
-  });
-
-  eventIds.push(event.insertedId);
+  try {
+    let event = db.events.insertOne({
+      title: eventTitles[titleRandomIndex],
+      description: eventDescriptions[desRandomIndex],
+      images: imageRandom,
+      category: categories[categoryRandomIndex],
+      rating: randomRating(),
+      currentParticipants: randomParticipants(),
+      assignChecker: selectedStaffId,
+      startAt: startDate,
+      endAt: generateEndAt(startDate),
+      organizationId: existedOrganization._id,
+      skillNeeds: skillNeeds,
+      location: {
+        street: streets[streetRandomIndex],
+        ward: wards[wardRandomIndex],
+        district: districts[districtRandomIndex],
+        province: "Đà Nẵng",
+        postalCode: postCodeDaNang[randomPostCodeIndex],
+      },
+      formData: formQuestion[formDataRandomIndex],
+      status: eventStatus[eventStatusRandomIndex],
+    });
+  
+    // Update status staff
+    db.users.updateOne(
+      { _id: selectedStaffId },
+      { $set: { status: 'busy' } }
+    )
+  
+    eventIds.push(event.insertedId);
+  } catch (error) {
+    console.error(`Insert lỗi ở lần i = ${i}: `, error.message)
+  }
 }
 
 // EVENT REGISTRATION

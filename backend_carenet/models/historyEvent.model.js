@@ -15,6 +15,7 @@ const historyEventSchema = new Schema({
   status: {
     type: String,
     enum: [
+      "waiting", //chờ duyệt
       "completed", //duoc phep feedback
       "finished",  //sau khi feedback
       "processing",//sk đang diễn ra
@@ -31,15 +32,16 @@ const historyEventSchema = new Schema({
   },
   attendedAt: {
     type: Date,
+    default: null,
   },
   completedAt: {
     type: Date,
     default: null,
   },
-  earnedPoints: {
-    type: Number,
-    default: 0,
-  },
+  // earnedPoints: {
+  //   type: Number,
+  //   default: 0,
+  // },
   earnedHours: {
     type: Number,
     default: 0,

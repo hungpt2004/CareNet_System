@@ -15,7 +15,7 @@ export default function EventCard({ event, currentUser, customStyles, formatDate
 
   const handleGoToDetail = () => {
     console.log("Navigate to event details:", event.id)
-    navigate('/event-detail')
+    navigate(`/event-detail/${event._id}`);
     // Implement your navigation logic here
   }
 

@@ -10,6 +10,7 @@ const ProfileInfo = () => {
 
   // Get current user
   const currentUser = useAuthStore((state) => state.currentUser);
+  const {updateUser} = useAuthStore();
 
   // CSS styles defined directly in the component
   const styles = {

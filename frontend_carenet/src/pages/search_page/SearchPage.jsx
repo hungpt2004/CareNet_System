@@ -15,7 +15,7 @@ import { Sparkles } from "lucide-react"
 import searchStyles from '../../css/SearchPage.module.css'
 import EventCard from "../../components/component_page/card/EventCard"
 import axiosInstance from "../../utils/AxiosInstance"
-import { CustomFailedToast, CustomSuccessToast } from "../../components/toast/CustomToast"
+import { CustomFailedToast, CustomSuccessToast, CustomToast } from "../../components/toast/CustomToast"
 import EventCardSlider from "../../components/component_page/card/EventCardSlider"
 import CareNetLoading from "../../components/loading/CareNetLoading"
 import axios from "axios"
@@ -48,10 +48,7 @@ export default function VolunteerEventSearch() {
     startDate: "",
     endDate: "",
     category: "",
-    rating: ""
   })
-
-  const navigate = useNavigate();
 
   // State for events and filtered events
   const [events, setEvents] = useState([])
@@ -59,6 +56,7 @@ export default function VolunteerEventSearch() {
   const [aiFilterEvents, setAiFilterEvents] = useState([]);
   const [aiFilterShowed, setAiFilterShowed] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
+  const [searchRating, setSearchRating] = useState(0);
 
   // Use Ref
   const searchFilterRef = useRef(searchFilters);
@@ -73,6 +71,7 @@ export default function VolunteerEventSearch() {
 
   console.log(categories.length)
 
+  // Get category in select
   const getAllCategory = async () => {
     try {
       const response = await axios.get(`http://localhost:5000/search/all-category`);
@@ -83,7 +82,6 @@ export default function VolunteerEventSearch() {
       console.log(error.response?.data?.message);
     }
   }
-
   // API get location in VN
   const fetchProvinces = async () => {
     try {
@@ -111,7 +109,6 @@ export default function VolunteerEventSearch() {
       console.error('Error fetching wards:', error)
     }
   }
-
 
   // Get name location
   const extractLocationName = (fullName) => {
@@ -143,6 +140,47 @@ export default function VolunteerEventSearch() {
       }, 10000);
     }
   }
+
+  const handleSearchByRating = async () => {
+    // Kiểm tra nếu searchRating là 0 (chưa chọn mức đánh giá)
+    if (searchRating === 0) {
+      // Không làm gì khi searchRating là 0, tránh gửi yêu cầu không cần thiết
+      return;
+    }
+  
+    try {
+      setIsLoading(true);
+      setFilteredEvents([]);
+  
+      const response = await axios.get(`http://localhost:5000/search/rating-search`, {
+        params: { rating: searchRating } // Gửi rating như một tham số rõ ràng
+      });
+  
+      if (response.data.status === 'success' && response.data.mapEvents) {
+        setFilteredEvents(response.data.mapEvents);
+        if (response.data.mapEvents.length === 0) {
+          console.log("Không tìm thấy sự kiện phù hợp với mức đánh giá này!");
+        } else {
+          console.log(response.data.message);
+        }
+      } else {
+        setFilteredEvents([]);
+        CustomFailedToast(response.data.message || "Không tìm thấy sự kiện!");
+      }
+    } catch (error) {
+      console.error("Lỗi ở hàm handleSearchByRating:", {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+      setEvents([]);
+      CustomFailedToast("Đã xảy ra lỗi khi tìm kiếm theo đánh giá!");
+    } finally {
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 1000);
+    }
+  };
 
   console.log(JSON.stringify(searchFilters, null, 2))
 
@@ -188,6 +226,8 @@ export default function VolunteerEventSearch() {
     }
   };
 
+  console.log(`Length filter event: ${filteredEvents.length}`)
+
   useEffect(() => {
     getAllCategory();
   }, [])
@@ -213,13 +253,19 @@ export default function VolunteerEventSearch() {
       if (searchFilters.endDate) params.endDate = searchFilters.endDate;
       if (searchFilters.category) params.category = searchFilters.category;
 
+      if (Object.keys(params).length === 0) {
+        CustomFailedToast("Vui lòng điền ít nhất một tiêu chí tìm kiếm!");
+        setIsLoading(false);
+        return;
+      }
+
       const response = await axios.get(`http://localhost:5000/search/e-search`, {
         params: params
       })
 
       if (response.data && response.data.events) {
         setFilteredEvents(response.data.events);
-      }
+      } 
 
     } catch (error) {
       console.log("Lỗi ở hàm handle search");
@@ -335,8 +381,13 @@ export default function VolunteerEventSearch() {
     searchFilterRef.current = searchFilters;
   }, [searchFilters]);
 
+  useEffect(() => {
+    handleSearchByRating();
+  }, [searchRating])
+
   return (
     <>
+    <CustomToast/>
       <Container fluid className={`py-4 p-5 mt-4`}>
 
         {/* AI gợi ý */}
@@ -537,89 +588,113 @@ export default function VolunteerEventSearch() {
             </Card>
 
             {/* Rating */}
-            <Card className="mt-3 shadow">
-              <Card.Header className="text-center fw-bold fs-5">Tìm kiếm theo đánh giá tổ chức</Card.Header>
-              <Card.Body>
-                {/* 5 sao */}
-                <FormCheck
-                  type="radio"
-                  id="rating-5"
-                  label={
-                    <span>
-                      {[...Array(5)].map((_, i) => (
-                        <BsStarFill key={i} color="#ffc107" />
-                      ))}
-                      <span> (5.0)</span>
-                    </span>
-                  }
-                />
+            <form onSubmit={handleSearchByRating}>
+              <Card className="mt-3 shadow">
+                <Card.Header className="text-center fw-bold fs-5">
+                  Tìm kiếm theo đánh giá tổ chức
+                </Card.Header>
+                <Card.Body>
+                  {/* 5 sao */}
+                  <FormCheck
+                    type="radio"
+                    name="rating"
+                    id="rating-5"
+                    value={5}
+                    checked={searchRating === 5}
+                    onChange={(e) => setSearchRating(Number(e.target.value))}
+                    label={
+                      <span>
+                        {[...Array(5)].map((_, i) => (
+                          <BsStarFill key={i} color="#ffc107" />
+                        ))}
+                        <span> (5.0)</span>
+                      </span>
+                    }
+                  />
 
-                {/* 4 sao trở lên */}
-                <FormCheck
-                  type="radio"
-                  id="rating-4"
-                  label={
-                    <span>
-                      {[...Array(4)].map((_, i) => (
-                        <BsStarFill key={i} color="#ffc107" />
-                      ))}
-                      <span><BsStar color="#ccc" /> (4.0 trở lên)</span>
-                    </span>
-                  }
-                />
+                  {/* 4 sao trở lên */}
+                  <FormCheck
+                    type="radio"
+                    name="rating"
+                    id="rating-4"
+                    value={4}
+                    checked={searchRating === 4}
+                    onChange={(e) => setSearchRating(Number(e.target.value))}
+                    label={
+                      <span>
+                        {[...Array(4)].map((_, i) => (
+                          <BsStarFill key={i} color="#ffc107" />
+                        ))}
+                        <BsStar color="#ccc" /> <span> (4.0 trở lên)</span>
+                      </span>
+                    }
+                  />
 
-                {/* 3 sao trở lên */}
-                <FormCheck
-                  type="radio"
-                  id="rating-3"
-                  label={
-                    <span>
-                      {[...Array(3)].map((_, i) => (
-                        <BsStarFill key={i} color="#ffc107" />
-                      ))}
-                      {[...Array(2)].map((_, i) => (
-                        <BsStar key={i} color="#ccc" />
-                      ))}
-                      <span> (3.0 trở lên)</span>
-                    </span>
-                  }
-                />
+                  {/* 3 sao trở lên */}
+                  <FormCheck
+                    type="radio"
+                    name="rating"
+                    id="rating-3"
+                    value={3}
+                    checked={searchRating === 3}
+                    onChange={(e) => setSearchRating(Number(e.target.value))}
+                    label={
+                      <span>
+                        {[...Array(3)].map((_, i) => (
+                          <BsStarFill key={i} color="#ffc107" />
+                        ))}
+                        {[...Array(2)].map((_, i) => (
+                          <BsStar key={i} color="#ccc" />
+                        ))}
+                        <span> (3.0 trở lên)</span>
+                      </span>
+                    }
+                  />
 
-                {/* 2 sao trở lên */}
-                <FormCheck
-                  type="radio"
-                  id="rating-2"
-                  label={
-                    <span>
-                      {[...Array(2)].map((_, i) => (
-                        <BsStarFill key={i} color="#ffc107" />
-                      ))}
-                      {[...Array(3)].map((_, i) => (
-                        <BsStar key={i} color="#ccc" />
-                      ))}
-                      <span> (2.0 trở lên)</span>
-                    </span>
-                  }
-                />
+                  {/* 2 sao trở lên */}
+                  <FormCheck
+                    type="radio"
+                    name="rating"
+                    id="rating-2"
+                    value={2}
+                    checked={searchRating === 2}
+                    onChange={(e) => setSearchRating(Number(e.target.value))}
+                    label={
+                      <span>
+                        {[...Array(2)].map((_, i) => (
+                          <BsStarFill key={i} color="#ffc107" />
+                        ))}
+                        {[...Array(3)].map((_, i) => (
+                          <BsStar key={i} color="#ccc" />
+                        ))}
+                        <span> (2.0 trở lên)</span>
+                      </span>
+                    }
+                  />
 
-                <FormCheck
-                  type="radio"
-                  id="rating-1"
-                  label={
-                    <span>
-                      {[...Array(1)].map((_, i) => (
-                        <BsStarFill key={i} color="#ffc107" />
-                      ))}
-                      {[...Array(4)].map((_, i) => (
-                        <BsStar key={i} color="#ccc" />
-                      ))}
-                      <span> (1.0 trở lên)</span>
-                    </span>
-                  }
-                />
-              </Card.Body>
-            </Card>
-
+                  {/* 1 sao trở lên */}
+                  <FormCheck
+                    type="radio"
+                    name="rating"
+                    id="rating-1"
+                    value={1}
+                    checked={searchRating === 1}
+                    onChange={(e) => setSearchRating(Number(e.target.value))}
+                    label={
+                      <span>
+                        {[...Array(1)].map((_, i) => (
+                          <BsStarFill key={i} color="#ffc107" />
+                        ))}
+                        {[...Array(4)].map((_, i) => (
+                          <BsStar key={i} color="#ccc" />
+                        ))}
+                        <span> (1.0 trở lên)</span>
+                      </span>
+                    }
+                  />
+                </Card.Body>
+              </Card>
+            </form>
 
             {/* Position */}
             <Card className="mt-3 shadow">
