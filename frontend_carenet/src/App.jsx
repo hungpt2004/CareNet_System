@@ -147,7 +147,7 @@ function App() {
                 key={path}
                 path={path}
                 element={
-                  <ProtectedRoute allowedRoles={['owner']}>
+                  <ProtectedRoute allowedRoles={['organization']}>
                     {element}
                   </ProtectedRoute>
                 }

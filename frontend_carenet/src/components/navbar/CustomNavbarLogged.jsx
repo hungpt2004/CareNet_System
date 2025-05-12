@@ -16,7 +16,6 @@ const CustomNavbarLogged = () => {
   // Get current user information
   const currentUser = useAuthStore((state) => state.currentUser);
 
-  console.log(currentUser._id)
 
   const {logout} = useAuthStore();
 

@@ -1,122 +1,93 @@
-"use client"
-
 import { useEffect, useState } from "react"
-import { Container, Row, Col, Button, Modal, Form, InputGroup, Alert, Spinner } from "react-bootstrap"
-import { Mail, Lock, Eye, EyeOff, Facebook, Twitter, Github, ArrowRight, User, Calendar, Phone } from "lucide-react"
-import { FcGoogle } from "react-icons/fc";
-import { FaFacebookSquare } from "react-icons/fa";
-import { SocialLoginComponent } from "../../components/button/SocialLoginComponent";
-import { useNavigate } from "react-router-dom";
-import useAuthStore from "../../hooks/authStore";
-import { CustomFailedToast, CustomSuccessToast, CustomToast } from "../../components/toast/CustomToast";
+import { useNavigate } from "react-router-dom"
+import {
+  Layout,
+  Typography,
+  Button,
+  Modal,
+  Form,
+  Input,
+  Checkbox,
+  Divider,
+  Space,
+  Alert,
+  DatePicker,
+  ConfigProvider,
+  notification,
+} from "antd"
+import { FacebookFilled, GoogleOutlined } from "@ant-design/icons"
+import { Eye, EyeOff, Mail, Lock, User, Calendar, Phone } from "lucide-react"
+import { CustomSuccessToast, CustomFailedToast, CustomToast } from "../../components/toast/CustomToast"
+import useAuthStore from "../../hooks/authStore"
 
-// Custom CSS variables for the color scheme
-const customStyles = {
-  primaryColor: "#5DB996",
-  secondaryColor: "#FBF6E9",
+// Custom theme configuration
+const theme = {
+  token: {
+    colorPrimary: "#5DB996",
+    colorBgContainer: "#FFFFFF",
+    colorBgElevated: "#FFFFFF",
+    borderRadius: 8,
+    fontSize: 16,
+  },
 }
 
+// Social login component
+const SocialLoginButton = ({ icon, title, color, onClick }) => (
+  <Button
+    icon={icon}
+    size="large"
+    style={{
+      width: "100%",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      color: color,
+    }}
+    onClick={onClick}
+  >
+    {title}
+  </Button>
+)
+
 function AuthenGatePage() {
-  // Navigate 
-  const navigate = useNavigate();
+  const navigate = useNavigate()
+  const { login, register, currentUser, loading: authLoading, error: authError, successMessage: authSuccess } = useAuthStore()
 
   // State for modals
   const [showLoginModal, setShowLoginModal] = useState(false)
   const [showRegisterModal, setShowRegisterModal] = useState(false)
-  const [stateRegiser, setStateRegister] = useState(null);
-  const { login, loading, register, error, successMessage, clearSuccess, currentUser} = useAuthStore();
-
-  // Login form state
-  const [loginData, setLoginData] = useState({
-    email: "",
-    password: "",
-    rememberMe: false,
-  })
-
-  // Register form state
-  const [registerData, setRegisterData] = useState({
-    fullname: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    dob: "",
-    phone: "",
-    agreeTerms: false,
-  })
 
   // State for password visibility
   const [showLoginPassword, setShowLoginPassword] = useState(false)
   const [showRegisterPassword, setShowRegisterPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
-  // State for form validation
-  const [loginValidated, setLoginValidated] = useState(false)
-  const [registerValidated, setRegisterValidated] = useState(false)
+  // Login form reference
+  const [loginForm] = Form.useForm()
+  const [registerForm] = Form.useForm()
 
   // State for errors
   const [loginError, setLoginError] = useState("")
-  const [registerErrors, setRegisterErrors] = useState({})
+
+  // Notification API
+  const [api, contextHolder] = notification.useNotification()
 
   // Handle login modal
   const handleLoginModalClose = () => {
     setShowLoginModal(false)
-    setLoginData({
-      email: "",
-      password: "",
-      rememberMe: false,
-    })
-    setLoginValidated(false)
+    loginForm.resetFields()
     setLoginError("")
   }
+
   const handleLoginModalShow = () => setShowLoginModal(true)
 
   // Handle register modal
   const handleRegisterModalClose = () => {
     setShowRegisterModal(false)
-    setRegisterData({
-      fullname: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-      birthDate: "",
-      phone: "",
-      agreeTerms: false,
-    })
-    setRegisterValidated(false)
-    setRegisterErrors({})
+    registerForm.resetFields()
   }
+
   const handleRegisterModalShow = () => setShowRegisterModal(true)
-
-  // Handle login input changes
-  const handleLoginChange = (e) => {
-    const { name, value, type, checked } = e.target
-    setLoginData({
-      ...loginData,
-      [name]: type === "checkbox" ? checked : value,
-    })
-
-    // Clear error when user types
-    if (loginError) setLoginError("")
-  }
-
-
-  // Handle register input changes
-  const handleRegisterChange = (e) => {
-    const { name, value, type, checked } = e.target
-    sessionStorage.setItem('state', e.target);
-    setRegisterData({
-      ...registerData,
-      [name]: type === "checkbox" ? checked : value,
-    })
-
-    // Clear specific error when field is changed
-    if (registerErrors[name]) {
-      setRegisterErrors({
-        ...registerErrors,
-        [name]: "",
-      })
-    }
-  }
 
   // Toggle password visibility
   const toggleLoginPasswordVisibility = () => {
@@ -131,285 +102,284 @@ function AuthenGatePage() {
     setShowConfirmPassword(!showConfirmPassword)
   }
 
-  console.log(currentUser);
-
   // Handle login form submission
-  const handleLoginSubmit = async (e) => {
-    e.preventDefault()
-    const form = e.currentTarget
-
-    if (form.checkValidity() === false) {
-      e.stopPropagation()
-      setLoginValidated(true)
-      return
-    }
-
-    // Simulate login - in a real app, you would call your auth API
-    console.log("Login attempt with:", loginData)
-
-    // Simulate login error for demo purposes (if email doesn't contain '@')
-    if (!loginData.email.includes("@")) {
-      setLoginError("Email hoặc mật khẩu không hợp lệ. Vui lòng thử lại.")
-      return
-    }
-
+  const handleLoginSubmit = async (values) => {
     try {
-      await login(loginData.email, loginData.password);
-      console.log(loginData)
-      if(currentUser?.hobbies?.length <= 0) {
-        setTimeout(() => {
-          navigate('/onboarding')
-        }, 800)
-      } else {
-        setTimeout(() => {
-          navigate('/')
-        }, 800)
-      }
+      setLoginError("")
+      await login(values.email, values.password)
+      CustomSuccessToast("Đăng nhập thành công")
+      
+      // Navigate based on user state
+      setTimeout(() => {
+        if (currentUser?.hobbies?.length <= 0) {
+          navigate("/onboarding")
+        } else {
+          navigate("/")
+        }
+      }, 800)
     } catch (err) {
-      console.log(err.message);
+      setLoginError(err || "Đăng nhập thất bại. Vui lòng thử lại.")
+      CustomFailedToast(err || "Đăng nhập thất bại. Vui lòng thử lại.")
     }
-    // Simulate successful login
-    // handleLoginModalClose()
-  }
-
-  // Validate register form
-  const validateRegisterForm = () => {
-    const newErrors = {}
-
-    if (!registerData.email) newErrors.email = "Email không được để trống"
-    else if (!/\S+@\S+\.\S+/.test(registerData.email)) newErrors.email = "Email không hợp lệ"
-
-    if (!registerData.password) newErrors.password = "Mật khẩu không được để trống"
-    else if (registerData.password.length < 8) newErrors.password = "Mật khẩu phải có ít nhất 8 ký tự"
-
-    if (!registerData.confirmPassword) newErrors.confirmPassword = "Vui lòng xác nhận mật khẩu"
-    else if (registerData.password !== registerData.confirmPassword) newErrors.confirmPassword = "Mật khẩu không khớp"
-
-    if (!registerData.fullname) newErrors.fullname = "Họ tên không được để trống"
-
-    if (!registerData.agreeTerms) newErrors.agreeTerms = "Bạn phải đồng ý với điều khoản dịch vụ"
-
-    setRegisterErrors(newErrors)
-    return Object.keys(newErrors).length === 0
   }
 
   // Handle register form submission
-  const handleRegisterSubmit = async (e) => {
-    e.preventDefault()
-    const form = e.currentTarget
-
-    if (form.checkValidity() === false) {
-      e.stopPropagation()
-      setRegisterValidated(true)
-      return;
-    }
-
-    if (validateRegisterForm()) {
-
-      try {
-        await register(registerData);
-      } catch (err) {
-        console.log(err.message);
+  const handleRegisterSubmit = async (values) => {
+    try {
+      const userData = {
+        fullname: values.fullname,
+        email: values.email,
+        password: values.password,
+        dob: values.dob ? values.dob.format('YYYY-MM-DD') : null,
+        phone: values.phone,
       }
-
+      
+      await register(userData)
+      CustomSuccessToast("Đăng ký thành công! Vui lòng đăng nhập.")
       handleRegisterModalClose()
+      handleLoginModalShow()
+    } catch (err) {
+      CustomFailedToast(err?.message || "Đăng ký thất bại. Vui lòng thử lại.")
     }
   }
 
+  // Show error toast when auth error changes
   useEffect(() => {
-    if (successMessage) {
-      CustomSuccessToast(successMessage)
+    if (authError) {
+      CustomFailedToast(authError)
     }
-  }, [successMessage])
+  }, [authError])
 
+  // Show success toast when auth success changes
   useEffect(() => {
-    if (error) {
-      CustomFailedToast(error)
+    if (authSuccess) {
+      CustomSuccessToast(authSuccess)
     }
-  }, [error])
-
-  useEffect(() => {
-    if (sessionStorage.getItem('state')) {
-      setStateRegister(sessionStorage.getItem('state'))
-    }
-  })
+  }, [authSuccess])
 
   return (
     <>
-      <CustomToast />
-      <div
-        className="authen-page d-flex align-items-center justify-content-center min-vh-100"
+      <CustomToast/>
+      <ConfigProvider theme={theme}>
+      {contextHolder}
+      <Layout
         style={{
-          backgroundImage: "url(/volunteer_img/login.jpg)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
+          minHeight: "100vh",
+          background: "transparent",
+          position: "relative",
         }}
       >
-        {/* Overlay to darken the background image */}
+        {/* Background image with overlay */}
         <div
-          className="position-absolute top-0 start-0 w-100 h-100"
-          style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
-        ></div>
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundImage: "url(/volunteer_img/login.jpg)",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+            zIndex: -2,
+          }}
+        />
 
-        <Container className="position-relative text-center">
-          <Row className="justify-content-center">
-            <Col xs={12} md={8} lg={6}>
-              <div className="text-white mb-5">
-                <h1 className="display-4 fw-bold mb-3">CareNet</h1>
-                <p className="lead mb-4">
-                  Nền tảng kết nối tình nguyện viên với các tổ chức và sự kiện thiện nguyện trên khắp Việt Nam
-                </p>
-                <div className="d-flex justify-content-center gap-3">
-                  <Button
-                    size="lg"
-                    onClick={handleLoginModalShow}
-                    style={{
-                      backgroundColor: customStyles.primaryColor,
-                      borderColor: customStyles.primaryColor,
-                    }}
-                  >
-                    Đăng nhập
-                  </Button>
-                  <Button size="lg" variant="outline-light" onClick={handleRegisterModalShow}>
-                    Đăng ký
-                  </Button>
-                  <Button size="lg" variant="light" onClick={() => navigate('/')}>
-                    Xem trước
-                  </Button>
-                </div>
-              </div>
-            </Col>
-          </Row>
-        </Container>
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0, 0, 0, 0.6)",
+            zIndex: -1,
+          }}
+        />
+
+        {/* Main content */}
+        <Layout.Content
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: "24px",
+          }}
+        >
+          <div
+            style={{
+              textAlign: "center",
+              maxWidth: "600px",
+              width: "100%",
+            }}
+          >
+            <Typography.Title
+              level={1}
+              style={{
+                color: "white",
+                marginBottom: "16px",
+                fontSize: "3.5rem",
+                fontWeight: "bold",
+              }}
+            >
+              CareNet
+            </Typography.Title>
+
+            <Typography.Paragraph
+              style={{
+                color: "white",
+                fontSize: "1.2rem",
+                marginBottom: "32px",
+              }}
+            >
+              Nền tảng kết nối tình nguyện viên với các tổ chức và sự kiện thiện nguyện trên khắp Việt Nam
+            </Typography.Paragraph>
+
+            <Space size="middle">
+              <Button
+                type="primary"
+                size="large"
+                onClick={handleLoginModalShow}
+                style={{
+                  height: "48px",
+                  paddingLeft: "24px",
+                  paddingRight: "24px",
+                  fontWeight: "bold",
+                }}
+              >
+                Đăng nhập
+              </Button>
+
+              <Button
+                ghost
+                size="large"
+                onClick={handleRegisterModalShow}
+                style={{
+                  height: "48px",
+                  paddingLeft: "24px",
+                  paddingRight: "24px",
+                  borderColor: "white",
+                  color: "white",
+                  fontWeight: "bold",
+                }}
+              >
+                Đăng ký
+              </Button>
+
+              <Button
+                size="large"
+                onClick={() => navigate("/")}
+                style={{
+                  height: "48px",
+                  paddingLeft: "24px",
+                  paddingRight: "24px",
+                  fontWeight: "bold",
+                }}
+              >
+                Xem trước
+              </Button>
+            </Space>
+          </div>
+        </Layout.Content>
 
         {/* Login Modal */}
-        <Modal show={showLoginModal} onHide={handleLoginModalClose} centered size="lg">
-          <Modal.Body className="p-4">
-            <div className="text-center mb-4">
-              <h4 className="fw-bold mb-1 fs-1" style={{ color: customStyles.primaryColor }}>
+        <Modal
+          open={showLoginModal}
+          onCancel={handleLoginModalClose}
+          footer={null}
+          width={520}
+          centered
+          style={{ borderRadius: "16px" }}
+        >
+          <div style={{ padding: "16px 8px" }}>
+            <div style={{ textAlign: "center", marginBottom: "24px" }}>
+              <Typography.Title level={2} style={{ color: theme.token.colorPrimary, marginBottom: "8px" }}>
                 Chào mừng trở lại
-              </h4>
-              <p className="text-muted">Đăng nhập để tiếp tục sử dụng CareNet</p>
+              </Typography.Title>
+              <Typography.Paragraph type="secondary">Đăng nhập để tiếp tục sử dụng CareNet</Typography.Paragraph>
             </div>
 
-            {loginError && (
-              <Alert variant="danger" className="mb-4">
-                {loginError}
-              </Alert>
-            )}
+            {loginError && <Alert message={loginError} type="error" showIcon style={{ marginBottom: "24px" }} />}
 
-            <Form noValidate validated={loginValidated} onSubmit={handleLoginSubmit}>
+            <Form form={loginForm} layout="vertical" onFinish={handleLoginSubmit} initialValues={{ remember: false }}>
               {/* Email Field */}
-              <Form.Group className="mb-3">
-                <Form.Label>Email</Form.Label>
-                <InputGroup>
-                  <InputGroup.Text>
-                    <Mail size={18} />
-                  </InputGroup.Text>
-                  <Form.Control
-                    type="email"
-                    name="email"
-                    placeholder="Nhập email của bạn"
-                    value={loginData.email}
-                    onChange={handleLoginChange}
-                    required
-                  />
-                  <Form.Control.Feedback type="invalid">Vui lòng nhập email hợp lệ.</Form.Control.Feedback>
-                </InputGroup>
-              </Form.Group>
+              <Form.Item
+                name="email"
+                label="Email"
+                rules={[
+                  { required: true, message: "Vui lòng nhập email của bạn!" },
+                  { type: "email", message: "Email không hợp lệ!" },
+                ]}
+              >
+                <Input
+                  prefix={<Mail size={18} className="site-form-item-icon" />}
+                  placeholder="Nhập email của bạn"
+                  size="large"
+                />
+              </Form.Item>
 
               {/* Password Field */}
-              <Form.Group className="mb-3">
-                <div className="d-flex justify-content-between align-items-center">
-                  <Form.Label>Mật khẩu</Form.Label>
-                  <a
-                    href="/forgot-password"
-                    className="text-decoration-none small"
-                    style={{ color: customStyles.primaryColor }}
-                  >
-                    Quên mật khẩu?
-                  </a>
-                </div>
-                <InputGroup>
-                  <InputGroup.Text>
-                    <Lock size={18} />
-                  </InputGroup.Text>
-                  <Form.Control
-                    type={showLoginPassword ? "text" : "password"}
-                    name="password"
-                    placeholder="Nhập mật khẩu của bạn"
-                    value={loginData.password}
-                    onChange={handleLoginChange}
-                    required
-                    minLength={6}
-                  />
-                  <Button variant="outline-secondary" onClick={toggleLoginPasswordVisibility} type="button">
-                    {showLoginPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </Button>
-                  <Form.Control.Feedback type="invalid">Mật khẩu phải có ít nhất 6 ký tự.</Form.Control.Feedback>
-                </InputGroup>
-              </Form.Group>
+              <Form.Item
+                name="password"
+                label={
+                  <div style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
+                    <span>Mật khẩu</span>
+                    <a href="/forgot-password" style={{ color: theme.token.colorPrimary }}>
+                      Quên mật khẩu?
+                    </a>
+                  </div>
+                }
+                rules={[
+                  { required: true, message: "Vui lòng nhập mật khẩu của bạn!" },
+                  { min: 6, message: "Mật khẩu phải có ít nhất 6 ký tự!" },
+                ]}
+              >
+                <Input.Password
+                  prefix={<Lock size={18} className="site-form-item-icon" />}
+                  placeholder="Nhập mật khẩu của bạn"
+                  size="large"
+                  iconRender={(visible) => (visible ? <Eye size={18} /> : <EyeOff size={18} />)}
+                />
+              </Form.Item>
 
               {/* Remember Me Checkbox */}
-              <Form.Group className="mb-4">
-                <Form.Check
-                  type="checkbox"
-                  id="rememberMe"
-                  name="rememberMe"
-                  label="Ghi nhớ đăng nhập"
-                  checked={loginData.rememberMe}
-                  onChange={handleLoginChange}
-                />
-              </Form.Group>
+              <Form.Item name="rememberMe" valuePropName="checked">
+                <Checkbox>Ghi nhớ đăng nhập</Checkbox>
+              </Form.Item>
 
               {/* Login Button */}
-              <div className="d-grid mb-4">
-                <Button
-                  type="submit"
-                  size="lg"
-                  style={{
-                    backgroundColor: customStyles.primaryColor,
-                    borderColor: customStyles.primaryColor,
-                  }}
-                >
-                  {loading ? <div className="text-center">
-                    <span><Spinner size="sm" color="white" />...Đang tải</span>
-                  </div> : <span>Đăng nhập</span>}
+              <Form.Item>
+                <Button type="primary" htmlType="submit" size="large" block loading={authLoading}>
+                  Đăng nhập
                 </Button>
-              </div>
+              </Form.Item>
 
               {/* Divider */}
-              <div className="d-flex align-items-center mb-4">
-                <div className="flex-grow-1 border-bottom"></div>
-                <div className="px-3 text-muted small">HOẶC ĐĂNG NHẬP VỚI</div>
-                <div className="flex-grow-1 border-bottom"></div>
-              </div>
+              <Divider plain>HOẶC ĐĂNG NHẬP VỚI</Divider>
 
               {/* Social Login Buttons */}
-              <div className="d-flex justify-content-center gap-2 mb-4">
-                <SocialLoginComponent
-                  Icon={FaFacebookSquare}
-                  color={'blue'}
-                  title={"Đăng nhập với Facebook"}
-                  size={30}
+              <div style={{ display: "flex", gap: "16px", marginBottom: "24px" }}>
+                <SocialLoginButton
+                  icon={<FacebookFilled />}
+                  title="Facebook"
+                  color="#1877F2"
+                  onClick={() => console.log("Facebook login")}
                 />
-                <SocialLoginComponent
-                  Icon={FcGoogle}
-                  color={'blue'}
-                  title={"Đăng nhập với Google"}
-                  size={30}
+                <SocialLoginButton
+                  icon={<GoogleOutlined />}
+                  title="Google"
+                  color="#DB4437"
+                  onClick={() => console.log("Google login")}
                 />
               </div>
 
               {/* Sign Up Link */}
-              <div className="text-center">
-                <p className="mb-0">
+              <div style={{ textAlign: "center" }}>
+                <Typography.Paragraph style={{ marginBottom: 0 }}>
                   Chưa có tài khoản?{" "}
                   <a
                     href="#"
-                    className="text-decoration-none fw-bold"
-                    style={{ color: customStyles.primaryColor }}
+                    style={{ color: theme.token.colorPrimary, fontWeight: "bold" }}
                     onClick={(e) => {
                       e.preventDefault()
                       handleLoginModalClose()
@@ -418,232 +388,196 @@ function AuthenGatePage() {
                   >
                     Đăng ký ngay
                   </a>
-                </p>
+                </Typography.Paragraph>
               </div>
             </Form>
-          </Modal.Body>
+          </div>
         </Modal>
 
         {/* Register Modal */}
-        <Modal show={showRegisterModal} onHide={handleRegisterModalClose} centered size="lg">
-          <Modal.Body className="p-4">
-            <div className="text-center mb-4">
-              <h4 className="fw-bold mb-1 fs-1" style={{ color: customStyles.primaryColor }}>
+        <Modal
+          open={showRegisterModal}
+          onCancel={handleRegisterModalClose}
+          footer={null}
+          width={520}
+          centered
+          style={{ borderRadius: "16px" }}
+        >
+          <div style={{ padding: "16px 8px" }}>
+            <div style={{ textAlign: "center", marginBottom: "24px" }}>
+              <Typography.Title level={2} style={{ color: theme.token.colorPrimary, marginBottom: "8px" }}>
                 Tham gia cùng CareNet
-              </h4>
-              <p className="text-muted">Tạo tài khoản để bắt đầu hành trình tình nguyện của bạn</p>
+              </Typography.Title>
+              <Typography.Paragraph type="secondary">
+                Tạo tài khoản để bắt đầu hành trình tình nguyện của bạn
+              </Typography.Paragraph>
             </div>
 
-            <Form noValidate validated={registerValidated} onSubmit={handleRegisterSubmit}>
+            <Form form={registerForm} layout="vertical" onFinish={handleRegisterSubmit}>
               {/* Full Name Field */}
-              <Form.Group className="mb-3">
-                <Form.Label>
-                  Họ và tên <span className="text-danger">*</span>
-                </Form.Label>
-                <InputGroup>
-                  <InputGroup.Text>
-                    <User size={18} />
-                  </InputGroup.Text>
-                  <Form.Control
-                    type="text"
-                    name="fullname"
-                    placeholder="Nhập họ và tên của bạn"
-                    value={registerData.fullname}
-                    onChange={handleRegisterChange}
-                    required
-                    isInvalid={!!registerErrors.fullname}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {registerErrors.fullname || "Vui lòng nhập họ và tên của bạn."}
-                  </Form.Control.Feedback>
-                </InputGroup>
-              </Form.Group>
+              <Form.Item
+                name="fullname"
+                label={
+                  <>
+                    Họ và tên <span style={{ color: "#ff4d4f" }}>*</span>
+                  </>
+                }
+                rules={[{ required: true, message: "Vui lòng nhập họ và tên của bạn!" }]}
+              >
+                <Input
+                  prefix={<User size={18} className="site-form-item-icon" />}
+                  placeholder="Nhập họ và tên của bạn"
+                  size="large"
+                />
+              </Form.Item>
 
               {/* Email Field */}
-              <Form.Group className="mb-3">
-                <Form.Label>
-                  Email <span className="text-danger">*</span>
-                </Form.Label>
-                <InputGroup>
-                  <InputGroup.Text>
-                    <Mail size={18} />
-                  </InputGroup.Text>
-                  <Form.Control
-                    type="email"
-                    name="email"
-                    placeholder="Nhập email của bạn"
-                    value={registerData.email}
-                    onChange={handleRegisterChange}
-                    required
-                    isInvalid={!!registerErrors.email}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {registerErrors.email || "Vui lòng nhập email hợp lệ."}
-                  </Form.Control.Feedback>
-                </InputGroup>
-              </Form.Group>
+              <Form.Item
+                name="email"
+                label={
+                  <>
+                    Email <span style={{ color: "#ff4d4f" }}>*</span>
+                  </>
+                }
+                rules={[
+                  { required: true, message: "Vui lòng nhập email của bạn!" },
+                  { type: "email", message: "Email không hợp lệ!" },
+                ]}
+              >
+                <Input
+                  prefix={<Mail size={18} className="site-form-item-icon" />}
+                  placeholder="Nhập email của bạn"
+                  size="large"
+                />
+              </Form.Item>
 
               {/* Password Field */}
-              <Form.Group className="mb-3">
-                <Form.Label>
-                  Mật khẩu <span className="text-danger">*</span>
-                </Form.Label>
-                <InputGroup>
-                  <InputGroup.Text>
-                    <Lock size={18} />
-                  </InputGroup.Text>
-                  <Form.Control
-                    type={showRegisterPassword ? "text" : "password"}
-                    name="password"
-                    placeholder="Nhập mật khẩu của bạn"
-                    value={registerData.password}
-                    onChange={handleRegisterChange}
-                    required
-                    minLength={8}
-                    isInvalid={!!registerErrors.password}
-                  />
-                  <Button variant="outline-secondary" onClick={toggleRegisterPasswordVisibility} type="button">
-                    {showRegisterPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </Button>
-                  <Form.Control.Feedback type="invalid">
-                    {registerErrors.password || "Mật khẩu phải có ít nhất 8 ký tự."}
-                  </Form.Control.Feedback>
-                </InputGroup>
-                <Form.Text className="text-muted">Mật khẩu phải có ít nhất 8 ký tự</Form.Text>
-              </Form.Group>
+              <Form.Item
+                name="password"
+                label={
+                  <>
+                    Mật khẩu <span style={{ color: "#ff4d4f" }}>*</span>
+                  </>
+                }
+                rules={[
+                  { required: true, message: "Vui lòng nhập mật khẩu của bạn!" },
+                  { min: 8, message: "Mật khẩu phải có ít nhất 8 ký tự!" },
+                ]}
+                extra="Mật khẩu phải có ít nhất 8 ký tự"
+              >
+                <Input.Password
+                  prefix={<Lock size={18} className="site-form-item-icon" />}
+                  placeholder="Nhập mật khẩu của bạn"
+                  size="large"
+                  iconRender={(visible) => (visible ? <Eye size={18} /> : <EyeOff size={18} />)}
+                />
+              </Form.Item>
 
               {/* Confirm Password Field */}
-              <Form.Group className="mb-3">
-                <Form.Label>
-                  Xác nhận mật khẩu <span className="text-danger">*</span>
-                </Form.Label>
-                <InputGroup>
-                  <InputGroup.Text>
-                    <Lock size={18} />
-                  </InputGroup.Text>
-                  <Form.Control
-                    type={showConfirmPassword ? "text" : "password"}
-                    name="confirmPassword"
-                    placeholder="Nhập lại mật khẩu của bạn"
-                    value={registerData.confirmPassword}
-                    onChange={handleRegisterChange}
-                    required
-                    isInvalid={!!registerErrors.confirmPassword}
-                  />
-                  <Button variant="outline-secondary" onClick={toggleConfirmPasswordVisibility} type="button">
-                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </Button>
-                  <Form.Control.Feedback type="invalid">
-                    {registerErrors.confirmPassword || "Vui lòng xác nhận mật khẩu."}
-                  </Form.Control.Feedback>
-                </InputGroup>
-              </Form.Group>
+              <Form.Item
+                name="confirmPassword"
+                label={
+                  <>
+                    Xác nhận mật khẩu <span style={{ color: "#ff4d4f" }}>*</span>
+                  </>
+                }
+                dependencies={["password"]}
+                rules={[
+                  { required: true, message: "Vui lòng xác nhận mật khẩu của bạn!" },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (!value || getFieldValue("password") === value) {
+                        return Promise.resolve()
+                      }
+                      return Promise.reject(new Error("Mật khẩu không khớp!"))
+                    },
+                  }),
+                ]}
+              >
+                <Input.Password
+                  prefix={<Lock size={18} className="site-form-item-icon" />}
+                  placeholder="Nhập lại mật khẩu của bạn"
+                  size="large"
+                  iconRender={(visible) => (visible ? <Eye size={18} /> : <EyeOff size={18} />)}
+                />
+              </Form.Item>
 
               {/* Birth Date Field */}
-              <Form.Group className="mb-3">
-                <Form.Label>Ngày sinh</Form.Label>
-                <InputGroup>
-                  <InputGroup.Text>
-                    <Calendar size={18} />
-                  </InputGroup.Text>
-                  <Form.Control
-                    type="date"
-                    name="dob"
-                    value={registerData.dob}
-                    onChange={handleRegisterChange}
-                  />
-                </InputGroup>
-              </Form.Group>
+              <Form.Item name="dob" label="Ngày sinh">
+                <DatePicker
+                  style={{ width: "100%" }}
+                  placeholder="Chọn ngày sinh"
+                  format="DD/MM/YYYY"
+                  size="large"
+                  suffixIcon={<Calendar size={18} />}
+                />
+              </Form.Item>
 
               {/* Phone Field */}
-              <Form.Group className="mb-3">
-                <Form.Label>Số điện thoại</Form.Label>
-                <InputGroup>
-                  <InputGroup.Text>
-                    <Phone size={18} />
-                  </InputGroup.Text>
-                  <Form.Control
-                    type="tel"
-                    name="phone"
-                    placeholder="Nhập số điện thoại của bạn"
-                    value={registerData.phone}
-                    onChange={handleRegisterChange}
-                  />
-                </InputGroup>
-              </Form.Group>
+              <Form.Item name="phone" label="Số điện thoại">
+                <Input
+                  prefix={<Phone size={18} className="site-form-item-icon" />}
+                  placeholder="Nhập số điện thoại của bạn"
+                  size="large"
+                />
+              </Form.Item>
 
               {/* Terms Checkbox */}
-              <Form.Group className="mb-4">
-                <Form.Check
-                  type="checkbox"
-                  id="agreeTerms"
-                  name="agreeTerms"
-                  checked={registerData.agreeTerms}
-                  onChange={handleRegisterChange}
-                  label={
-                    <span>
-                      Tôi đồng ý với{" "}
-                      <a href="#terms" className="text-primary">
-                        Điều khoản dịch vụ
-                      </a>{" "}
-                      và{" "}
-                      <a href="#privacy" className="text-primary">
-                        Chính sách bảo mật
-                      </a>
-                    </span>
-                  }
-                  isInvalid={!!registerErrors.agreeTerms}
-                />
-                {registerErrors.agreeTerms && <div className="text-danger mt-1 small">{registerErrors.agreeTerms}</div>}
-              </Form.Group>
+              <Form.Item
+                name="agreeTerms"
+                valuePropName="checked"
+                rules={[
+                  {
+                    validator: (_, value) =>
+                      value ? Promise.resolve() : Promise.reject(new Error("Bạn phải đồng ý với điều khoản dịch vụ!")),
+                  },
+                ]}
+              >
+                <Checkbox>
+                  Tôi đồng ý với{" "}
+                  <a href="#terms" style={{ color: theme.token.colorPrimary }}>
+                    Điều khoản dịch vụ
+                  </a>{" "}
+                  và{" "}
+                  <a href="#privacy" style={{ color: theme.token.colorPrimary }}>
+                    Chính sách bảo mật
+                  </a>
+                </Checkbox>
+              </Form.Item>
 
               {/* Register Button */}
-              <div className="d-grid mb-4">
-                <Button
-                  type="submit"
-                  size="lg"
-                  style={{
-                    backgroundColor: customStyles.primaryColor,
-                    borderColor: customStyles.primaryColor,
-                  }}
-                >
-                  {loading ? <div className="text-center">
-                    <span><Spinner size="sm" color="white" />...Đang tải</span>
-                  </div> : <span>Đăng kí</span>}
+              <Form.Item>
+                <Button type="primary" htmlType="submit" size="large" block loading={authLoading}>
+                  Đăng ký
                 </Button>
-              </div>
+              </Form.Item>
 
               {/* Divider */}
-              <div className="d-flex align-items-center mb-4">
-                <div className="flex-grow-1 border-bottom"></div>
-                <div className="px-3 text-muted small">HOẶC ĐĂNG KÝ VỚI</div>
-                <div className="flex-grow-1 border-bottom"></div>
-              </div>
+              <Divider plain>HOẶC ĐĂNG KÝ VỚI</Divider>
 
               {/* Social Register Buttons */}
-              <div className="d-flex justify-content-center gap-2 mb-4">
-                <SocialLoginComponent
-                  Icon={FaFacebookSquare}
-                  color={'blue'}
-                  title={"Đăng nhập với Facebook"}
-                  size={30}
+              <div style={{ display: "flex", gap: "16px", marginBottom: "24px" }}>
+                <SocialLoginButton
+                  icon={<FacebookFilled />}
+                  title="Facebook"
+                  color="#1877F2"
+                  onClick={() => console.log("Facebook login")}
                 />
-                <SocialLoginComponent
-                  Icon={FcGoogle}
-                  color={'blue'}
-                  title={"Đăng nhập với Google"}
-                  size={30}
+                <SocialLoginButton
+                  icon={<GoogleOutlined />}
+                  title="Google"
+                  color="#DB4437"
+                  onClick={() => console.log("Google login")}
                 />
               </div>
 
               {/* Login Link */}
-              <div className="text-center">
-                <p className="mb-0">
+              <div style={{ textAlign: "center" }}>
+                <Typography.Paragraph style={{ marginBottom: 0 }}>
                   Đã có tài khoản?{" "}
                   <a
                     href="#"
-                    className="text-decoration-none fw-bold"
-                    style={{ color: customStyles.primaryColor }}
+                    style={{ color: theme.token.colorPrimary, fontWeight: "bold" }}
                     onClick={(e) => {
                       e.preventDefault()
                       handleRegisterModalClose()
@@ -652,12 +586,13 @@ function AuthenGatePage() {
                   >
                     Đăng nhập
                   </a>
-                </p>
+                </Typography.Paragraph>
               </div>
             </Form>
-          </Modal.Body>
+          </div>
         </Modal>
-      </div>
+      </Layout>
+    </ConfigProvider>
     </>
   )
 }

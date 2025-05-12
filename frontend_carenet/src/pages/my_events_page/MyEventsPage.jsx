@@ -41,7 +41,6 @@ function MyEventsPage() {
    const [selectedEvent, setSelectedEvent] = useState(null);
    const [showModal, setShowModal] = useState(false);
    const [isLoading, setIsLoading] = useState(false);
-   const { currentUser } = useAuthStore();
 
    // Fetch user's registered events
    const fetchUserEvents = async () => {
@@ -86,9 +85,20 @@ function MyEventsPage() {
          pending: "warning",    // yêu cầu hủy tham gia
          cancelled: "default",  // sau khi được duyệt hủy tham gia
       };
+      const vietnameseStatus = {
+         waiting: "Chờ duyệt",
+         completed: "Đã được phép feedback",
+         finished: "Sau khi feedback",
+         processing: "Đang diễn ra",
+         rejected: "Đã bị từ chối",
+         approved: "Đã được chấp nhận",
+         pending: "Yêu cầu hủy tham gia",
+         hiring: "Đang tuyển dụng",
+         cancelled: "Đã được duyệt hủy tham gia",
+      }
       return (
          <Tag color={statusColors[status]}>
-            {status.toUpperCase()}
+            {vietnameseStatus[status]}
          </Tag>
       );
    };

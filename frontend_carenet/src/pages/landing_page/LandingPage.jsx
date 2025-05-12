@@ -221,7 +221,7 @@ function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5 }}
               >
-                <h2 className="display-4 fw-bold">500+</h2>
+                <h2 className={`${styles.textPrimary} display-4 fw-bold`}>500+</h2>
                 <p className="lead">Tổ Chức Phi Lợi Nhuận Đã Được Giúp Đỡ</p>
               </motion.div>
             </Col>
@@ -232,7 +232,7 @@ function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: 0.2 }}
               >
-                <h2 className="display-4 fw-bold">1,200+</h2>
+                <h2 className={`${styles.textPrimary} display-4 fw-bold`}>1,200+</h2>
                 <p className="lead">Tình Nguyện Viên Công Nghệ</p>
               </motion.div>
             </Col>
@@ -243,7 +243,7 @@ function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: 0.4 }}
               >
-                <h2 className="display-4 fw-bold">3,000+</h2>
+                <h2 className={`${styles.textPrimary} display-4 fw-bold`}>3,000+</h2>
                 <p className="lead">Dự Án Đã Hoàn Thành</p>
               </motion.div>
             </Col>
@@ -255,7 +255,7 @@ function LandingPage() {
       <section id="features" className="py-5">
         <Container fluid>
           <div className="text-center mb-5">
-            <h2 className="display-5 fw-bold">Cách Chúng Tôi Giúp Đỡ</h2>
+            <h2 className={`${styles.textPrimary} display-5 fw-bold`}>Cách Chúng Tôi Giúp Đỡ</h2>
             <p className="lead text-muted">Kết nối các tổ chức phi lợi nhuận với sự hỗ trợ công nghệ mà họ cần</p>
           </div>
           <Row className="px-md-5">

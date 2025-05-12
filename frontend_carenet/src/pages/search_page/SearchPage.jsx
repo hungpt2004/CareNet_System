@@ -19,6 +19,7 @@ import { CustomFailedToast, CustomSuccessToast, CustomToast } from "../../compon
 import EventCardSlider from "../../components/component_page/card/EventCardSlider"
 import CareNetLoading from "../../components/loading/CareNetLoading"
 import axios from "axios"
+import CustomSpinner from "../../components/spinner/CustomSpinner"
 
 // Custom CSS variables for the color scheme
 const customStyles = {
@@ -268,7 +269,7 @@ export default function VolunteerEventSearch() {
       } 
 
     } catch (error) {
-      console.log("Lỗi ở hàm handle search");
+      console.log(error);
     } finally {
       setTimeout(() => {
         setIsLoading(false);
@@ -760,9 +761,7 @@ export default function VolunteerEventSearch() {
 
             {/* Event Cards */}
             {isLoading ? (
-              <div className="text-center">
-                <Spinner animation="border" color="primary" size="sm" role="status" />
-              </div>
+              <CustomSpinner/>
             ) : (filteredEvents.length > 0 ? (
               <div className="d-grid gap-3">
                 {filteredEvents.map((event) => (
