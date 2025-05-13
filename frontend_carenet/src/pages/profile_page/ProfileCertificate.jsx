@@ -13,7 +13,7 @@ import {
 import { motion } from "framer-motion";
 import { Download, Printer, Eye } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
-
+import defaultAvatar from "../../assets/defaultAvatar.png";
 const ProfileCertificate = () => {
   // CSS styles defined directly in the component
   const styles = {
@@ -512,7 +512,7 @@ const ProfileCertificate = () => {
               <Card.Body className="p-0">
                 <div style={styles.userProfile}>
                   <img
-                    src="https://img.freepik.com/premium-vector/avatar-profile-icon-flat-style-female-user-profile-vector-illustration-isolated-background-women-profile-sign-business-concept_157943-38866.jpg?semt=ais_hybrid"
+                    src={JSON.parse(localStorage.getItem("user")).avatarUrl||defaultAvatar}
                     alt="User Avatar"
                     className="avatar-img"
                     style={styles.avatar}

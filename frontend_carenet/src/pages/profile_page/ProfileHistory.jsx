@@ -21,6 +21,7 @@ import {
   CustomSuccessToast,
   CustomToast,
 } from "../../components/toast/CustomToast";
+import defaultAvatar from "../../assets/defaultAvatar.png";
 const ProfileHistory = () => {
   // CSS styles defined directly in the component
   const styles = {
@@ -368,7 +369,6 @@ const ProfileHistory = () => {
 
   const navigate = useNavigate();
 
-
   const [activeFilter, setActiveFilter] = useState("ALL");
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredEfforts, setFilteredEfforts] = useState([]);
@@ -390,9 +390,25 @@ const ProfileHistory = () => {
       const response = await axiosInstance.get(
         "/profile/get-all-history-events"
       );
-      if (response.data && response.data.historyEvents) {
-        setEffortData(response.data.historyEvents);
-        console.log(`Get history event successfully`);
+
+      if (
+        response.data &&
+        response.data.historyEvents &&
+        response.data.feedbacks
+      ) {
+        // Map feedbacks to the respective event in historyEvents
+        const feedbacks = response.data.feedbacks;
+        const historyEvents = response.data.historyEvents.map((event) => {
+          // Find matching feedback for this event
+          const eventFeedbacks = feedbacks.filter(
+            (feedback) => feedback.eventId === event.event._id
+          );
+          event.event.feedbacks = eventFeedbacks; // Attach the feedbacks to the event
+          return event;
+        });
+
+        setEffortData(historyEvents); // Pass the updated historyEvents with feedbacks
+        console.log("Get history event successfully with feedbacks");
       }
     } catch (error) {
       console.log(error);
@@ -401,105 +417,21 @@ const ProfileHistory = () => {
 
   console.log(`List history event: ${JSON.stringify(effortData, null, 2)}`);
 
-  // Expanded effort data with all status types
-  // const effortData = [
-  //   {
-  //     id: "EF001",
-  //     eventName: "Community Park Cleanup",
-  //     startDate: "April 5, 2023",
-  //     endDate: "April 8, 2023",
-  //     status: "completed",
-  //   },
-  //   {
-  //     id: "EF002",
-  //     eventName: "Green Rooftop Initiative",
-  //     startDate: "April 10, 2023",
-  //     endDate: "April 15, 2023",
-  //     status: "rejected",
-  //   },
-  //   {
-  //     id: "EF003",
-  //     eventName: "Tree Planting Drive",
-  //     startDate: "April 18, 2023",
-  //     endDate: "April 19, 2023",
-  //     status: "pending",
-  //   },
-  //   {
-  //     id: "EF004",
-  //     eventName: "Blood Donation Camp",
-  //     startDate: "April 22, 2023",
-  //     endDate: "April 23, 2023",
-  //     status: "approved",
-  //   },
-  //   {
-  //     id: "EF005",
-  //     eventName: "Beach Cleanup Day",
-  //     startDate: "May 5, 2023",
-  //     endDate: "May 5, 2023",
-  //     status: "finished",
-  //   },
-  //   {
-  //     id: "EF006",
-  //     eventName: "Elderly Care Volunteer",
-  //     startDate: "May 12, 2023",
-  //     endDate: "May 14, 2023",
-  //     status: "processing",
-  //   },
-  //   {
-  //     id: "EF007",
-  //     eventName: "Food Bank Distribution",
-  //     startDate: "May 20, 2023",
-  //     endDate: "May 21, 2023",
-  //     status: "completed",
-  //   },
-  //   {
-  //     id: "EF008",
-  //     eventName: "Literacy Program",
-  //     startDate: "June 3, 2023",
-  //     endDate: "June 10, 2023",
-  //     status: "cancelled",
-  //   },
-  //   {
-  //     id: "EF009",
-  //     eventName: "Animal Shelter Support",
-  //     startDate: "June 15, 2023",
-  //     endDate: "June 16, 2023",
-  //     status: "approved",
-  //   },
-  //   {
-  //     id: "EF010",
-  //     eventName: "Community Garden Project",
-  //     startDate: "June 25, 2023",
-  //     endDate: "June 26, 2023",
-  //     status: "processing",
-  //   },
-  //   {
-  //     id: "EF011",
-  //     eventName: "Youth Mentorship Program",
-  //     startDate: "July 5, 2023",
-  //     endDate: "July 15, 2023",
-  //     status: "finished",
-  //   },
-  //   {
-  //     id: "EF012",
-  //     eventName: "Homeless Shelter Assistance",
-  //     startDate: "July 20, 2023",
-  //     endDate: "July 21, 2023",
-  //     status: "cancelled",
-  //   },
-  // ];
-
-  // Filter efforts when activeFilter changes
   useEffect(() => {
-    let filtered = [];
-    if (activeFilter === "ALL") {
-      filtered = [...effortData];
-    } else {
-      filtered = effortData.filter((effort) => effort.status === activeFilter);
+    // Chỉ lọc dữ liệu khi effortData có sẵn
+    if (effortData.length > 0) {
+      let filtered = [];
+      if (activeFilter === "ALL") {
+        filtered = [...effortData]; // Hiển thị tất cả nếu filter là "ALL"
+      } else {
+        filtered = effortData.filter(
+          (effort) => effort.status === activeFilter
+        );
+      }
+      setFilteredEfforts(filtered);
+      setCurrentPage(1); // Reset lại trang khi filter thay đổi
     }
-    setFilteredEfforts(filtered);
-    setCurrentPage(1); // Reset to first page when filter changes
-  }, [activeFilter]);
+  }, [effortData, activeFilter]); // Đảm bảo useEffect này chạy khi effortData hoặc activeFilter thay đổi
 
   // Calculate total pages
   const totalPages = Math.ceil(filteredEfforts.length / itemsPerPage);
@@ -569,20 +501,25 @@ const ProfileHistory = () => {
   };
 
   // Handle feedback submission
-  const handleSubmitFeedback = () => {
-    // Here you would typically send the feedback to your backend
-    console.log("Feedback submitted:", {
-      effortId: selectedEffort.id,
-      eventName: selectedEffort.eventName,
-      feedbackText,
+  const handleSubmitFeedback = async () => {
+    const feedbackData = {
+      eventId: selectedEffort.event._id,
       rating,
-    });
+      content: feedbackText,
+    };
 
-    // Show success message (in a real app, you'd use a toast notification)
-    alert(`Thank you for your feedback for ${selectedEffort.eventName}!`);
-
-    // Close the modal
-    setIsModalVisible(false);
+    try {
+      const res = await axiosInstance.post(`/profile/send-feedback-history-events/${selectedEffort.event._id}`,feedbackData);
+      if (res.data && res.data.message) {
+        CustomSuccessToast(res.data.message);
+        setIsModalVisible(false); 
+      }
+    } catch (err) {
+      console.error("Error submitting feedback:", err);
+      if (err.response && err.response.data && err.response.data.message) {
+        CustomFailedToast(err.response.data.message);
+      }
+    }
   };
 
   // All available status filters
@@ -596,6 +533,28 @@ const ProfileHistory = () => {
     "pending",
     "cancelled",
   ];
+  // Hàm dịch các trạng thái từ tiếng Anh sang tiếng Việt
+  const translateStatus = (status) => {
+    switch (status) {
+      case "completed":
+        return "Hoàn thành";
+      case "finished":
+        return "Kết thúc";
+      case "processing":
+        return "Đang xử lý";
+      case "rejected":
+        return "Từ chối";
+      case "approved":
+        return "Đã duyệt";
+      case "pending":
+        return "Chờ xử lý";
+      case "cancelled":
+        return "Đã hủy";
+      default:
+        return status; // Trả về trạng thái gốc nếu không có trạng thái nào trùng khớp
+    }
+  };
+
   return (
     <Container
       className="d-flex justify-content-center align-items-center"
@@ -612,14 +571,17 @@ const ProfileHistory = () => {
               <Card.Body className="p-0">
                 <div style={styles.userProfile}>
                   <img
-                    src="https://cdn-icons-png.flaticon.com/512/6596/6596121.png"
+                    src={
+                      JSON.parse(localStorage.getItem("user")).avatarUrl ||
+                      defaultAvatar
+                    }
                     alt="User Avatar"
                     className="avatar-img"
                     style={styles.avatar}
                   />
                   <div style={styles.userInfo}>
                     <h5 style={styles.userName}>Hung Pham Trong</h5>
-                    <p style={styles.accountType}>Normal Account</p>
+                    <p style={styles.accountType}>Tài Khoản Cá Nhân</p>
                   </div>
                 </div>
                 <div style={styles.menuItems}>
@@ -628,45 +590,45 @@ const ProfileHistory = () => {
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-information")}
                   >
-                    <span>Information</span>
+                    <span>Thông Tin </span>
                   </div>
                   <div
                     className="menu-item"
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-avatar")}
                   >
-                    <span>Update Avatar</span>
+                    <span>Cập Nhật Avatar</span>
                   </div>
                   <div
                     className="menu-item active"
                     style={{ ...styles.menuItem, ...styles.menuItemActive }}
                     onClick={() => navigate("/profile-history")}
                   >
-                    <span>History Effort</span>
+                    <span>Lịch Sử Nỗ lực</span>
                   </div>
                   <div
                     className="menu-item"
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-favourite")}
                   >
-                    <span>Favourite</span>
+                    <span>Yêu Thích</span>
                   </div>
                   <div
                     className="menu-item"
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-score")}
                   >
-                    <span>Score</span>
+                    <span>Số Điểm</span>
                   </div>
                   <div
                     className="menu-item"
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-certificate")}
                   >
-                    <span>Certificate</span>
+                    <span>Chứng Chỉ </span>
                   </div>
                   <div className="menu-item" style={styles.menuItem}>
-                    <span>Log Out</span>
+                    <span>Đăng Xuất</span>
                   </div>
                 </div>
               </Card.Body>
@@ -681,7 +643,7 @@ const ProfileHistory = () => {
           >
             <Card style={styles.infoCard}>
               <Card.Header style={styles.infoHeader}>
-                <h4 className="mb-0">HISTORY EFFORT</h4>
+                <h4 className="mb-0">LỊCH SỬ NỖ LỰC</h4>
               </Card.Header>
               <Card.Body style={styles.infoCardBody}>
                 <div style={styles.filterContainer}>
@@ -700,7 +662,8 @@ const ProfileHistory = () => {
                       }}
                       onClick={() => handleFilterChange(filter)}
                     >
-                      {filter}
+                      {filter === "ALL" ? "Tất cả" : translateStatus(filter)}{" "}
+                      {/* Hiển thị tiếng Việt */}
                     </Button>
                   ))}
                 </div>
@@ -710,7 +673,7 @@ const ProfileHistory = () => {
                     <AnimatePresence>
                       {currentItems.map((effort, index) => (
                         <motion.div
-                          key={effort.id}
+                          key={effort._id}
                           style={styles.effortCard}
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
@@ -719,25 +682,29 @@ const ProfileHistory = () => {
                           layout
                         >
                           <h5 style={styles.effortHeader}>
-                            {effort.eventName}
+                            {effort.event.title}
                           </h5>
 
                           <div style={styles.effortField}>
-                            <div style={styles.effortLabel}>Start Date:</div>
+                            <div style={styles.effortLabel}>Bắt Đầu: </div>
                             <div style={styles.effortValue}>
-                              {effort.startDate}
+                              {new Date(
+                                effort.event.startAt
+                              ).toLocaleDateString("en-GB")}
                             </div>
                           </div>
 
                           <div style={styles.effortField}>
-                            <div style={styles.effortLabel}>End Date:</div>
+                            <div style={styles.effortLabel}>Kết Thúc: </div>
                             <div style={styles.effortValue}>
-                              {effort.endDate}
+                              {new Date(effort.event.endAt).toLocaleDateString(
+                                "en-GB"
+                              )}
                             </div>
                           </div>
 
                           <div style={styles.effortField}>
-                            <div style={styles.effortLabel}>Status:</div>
+                            <div style={styles.effortLabel}>Tình Trạng:</div>
                             <div style={styles.effortValue}>
                               <span
                                 style={{
@@ -745,7 +712,7 @@ const ProfileHistory = () => {
                                   ...getStatusStyle(effort.status),
                                 }}
                               >
-                                {effort.status}
+                                {translateStatus(effort.status)}
                               </span>
                             </div>
                           </div>
@@ -755,7 +722,7 @@ const ProfileHistory = () => {
                             style={styles.feedbackButton}
                             onClick={() => handleFeedbackClick(effort)}
                           >
-                            Feedback
+                            Đánh Giá
                           </Button>
                         </motion.div>
                       ))}
@@ -763,8 +730,11 @@ const ProfileHistory = () => {
                   </div>
                 ) : (
                   <div style={styles.noResults}>
-                    <h5>No efforts found with status: {activeFilter}</h5>
-                    <p>Try selecting a different filter or check back later.</p>
+                    <h5>
+                      Không tìm thấy nỗ lực với trạng thái:{" "}
+                      {translateStatus(activeFilter)}
+                    </h5>
+                    <p>Hãy thử chọn bộ lọc khác hoặc quay lại sau.</p>
                   </div>
                 )}
 
@@ -805,7 +775,9 @@ const ProfileHistory = () => {
 
       {/* Feedback Modal */}
       <Modal
-        title={`Feedback for ${selectedEffort?.eventName || "Event"}`}
+        title={`Đánh Giá Cho Sự Kiện: ${
+          selectedEffort?.event.title || "Event"
+        }`}
         open={isModalVisible}
         onCancel={handleModalClose}
         footer={null}
@@ -819,19 +791,22 @@ const ProfileHistory = () => {
           transition={{ duration: 0.3 }}
         >
           <div style={styles.modalBody}>
-            <h5>Send us your feedback</h5>
+            <h5>Gửi Đánh Giá Cho Chúng Tôi </h5>
             <p>
-              We appreciate your feedback on the {selectedEffort?.eventName}{" "}
-              event. Please share your thoughts and rate your experience.
+              Chúng tôi trân trọng ý kiến phản hồi của bạn về sự kiện:{" "}
+              {selectedEffort?.event.title}. Xin vui lòng chia sẻ suy nghĩ của
+              bạn và đánh giá trải nghiệm của mình.
             </p>
 
             <Form style={styles.feedbackForm}>
               <Form.Group className="mb-4" controlId="feedbackText">
-                <Form.Label style={styles.formLabel}>Your Feedback</Form.Label>
+                <Form.Label style={styles.formLabel}>
+                  Đánh Giá Của Bạn
+                </Form.Label>
                 <Form.Control
                   as="textarea"
                   rows={4}
-                  placeholder="Please share your experience, suggestions, or concerns..."
+                  placeholder="Xin vui lòng chia sẻ trải nghiệm, gợi ý hoặc những lo ngại của bạn..."
                   value={feedbackText}
                   onChange={(e) => setFeedbackText(e.target.value)}
                 />
@@ -839,7 +814,7 @@ const ProfileHistory = () => {
 
               <div style={styles.ratingContainer}>
                 <Form.Label style={styles.formLabel}>
-                  Rate Your Experience
+                  Đánh giá trải nghiệm của bạn
                 </Form.Label>
                 <div>
                   <Rate
@@ -851,9 +826,9 @@ const ProfileHistory = () => {
                   />
                   <span className="ms-2">
                     {rating ? (
-                      <strong>{rating} out of 5 stars</strong>
+                      <strong>{rating} trong số 5 sao</strong>
                     ) : (
-                      "Click to rate"
+                      "Nhấn để đánh giá"
                     )}
                   </span>
                 </div>
@@ -865,7 +840,7 @@ const ProfileHistory = () => {
                   onClick={handleModalClose}
                   className="me-2"
                 >
-                  Cancel
+                  Hủy
                 </Button>
                 <Button
                   variant="primary"
@@ -874,7 +849,7 @@ const ProfileHistory = () => {
                   onClick={handleSubmitFeedback}
                   disabled={!feedbackText.trim() || rating === 0}
                 >
-                  Submit Feedback
+                  Gửi Đánh Giá
                 </Button>
               </div>
             </Form>

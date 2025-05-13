@@ -5,7 +5,7 @@ import { Container, Row, Col, Card, Pagination } from "react-bootstrap";
 import { motion } from "framer-motion";
 import { HeartFill } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
-
+import defaultAvatar from "../../assets/defaultAvatar.png";
 const ProfileFavourite = () => {
   // Hình ảnh sự kiện
   const treeImage =
@@ -232,7 +232,7 @@ const ProfileFavourite = () => {
               <Card.Body className="p-0">
                 <div style={styles.userProfile}>
                   <img
-                    src="https://img.freepik.com/premium-vector/avatar-profile-icon-flat-style-female-user-profile-vector-illustration-isolated-background-women-profile-sign-business-concept_157943-38866.jpg?semt=ais_hybrid"
+                    src={JSON.parse(localStorage.getItem("user")).avatarUrl||defaultAvatar}
                     alt="User Avatar"
                     className="avatar-img"
                     style={styles.avatar}

@@ -124,81 +124,73 @@ exports.getHistoryEventById = asyncHandler(async (req, res) => {
 
 exports.getAllHistoryEvent = asyncHandler(async (req, res) => {
   const user = req.user.user;
-  const historyEvents = await HistoryEvent.find({ user: user._id }).populate(
-    "event"
-  ); //return array
+  const historyEvents = await HistoryEvent.find({ user: user._id }).populate("event"); 
+  const feedbacks = await Feedback.find({ userId: user._id });
   return res.status(200).json({
     status: "success",
     message: "Get all history event successfully",
     historyEvents: historyEvents,
+    feedbacks: feedbacks,
   });
 });
 
-exports.sendFeedbackHistoryEvents = async (req, res) => {
+exports.sendFeedbackHistoryEvents = asyncHandler(async (req, res) => {
   const user = req.user.user;
   const userId = user._id;
   const eventId = req.params.eventId; // Getting the eventId from route parameters
 
   const { rating, content } = req.body;
 
-  try {
-    if (userId !== user._id.toString()) {
-      return res.status(403).json({ error: true, message: "Unauthorized." });
-    }
+  if (userId !== user._id.toString()) {
+    return res.status(403).json({ error: true, message: "Unauthorized." });
+  }
 
-    // Check if the user has completed or finished the event
-    const history = await HistoryEvent.findOne({
-      user: user._id,
-      event: eventId,
-      status: { $in: ["completed"] }, // allow both statuses
-    });
+  // Check if the user has completed the event
+  const history = await HistoryEvent.findOne({
+    user: user._id,
+    event: eventId,
+    status: { $in: ["completed"] },
+  });
 
-    if (!history) {
-      return res.status(400).json({
-        error: true,
-        message: "You are not eligible to send feedback for this event.",
-      });
-    }
-
-    const response = await checkWordByGemini(content);
-    if (response) {
-      return res.status(500).json({
-        status: "fail",
-        message: `Word ${content} is not allowed`,
-      });
-    }
-
-    // Either update existing feedback or create new
-    const feedback = await Feedback.findOneAndUpdate(
-      { userId: user._id, eventId: eventId },
-      {
-        rating,
-        content,
-        createdAt: new Date(),
-      },
-      { new: true, upsert: true } // create if not exists
-    );
-
-    // If history is still "completed", update it to "finished"
-    //Fix set status completed to finished
-    if (history.status === "completed") {
-      await HistoryEvent.findOneAndUpdate(
-        { _id: history._id },
-        { status: "finished" },
-        { new: true }
-      );
-    }
-
-    return res.status(200).json({
-      error: false,
-      feedback,
-      message: "Feedback submitted successfully.",
-    });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({
+  if (!history) {
+    return res.status(400).json({
       error: true,
-      message: "Failed to submit or update feedback.",
+      message: "You are not eligible to send feedback for this event.",
     });
   }
-};
+
+  const response = await checkWordByGemini(content);
+  if (response) {
+    return res.status(500).json({
+      status: "fail",
+      message: `Word ${content} is not allowed`,
+    });
+  }
+
+  // Either update existing feedback or create new
+  const feedback = await Feedback.findOneAndUpdate(
+    { userId: user._id, eventId: eventId },
+    {
+      rating,
+      content,
+      createdAt: new Date(),
+    },
+    { new: true, upsert: true } // create if not exists
+  );
+
+  // If history is still "completed", update it to "finished"
+  //Fix set status completed to finished
+  if (history.status === "completed") {
+    await HistoryEvent.findOneAndUpdate(
+      { _id: history._id },
+      { status: "finished" },
+      { new: true }
+    );
+  }
+
+  return res.status(200).json({
+    error: false,
+    feedback: feedback,
+    message: "Feedback submitted successfully.",
+  });
+});

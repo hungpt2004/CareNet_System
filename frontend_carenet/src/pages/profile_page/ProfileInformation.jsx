@@ -334,7 +334,7 @@ const ProfileInfo = () => {
                 <Card.Body className="p-0">
                   <div style={styles.userProfile}>
                     <img
-                      src={defaultAvatar}
+                      src={JSON.parse(localStorage.getItem("user")).avatarUrl||defaultAvatar}
                       alt="User Avatar"
                       className="avatar-img"
                       style={styles.avatar}
