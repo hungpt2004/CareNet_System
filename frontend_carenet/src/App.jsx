@@ -39,6 +39,9 @@ import OnBoardingPage from './pages/onboarding_page/OnBoardingPage';
 import PaymentSuccessPage from './pages/payment_status_page/PaymentSuccessPage';
 import PaymentCancelPage from './pages/payment_status_page/PaymentCancelPage';
 import MyEventsPage from './pages/my_events_page/MyEventsPage';
+import OrganizationEvents from './pages/organization_post_page/OrganizationEventManagement';
+import OrganizationDashboardPage from './pages/organization_dashboard_page/OrganizationDashboardPage';
+import StaffAttendancePage from './pages/staff_attendance_page/StaffAttendancePage';
 
 const guestRoutes = [
   { path: '/', element: <LandingPage /> },
@@ -78,34 +81,28 @@ const privateAdminRoutes = [
   { path: '/admin-organization', element: <AdminOrganizations /> },
   { path: '/admin-post', element: <AdminVolunteerPosts /> },
   { path: '/admin-attendance', element: <AdminEventAttendance /> },
-  { path: '/upgrade-pro', element: <UpgradePro /> },
 ];
 
 const privateOwnerRoutes = [
+  { path: '/owner-dashboard', element: <OrganizationDashboardPage /> },
   { path: '/owner-post', element: <OrganizationPostPage /> },
   { path: '/owner-user', element: <OrganizationUserRequests /> },
   { path: '/owner-attendance', element: <OrganizationEventAttendance /> },
   { path: '/admin-participant', element: <AdminEventParticipants /> },
+  { path: '/upgrade-pro', element: <UpgradePro /> },
+  { path: '/owner-finished-events', element: <OrganizationEvents /> },
 ];
 
+
+const privateStaffRoutes = [
+  { path: '/staff-attendance', element: <StaffAttendancePage /> },
+];
 
 function App() {
   return (
     <ToastProvider>
       <Router>
         <Routes>
-          {/* Public Routes */}
-          {publicRoutes.map(({ path, element }) => (
-              <Route key={path} path={path} element={element} />
-          ))}
-
-
-          {/* Guest */}
-          <Route element={<GuestLayout />}>
-            {guestRoutes.map(({ path, element }) => (
-              <Route key={path} path={path} element={element} />
-            ))}
-          </Route>
 
           {/* Customer Routes - Requires login with 'customer' role */}
           <Route element={<CustomerLayout />}>
@@ -154,6 +151,36 @@ function App() {
               />
             ))}
           </Route>
+
+
+          {/* Staff Routes - Requires login with 'staff' role */}
+          <Route element={<CustomerLayout />}>
+            {privateStaffRoutes.map(({ path, element }) => (
+              <Route
+                key={path}
+                path={path}
+                element={
+                  <ProtectedRoute allowedRoles={['staff']}>
+                    {element}
+                  </ProtectedRoute>
+                }
+              />
+            ))}
+          </Route>
+
+          {/* Public Routes */}
+          {publicRoutes.map(({ path, element }) => (
+              <Route key={path} path={path} element={element} />
+          ))}
+
+
+          {/* Guest */}
+          <Route element={<GuestLayout />}>
+            {guestRoutes.map(({ path, element }) => (
+              <Route key={path} path={path} element={element} />
+            ))}
+          </Route>
+
         </Routes>
       </Router>
     </ToastProvider>
