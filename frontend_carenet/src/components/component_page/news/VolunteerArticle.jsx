@@ -1,53 +1,70 @@
 import React from 'react';
-import { Card, Button, Row, Col, Container } from 'react-bootstrap';
-import '../../../css/LandingPage.css'
+import { Card, Row, Col, Typography } from 'antd';
+import { ArrowRight } from 'lucide-react';
+import styles from '../../../css/VolunteerArticle.module.css';
+
+const { Title, Paragraph } = Typography;
 
 const articles = [
   {
     id: 1,
     title: 'Lợi Ích Của Hoạt Động Tình Nguyện',
     image: '/volunteer_img/new1.jpg',
-    summary: 'Khám phá cách hoạt động tình nguyện không chỉ thay đổi cộng đồng mà còn thay đổi chính bản thân người tham gia.',
+    summary:
+      'Khám phá cách hoạt động tình nguyện không chỉ thay đổi cộng đồng mà còn thay đổi chính bản thân người tham gia.',
   },
   {
     id: 2,
     title: '5 Kỹ Năng Bạn Học Được Từ Tình Nguyện',
     image: '/volunteer_img/new2.jpg',
-    summary: 'Tìm hiểu cách tình nguyện giúp bạn phát triển những kỹ năng quý giá cho sự nghiệp và cuộc sống.',
+    summary:
+      'Tìm hiểu cách tình nguyện giúp bạn phát triển những kỹ năng quý giá cho sự nghiệp và cuộc sống.',
   },
   {
     id: 3,
     title: 'Những Câu Chuyện Truyền Cảm Hứng Về Tình Nguyện',
     image: '/volunteer_img/new3.jpg',
-    summary: 'Đọc những câu chuyện đầy cảm hứng từ những người đã tạo ra sự khác biệt thông qua hoạt động tình nguyện.',
+    summary:
+      'Đọc những câu chuyện đầy cảm hứng từ những người đã tạo ra sự khác biệt thông qua hoạt động tình nguyện.',
   },
 ];
 
 function VolunteerArticles() {
   return (
-    <section className="py-5" id="articles" style={{ backgroundColor: '#f8f9fa' }}>
-      <Container>
-        <Row className="g-4">
+    <section className={styles.sectionContainer} id="articles">
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 16px' }}>
+        <Row gutter={[24, 24]}>
           {articles.map((article) => (
-            <Col key={article.id} md={6} lg={4}>
-              <Card className="h-100 shadow rounded-4 border-0">
-                <Card.Img
-                  variant="top"
-                  src={article.image}
-                  alt={article.title}
-                  className="rounded-top-4"
-                  style={{ height: '200px', objectFit: 'cover' }}
-                />
-                <Card.Body className="d-flex flex-column">
-                  <Card.Title className="fw-bold mb-2">{article.title}</Card.Title>
-                  <Card.Text className="text-muted flex-grow-1">{article.summary}</Card.Text>
-                  <Button className="button mt-3 align-self-start">Xem Thêm</Button>
-                </Card.Body>
+            <Col key={article.id} xs={24} sm={12} lg={8}>
+              <Card
+                className={styles.card}
+                cover={
+                  <div className={styles.cardCover}>
+                    <img
+                      alt={article.title}
+                      src={article.image || '/placeholder.svg'}
+                    />
+                  </div>
+                }
+                bordered={false}
+              >
+                <div className={styles.cardBody}>
+                  <Title level={4} className={styles.cardTitle}>
+                    {article.title}
+                  </Title>
+                  <Paragraph className={styles.cardSummary}>
+                    {article.summary}
+                  </Paragraph>
+                  <button className={styles.readMoreButton}>
+                    Xem Thêm
+                    <ArrowRight className={styles.lucideIcon} size={16} />
+                  </button>
+                </div>
               </Card>
             </Col>
           ))}
         </Row>
-      </Container>
+      </div>
     </section>
   );
 }

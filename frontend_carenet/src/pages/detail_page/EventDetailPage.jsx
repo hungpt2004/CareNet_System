@@ -1,14 +1,13 @@
-"use client"
-
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
    Container, Row, Col, Card, Badge, Button,
    ListGroup, Form, Alert, ProgressBar
 } from 'react-bootstrap'
 import { Calendar, MapPin, Users, Clock, Heart, Share2, ChevronLeft, Star, MessageSquare, Award, Bookmark, CheckCircle, ExternalLink } from 'lucide-react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import MapComponent from '../../components/map/MapComponent'
 import styles from '../../css/AppColors.module.css'
+import axios from 'axios'
 
 // Custom CSS variables for the color scheme
 const customStyles = {
@@ -16,67 +15,52 @@ const customStyles = {
    secondaryColor: '#FBF6E9',
 }
 
-// Mock event data
-const eventData = {
-   id: 1,
-   name: "Chiến Dịch Dọn Rác Bãi Biển",
-   location: "Công Viên Bãi Biển Ven Biển, 123 Shoreline Dr",
-   startDate: "2025-04-15T09:00:00",
-   endDate: "2025-04-15T13:00:00",
-   category: "Môi Trường",
-   description: "Tham gia cùng chúng tôi trong chiến dịch dọn rác bãi biển để bảo vệ sinh vật biển và giữ cho bãi biển luôn sạch đẹp. Sự kiện phù hợp với mọi lứa tuổi và khả năng. Chúng tôi sẽ cung cấp tất cả các thiết bị cần thiết bao gồm găng tay, túi rác và dụng cụ gắp rác. Vui lòng mặc quần áo thoải mái và mang theo kem chống nắng, mũ và chai nước tái sử dụng.",
-   longDescription: "Các bãi biển của chúng ta đang phải đối mặt với vấn đề ngày càng nhiều rác thải nhựa và các loại rác khác trôi dạt vào bờ. Điều này không chỉ ảnh hưởng đến vẻ đẹp của bờ biển mà còn gây ra mối đe dọa nghiêm trọng đối với sinh vật biển và hệ sinh thái.\n\nBằng cách tham gia sự kiện dọn rác này, bạn sẽ trực tiếp góp phần cải thiện sức khỏe của môi trường địa phương. Năm ngoái, các tình nguyện viên của chúng tôi đã thu gom được hơn 500 pound rác chỉ trong một ngày!\n\nSự kiện sẽ bắt đầu với phần giới thiệu ngắn về các loại rác thường gặp và cách thu gom an toàn. Sau đó, chúng ta sẽ chia thành các nhóm nhỏ để dọn dẹp từng khu vực của bãi biển. Sau khi dọn xong, chúng ta sẽ tập trung để phân loại và ghi nhận số lượng rác thu thập được nhằm phục vụ mục đích theo dõi môi trường.",
-   organizer: "Nhóm Bảo Vệ Đại Dương",
-   organizerLogo: "/placeholder.svg?height=50&width=50",
-   organizerDescription: "Tổ chức phi lợi nhuận dành cho việc bảo vệ hệ sinh thái biển thông qua giáo dục, vận động và hành động trực tiếp.",
-   participants: 45,
-   maxParticipants: 75,
-   skills: ["Không cần kinh nghiệm", "Chào đón mọi lứa tuổi", "Hoạt động thể chất: Nhẹ nhàng"],
-   whatToBring: ["Quần áo thoải mái", "Kem chống nắng", "Mũ", "Chai nước tái sử dụng"],
-   whatProvided: ["Găng tay", "Túi rác", "Dụng cụ gắp rác", "Nước giải khát"],
-   coordinates: { lat: 10.762622, lng: 106.660172 },
-   image: "/placeholder.svg?height=400&width=800",
-   gallery: [
-      "https://i.pinimg.com/736x/e7/04/56/e7045643b35fba6754bf68e0dcae3bb0.jpg",
-      "https://i.pinimg.com/736x/b5/7d/f5/b57df5976700b222adc77766fc0e232e.jpg",
-      "https://i.pinimg.com/736x/00/27/65/002765ee261fbc54e8d549ea4cf2cd7e.jpg",
-      "https://i.pinimg.com/736x/d0/5a/69/d05a697a30fa47e016c2fded0cf2350a.jpg"
-   ],
-   reviews: [
-      {
-         id: 1,
-         user: "Sarah Johnson",
-         avatar: "https://i.pinimg.com/736x/25/33/8f/25338f488af2c45912c15ebab325e363.jpg",
-         date: "2024-03-10",
-         rating: 5,
-         comment: "Đây là lần đầu tiên tôi tham gia dọn rác bãi biển và đó là một trải nghiệm tuyệt vời! Những người tổ chức rất thân thiện và mọi thứ được sắp xếp rất chu đáo."
-      },
-      {
-         id: 2,
-         user: "Michael Chen",
-         avatar: "https://i.pinimg.com/736x/8d/e6/21/8de621e960298a6c9374933bbd91a69d.jpg",
-         date: "2024-03-05",
-         rating: 4,
-         comment: "Sự kiện rất phù hợp cho gia đình. Các con tôi đã học được rất nhiều về bảo vệ môi trường trong khi vẫn vui chơi. Chắc chắn sẽ tham gia lần nữa."
-      },
-      {
-         id: 3,
-         user: "Emily Rodriguez",
-         avatar: "https://i.pinimg.com/736x/3a/7a/37/3a7a37a296e99f1709212644c9e3d141.jpg",
-         date: "2024-02-28",
-         rating: 5,
-         comment: "Sự kiện được tổ chức rất tốt. Tôi rất ấn tượng với lượng rác chúng tôi đã thu gom được và tác động mà chúng tôi tạo ra chỉ trong vài giờ."
-      }
-   ]
-}
+const generateLongDescription = (shortDescription) => {
+   return `Chào mừng bạn đến với sự kiện đặc biệt của chúng tôi! Chúng tôi rất vui khi bạn quan tâm đến sự kiện này và mong muốn được chào đón bạn tham gia cùng chúng tôi.
+
+${shortDescription}
+
+Sự kiện này được tổ chức với mục tiêu tạo ra không gian giao lưu, học hỏi và kết nối giữa những người có cùng sở thích và đam mê. Đây là cơ hội tuyệt vời để bạn mở rộng mạng lưới quan hệ, cập nhật những xu hướng mới nhất trong ngành và tham gia vào các cuộc thảo luận sâu sắc với các chuyên gia hàng đầu.
+
+Khi tham gia sự kiện, bạn sẽ được:
+• Gặp gỡ và kết nối với những người có cùng chí hướng
+• Tiếp cận với những kiến thức và công nghệ tiên tiến
+• Tham gia các workshop thực hành và phiên thảo luận chuyên sâu
+• Cơ hội networking với các chuyên gia trong ngành
+• Trải nghiệm không gian sự kiện chuyên nghiệp và thân thiện
+
+Chúng tôi đã chuẩn bị mọi thứ kỹ lưỡng để đảm bảo bạn có trải nghiệm tốt nhất tại sự kiện. Từ nội dung chương trình phong phú đến đội ngũ nhân viên nhiệt tình, tất cả đều hướng đến việc mang lại giá trị thiết thực cho mỗi người tham dự.
+
+`;
+};
 
 
 export default function EventDetail() {
    const [isFavorite, setIsFavorite] = useState(false)
+   const { id } = useParams();
+   const [eventData, setEventData] = useState(null);
+   const [feedbackData, setFeedbackData] = useState([]);
    const [reviewText, setReviewText] = useState('')
    const [rating, setRating] = useState(0)
    const [showThankYou, setShowThankYou] = useState(false)
    const navigate = useNavigate();
+
+   // Get Event Detail
+   const fetchEventDetail = async () => {
+      try {
+         const response = await axios.get(`http://localhost:5000/event/get-event-detail/${id}`);
+         if (response.data && response.data.event && response.data.feedback) {
+            setEventData(response.data.event);
+            setFeedbackData(response.data.feedback);
+            console.log(`Lấy thông tin event thành công`)
+         }
+      } catch (error) {
+         console.log(`${error}`);
+      }
+   }
+
+   console.log(`Du lieu event: ${JSON.stringify(eventData, null, 2)}`);
+   console.log(`Du lieu feedback: ${JSON.stringify(feedbackData, null, 2)}`)
 
    // Format date for display
    const formatDate = (dateString) => {
@@ -107,7 +91,7 @@ export default function EventDetail() {
    }
 
    const handleGotToRegisterForm = () => {
-      navigate('/form-register')
+      navigate(`/form-register/${id}`)
    }
 
    const handleBackBeforePage = () => {
@@ -115,10 +99,14 @@ export default function EventDetail() {
    }
 
    // Calculate average rating
-   const averageRating = eventData.reviews.reduce((acc, review) => acc + review.rating, 0) / eventData.reviews.length
+   const averageRating = feedbackData.reduce((acc, review) => acc + review.rating, 0) / feedbackData.length
 
    // Calculate participation percentage
-   const participationPercentage = (eventData.participants / eventData.maxParticipants) * 100
+   // const participationPercentage = (eventData.participants / eventData.maxParticipants) * 100
+
+   useEffect(() => {
+      fetchEventDetail();
+   }, []);
 
    return (
       <Container fluid className={`${styles.body} py-4 min-vh-100`}>
@@ -138,8 +126,8 @@ export default function EventDetail() {
             <Card className="border-0 shadow-sm mb-4 overflow-hidden">
                <div className="position-relative">
                   <img
-                     src={"https://i.pinimg.com/736x/59/68/16/5968160f97edba47dcc44a41d89829d5.jpg"}
-                     alt={eventData.name}
+                     src={`${eventData?.images[0]}`}
+                     alt={eventData?.title}
                      className="w-100 object-fit-cover"
                      style={{ maxHeight: '400px' }}
                   />
@@ -149,9 +137,9 @@ export default function EventDetail() {
                         className="mb-2"
                         style={{ backgroundColor: customStyles.primaryColor }}
                      >
-                        {eventData.category}
+                        {eventData?.category}
                      </Badge>
-                     <h1 className="text-white mb-0">{eventData.name}</h1>
+                     <h1 className="text-white mb-0">{eventData?.title}</h1>
                   </div>
                </div>
 
@@ -161,9 +149,9 @@ export default function EventDetail() {
                         <div className="d-flex align-items-center mb-3">
                            <Calendar size={20} className="me-2" style={{ color: customStyles.primaryColor }} />
                            <div>
-                              <strong>{formatDate(eventData.startDate)}</strong>
+                              <strong>{formatDate(eventData?.startAt)}</strong>
                               <div className="text-muted">
-                                 {formatTime(eventData.startDate)} - {formatTime(eventData.endDate)}
+                                 {formatTime(eventData?.startAt)} - {formatTime(eventData?.endAt)}
                               </div>
                            </div>
                         </div>
@@ -171,19 +159,19 @@ export default function EventDetail() {
                         <div className="d-flex align-items-center mb-3">
                            <MapPin size={20} className="me-2" style={{ color: customStyles.primaryColor }} />
                            <div>
-                              <strong>{eventData.location}</strong>
+                              <strong>{eventData?.location.province}</strong>
                            </div>
                         </div>
 
                         <div className="d-flex align-items-center mb-4">
                            <Users size={20} className="me-2" style={{ color: customStyles.primaryColor }} />
                            <div>
-                              <strong>{eventData.participants} người tham gia</strong>
-                              <div className="text-muted">{eventData.maxParticipants - eventData.participants} spots left</div>
+                              <strong>{eventData?.currentParticipants} người tham gia</strong>
+                              {/* <div className="text-muted">{eventData.maxParticipants - eventData.participants} spots left</div> */}
                            </div>
                         </div>
 
-                        <div className="mb-3">
+                        {/* <div className="mb-3">
                            <ProgressBar
                               now={participationPercentage}
                               style={{
@@ -200,7 +188,8 @@ export default function EventDetail() {
                               <small className="text-muted">{eventData.participants} đã tham gia</small>
                               <small className="text-muted">{eventData.maxParticipants} tối đa</small>
                            </div>
-                        </div>
+                        </div> */}
+
                      </Col>
 
                      <Col md={4} className="d-flex flex-column justify-content-between">
@@ -251,9 +240,16 @@ export default function EventDetail() {
                   {/* Description */}
                   <Card className="border-0 shadow-sm mb-4">
                      <Card.Body className="p-4">
-                        <h3 className="mb-3">Thông tin về sự kiện này</h3>
-                        <p className="mb-4">{eventData.description}</p>
-                        <p style={{ whiteSpace: 'pre-line' }}>{eventData.longDescription}</p>
+                        <div className="container mx-auto p-4">
+                           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+                              <h3 className="text-xl font-bold mb-4">Thông tin về sự kiện này</h3>
+
+                              {/* Hiển thị mô tả dài với mô tả ngắn được nhúng vào giữa */}
+                              <div className="text-gray-600" style={{ whiteSpace: 'pre-line' }}>
+                                 {generateLongDescription(eventData?.description)}
+                              </div>
+                           </div>
+                        </div>
                      </Card.Body>
                   </Card>
 
@@ -264,7 +260,7 @@ export default function EventDetail() {
 
                         <h5 className="mb-2">Kĩ năng yêu cầu</h5>
                         <div className="d-flex flex-wrap gap-2 mb-4">
-                           {eventData.skills.map((skill, index) => (
+                           {eventData?.skillNeeds.map((skill, index) => (
                               <Badge
                                  key={index}
                                  className="py-2 px-3"
@@ -278,7 +274,7 @@ export default function EventDetail() {
                            ))}
                         </div>
 
-                        <Row className="mb-3">
+                        {/* <Row className="mb-3">
                            <Col md={6}>
                               <h5 className="mb-2">Cần trang bị gì ?</h5>
                               <ListGroup variant="flush">
@@ -302,7 +298,8 @@ export default function EventDetail() {
                                  ))}
                               </ListGroup>
                            </Col>
-                        </Row>
+                        </Row> */}
+
                      </Card.Body>
                   </Card>
 
@@ -311,7 +308,7 @@ export default function EventDetail() {
                      <Card.Body className="p-4">
                         <h3 className="mb-3">Ảnh của sự kiện</h3>
                         <div className="d-flex gap-2 flex-wrap">
-                           {eventData.gallery.map((photo, index) => (
+                           {eventData?.images.map((photo, index) => (
                               <img
                                  key={index}
                                  src={photo || "/placeholder.svg"}
@@ -341,7 +338,7 @@ export default function EventDetail() {
                                  ))}
                               </div>
                               <span className="fw-bold">{averageRating.toFixed(1)}</span>
-                              <span className="text-muted ms-1">({eventData.reviews.length})</span>
+                              <span className="text-muted ms-1">({feedbackData.length})</span>
                            </div>
                         </div>
 
@@ -354,21 +351,21 @@ export default function EventDetail() {
                         {/* Review Form */}
                         <Card className="bg-light border-0 mb-4">
                            <Card.Body className="p-3">
-                              <h5 className="mb-3">Share Your Experience</h5>
+                              <h5 className="mb-3">Chia sẻ trải nghiệm</h5>
                               <Form onSubmit={handleReviewSubmit}>
                                  <Form.Group className="mb-3">
                                     <div className="d-flex align-items-center mb-2">
-                                       <Form.Label className="mb-0 me-2">Your Rating:</Form.Label>
+                                       <Form.Label className="mb-0 me-2">Mức độ đánh giá:</Form.Label>
                                        <div>
                                           {[...Array(5)].map((_, i) => (
                                              <Star
                                                 key={i}
                                                 size={20}
-                                                className={`cursor-pointer ${i < rating ? 'fill-current' : ''}`}
-                                                style={{
-                                                   color: i < rating ? '#FFD700' : '#e0e0e0',
-                                                   cursor: 'pointer'
-                                                }}
+                                                fill={i < rating ? '#FFD700' : 'transparent'}
+                                                stroke={i < rating ? '#FFD700' : '#e0e0e0'}
+                                                strokeWidth={2}
+                                                className="mx-1 cursor-pointer"
+                                                style={{ cursor: 'pointer' }}
                                                 onClick={() => setRating(i + 1)}
                                              />
                                           ))}
@@ -399,21 +396,21 @@ export default function EventDetail() {
 
                         {/* Review List */}
                         <div>
-                           {eventData.reviews.map((review) => (
-                              <div key={review.id} className="mb-4 pb-4 border-bottom">
+                           {feedbackData.map((review, index) => (
+                              <div key={index} className="mb-4 pb-4 border-bottom">
                                  <div className="d-flex mb-2">
                                     <img
                                        src={review.avatar || "/placeholder.svg"}
-                                       alt={review.user}
+                                       alt={review.userId.fullname}
                                        className="rounded-circle me-2"
                                        width="40"
                                        height="40"
                                     />
                                     <div>
-                                       <h6 className="mb-0">{review.user}</h6>
+                                       <h6 className="mb-0">{review.userId.fullname}</h6>
                                        <div className="d-flex align-items-center">
                                           <small className="text-muted me-2">
-                                             {new Date(review.date).toLocaleDateString()}
+                                             {new Date(review.createdAt).toLocaleDateString()}
                                           </small>
                                           <div>
                                              {[...Array(5)].map((_, i) => (
@@ -428,7 +425,7 @@ export default function EventDetail() {
                                        </div>
                                     </div>
                                  </div>
-                                 <p className="mb-0">{review.comment}</p>
+                                 <p className="mb-0">{review.content}</p>
                               </div>
                            ))}
                         </div>
@@ -440,24 +437,23 @@ export default function EventDetail() {
                   {/* Organizer Info */}
                   <Card className="border-0 shadow-sm mb-4">
                      <Card.Body className="p-4">
-                        <h3 className="mb-3">Organizer</h3>
                         <div className="d-flex align-items-center mb-3">
                            <img
-                              src={eventData.organizerLogo || "/placeholder.svg"}
-                              alt={eventData.organizer}
+                              src={eventData?.organizerLogo || "/placeholder.svg"}
+                              alt={eventData?.organizationId.name}
                               className="rounded-circle me-3"
                               width="50"
                               height="50"
                            />
                            <div>
-                              <h5 className="mb-0">{eventData.organizer}</h5>
+                              <h5 className="mb-0">{eventData?.organizationId.name}</h5>
                               <div className="d-flex align-items-center">
                                  <Award size={14} className="me-1" style={{ color: customStyles.primaryColor }} />
-                                 <small>Verified Organizer</small>
+                                 <small>Tổ chức đã được xác minh</small>
                               </div>
                            </div>
                         </div>
-                        <p className="mb-3">{eventData.organizerDescription}</p>
+                        <p className="mb-3">{eventData?.organizationId.description}</p>
                         <Button
                            variant="outline-primary"
                            className="w-100"
@@ -466,7 +462,7 @@ export default function EventDetail() {
                               color: customStyles.primaryColor
                            }}
                         >
-                           View Organizer Profile
+                           Xem thông tin
                         </Button>
                      </Card.Body>
                   </Card>
@@ -482,11 +478,11 @@ export default function EventDetail() {
                            >
                               {/* Placeholder for map - in a real implementation, you would integrate a map library here */}
                               <div style={{ height: '20px' }}>
-                                 <MapComponent />
+                                 <MapComponent province={eventData?.location.province} district={eventData?.location.district} ward={eventData?.location.ward} />
                               </div>
 
                            </div>
-                           <h5>{eventData.location}</h5>
+                           <h5>{eventData?.location.province}</h5>
                            <Button
                               variant="outline-secondary"
                               className="w-100"
@@ -545,8 +541,8 @@ export default function EventDetail() {
                style={{ backgroundColor: customStyles.primaryColor }}
             >
                <Card.Body className="p-4">
-                  <h2 className="text-white mb-3">Ready to Make a Difference?</h2>
-                  <p className="text-white mb-4">Join {eventData.participants} others and be part of this amazing volunteer opportunity.</p>
+                  <h2 className="text-white mb-3">Sẵn Sàng Tạo Nên Sự Thay Đổi?</h2>
+                  <p className="text-white mb-4">Tham gia cùng {eventData?.currentParticipants} người khác và trở thành một phần của cơ hội tình nguyện tuyệt vời này.</p>
                   <Link href={`/form-register`} >
                      <Button
                         size="lg"
@@ -557,7 +553,7 @@ export default function EventDetail() {
                            borderColor: 'white'
                         }}
                      >
-                        Register Now
+                        Ghi danh ngay
                      </Button>
                   </Link>
                </Card.Body>

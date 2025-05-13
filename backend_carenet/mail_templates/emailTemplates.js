@@ -129,7 +129,7 @@ module.exports = {
   </table>
 </body>
 </html>
-   `,
+  `,
 
   // Email forgot password
   RESET_PASSWORD_TEMPLATE: `
@@ -284,9 +284,9 @@ module.exports = {
   </table>
 </body>
 </html>
-   `,
-   
-  // Email thank you after finish event 
+  `,
+
+  // Email thank you after finish event
   THANK_YOU_TEMPLATE: `
    <!DOCTYPE html>
 <html lang="vi">
@@ -642,9 +642,565 @@ module.exports = {
 </html>
   `,
 
-  // Email success register
+  // Email success register event
+  SUCCESS_REGISTER_TEMPLATE: `
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác nhận đăng ký sự kiện CareNet</title>
+  </head>
+  <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #02301a; margin: 0; padding: 0; background-color: #f6f4ef;">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width: 650px; margin: 0 auto; background-color: #f6f4ef; padding: 20px;">
+      <tr>
+        <td>
+          <!-- Logo and Header Section -->
+          <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom: 20px;">
+            <tr>
+              <td align="center" style="padding: 0 0 20px 0;">
+                <img src="../../frontend_carenet/public/volunteer_img/Carenet.png" alt="CareNet Logo" style="max-width: 180px; height: auto;" />
+              </td>
+            </tr>
+          </table>
+          
+          <!-- Main Content Container -->
+          <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(2, 48, 26, 0.08);">
+            <!-- Header Banner -->
+            <tr>
+              <td style="background: linear-gradient(135deg, #0A6B3D 0%, #5db996 100%); padding: 35px 0; text-align: center;">
+                <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600; letter-spacing: 0.5px;">Đăng ký sự kiện thành công</h1>
+                <p style="color: #e3f0af; margin: 10px 0 0 0; font-size: 16px;">Cảm ơn bạn đã tham gia cùng CareNet!</p>
+              </td>
+            </tr>
+            
+            <!-- Email Content -->
+            <tr>
+              <td style="padding: 40px 50px;">
+                <p style="font-size: 17px; margin-top: 0; color: #02301a;">Xin chào {userName},</p>
+                
+                <p style="font-size: 17px; color: #02301a; line-height: 1.7;">Chúng tôi rất vui mừng thông báo rằng bạn đã ghi danh thành công cho sự kiện trên nền tảng <span style="font-weight: 600; color: #0A6B3D;">CareNet</span>. Vui lòng đợi kết quả từ Tổ Chức nhé ^^!</p>
+                
+                <!-- Event Details -->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin: 25px 0; background-color: #f5f5f5; padding: 20px; border-radius: 8px;">
+                  <tr>
+                    <td>
+                      <p style="font-size: 16px; font-weight: 600; color: #0A6B3D; margin: 0 0 10px 0;">Chi tiết sự kiện</p>
+                      <p style="font-size: 15px; color: #02301a; margin: 5px 0;"><strong>Tên sự kiện:</strong> {eventName}</p>
+                      <p style="font-size: 15px; color: #02301a; margin: 5px 0;"><strong>Thời gian bắt đầu:</strong> {eventStartAt}</p>
+                      <p style="font-size: 15px; color: #02301a; margin: 5px 0;"><strong>Thời gian kết thúc:</strong> {eventEndAt}</p>
+                      <p style="font-size: 15px; color: #02301a; margin: 5px 0;"><strong>Địa điểm:</strong> {eventLocation}</p>
+                    </td>
+                  </tr>
+                </table>
+                
+                <p style="font-size: 17px; color: #02301a; line-height: 1.7;">Vui lòng kiểm tra thông tin sự kiện và đảm bảo bạn có mặt đúng giờ. Nếu có bất kỳ câu hỏi nào, bạn có thể liên hệ với chúng tôi qua <a href="mailto:support@carenet.org" style="color: #0A6B3D; text-decoration: none; font-weight: 600;">support@carenet.org</a>.</p>
+                
+                <!-- Action Button -->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin: 35px 0;">
+                  <tr>
+                    <td align="center">
+                      <table cellpadding="0" cellspacing="0" border="0">
+                        <tr>
+                          <td align="center" style="background-color: #0A6B3D; border-radius: 8px; box-shadow: 0 4px 12px rgba(10, 107, 61, 0.2);">
+                            <a href="{eventDetailsLink}" target="_blank" style="display: inline-block; padding: 16px 36px; color: white; text-decoration: none; font-size: 17px; font-weight: 600; letter-spacing: 0.5px; border-radius: 8px;">Xem chi tiết sự kiện</a>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+                
+                <!-- Important Notice -->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom: 30px;">
+                  <tr>
+                    <td style="background-color: #e3f0af30; padding: 20px; border-radius: 8px; border: 1px solid #e3f0af;">
+                      <p style="font-size: 15px; color: #02301a; margin: 0; line-height: 1.6;">
+                        <span style="font-weight: 600;">Lưu ý:</span> Vui lòng lưu email này để theo dõi thông tin sự kiện. Nếu bạn không đăng ký sự kiện này, vui lòng liên hệ ngay với chúng tôi.
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+                
+                <!-- Signature -->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="border-top: 1px solid #e3f0af; padding-top: 25px; margin-bottom: 30px;">
+                  <tr>
+                    <td>
+                      <p style="font-size: 16px; margin: 0 0 5px 0; color: #02301a;">Trân trọng,</p>
+                      <p style="font-size: 18px; margin: 0; font-weight: 600; color: #0A6B3D;">Đội ngũ CareNet</p>
+                    </td>
+                  </tr>
+                </table>
+                
+                <!-- Social Icons -->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom: 20px;">
+                  <tr>
+                    <td align="center">
+                      <p style="margin: 0 0 10px 0; font-size: 14px; color: #02301a; font-weight: 600;">Kết nối với chúng tôi</p>
+                      <table cellpadding="0" cellspacing="0" border="0" align="center">
+                        <tr>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">C</a>
+                          </td>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">A</a>
+                          </td>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">R</a>
+                          </td>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">E</a>
+                          </td>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">N</a>
+                          </td>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">E</a>
+                          </td>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">T</a>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+                
+                <!-- Footer Information -->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                  <tr>
+                    <td align="center">
+                      <p style="font-size: 14px; color: #02301a; margin: 0 0 5px 0;">Đây là email tự động, vui lòng không trả lời email này.</p>
+                      <p style="font-size: 14px; color: #02301a; margin: 0;">© {currentYear} CareNet. Tất cả các quyền được bảo lưu.</p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+  </html>
+  `,
 
   // Email reject register
+  REJECT_REGISTER_TEMPLATE: `
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông báo từ chối đăng ký sự kiện CareNet</title>
+  </head>
+  <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #02301a; margin: 0; padding: 0; background-color: #f6f4ef;">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width: 650px; margin: 0 auto; background-color: #f6f4ef; padding: 20px;">
+      <tr>
+        <td>
+          <!-- Logo and Header Section -->
+          <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom: 20px;">
+            <tr>
+              <td align="center" style="padding: 0 0 20px 0;">
+                <img src="https://via.placeholder.com/180x60" alt="CareNet Logo" style="max-width: 180px; height: auto;" />
+              </td>
+            </tr>
+          </table>
+          
+          <!-- Main Content Container -->
+          <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(2, 48, 26, 0.08);">
+            <!-- Header Banner -->
+            <tr>
+              <td style="background: linear-gradient(135deg, #0A6B3D 0%, #5db996 100%); padding: 35px 0; text-align: center;">
+                <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600; letter-spacing: 0.5px;">Thông báo từ chối đăng ký</h1>
+                <p style="color: #e3f0af; margin: 10px 0 0 0; font-size: 16px;">Cảm ơn bạn đã quan tâm đến CareNet</p>
+              </td>
+            </tr>
+            
+            <!-- Email Content -->
+            <tr>
+              <td style="padding: 40px 50px;">
+                <p style="font-size: 17px; margin-top: 0; color: #02301a;">Xin chào {userName},</p>
+                
+                <p style="font-size: 17px; color: #02301a; line-height: 1.7;">Chúng tôi rất trân trọng sự quan tâm của bạn đối với sự kiện <span style="font-weight: 600; color: #0A6B3D;">{eventName}</span> trên nền tảng <span style="font-weight: 600; color: #0A6B3D;">CareNet</span>. Tuy nhiên, chúng tôi rất tiếc phải thông báo rằng đăng ký của bạn không được chấp thuận.</p>
+                
+                <!-- Rejection Reason -->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin: 25px 0; background-color: #f5f5f5; padding: 20px; border-radius: 8px;">
+                  <tr>
+                    <td>
+                      <p style="font-size: 16px; font-weight: 600; color: #0A6B3D; margin: 0 0 10px 0;">Lý do từ chối</p>
+                      <p style="font-size: 15px; color: #02301a; margin: 5px 0;">{rejectionReason}</p>
+                    </td>
+                  </tr>
+                </table>
+                
+                <p style="font-size: 17px; color: #02301a; line-height: 1.7;">Chúng tôi rất mong bạn tiếp tục tham gia các sự kiện khác trên CareNet. Bạn có thể xem các sự kiện sắp tới và đăng ký lại bất kỳ lúc nào.</p>
+                
+                <!-- Action Button -->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin: 35px 0;">
+                  <tr>
+                    <td align="center">
+                      <table cellpadding="0" cellspacing="0" border="0">
+                        <tr>
+                          <td align="center" style="background-color: #0A6B3D; border-radius: 8px; box-shadow: 0 4px 12px rgba(10, 107, 61, 0.2);">
+                            <a href="{eventsLink}" target="_blank" style="display: inline-block; padding: 16px 36px; color: white; text-decoration: none; font-size: 17px; font-weight: 600; letter-spacing: 0.5px; border-radius: 8px;">Xem các sự kiện khác</a>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+                
+                <p style="font-size: 17px; color: #02301a; line-height: 1.7;">Nếu bạn có bất kỳ câu hỏi nào hoặc cần hỗ trợ, vui lòng liên hệ với chúng tôi qua <a href="mailto:support@carenet.org" style="color: #0A6B3D; text-decoration: none; font-weight: 600;">support@carenet.org</a>.</p>
+                
+                <!-- Signature -->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="border-top: 1px solid #e3f0af; padding-top: 25px; margin-bottom: 30px;">
+                  <tr>
+                    <td>
+                      <p style="font-size: 16px; margin: 0 0 5px 0; color: #02301a;">Trân trọng,</p>
+                      <p style="font-size: 18px; margin: 0; font-weight: 600; color: #0A6B3D;">Đội ngũ CareNet</p>
+                    </td>
+                  </tr>
+                </table>
+                
+                <!-- Social Icons -->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom: 20px;">
+                  <tr>
+                    <td align="center">
+                      <p style="margin: 0 0 10px 0; font-size: 14px; color: #02301a; font-weight: 600;">Kết nối với chúng tôi</p>
+                      <table cellpadding="0" cellspacing="0" border="0" align="center">
+                        <tr>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">C</a>
+                          </td>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">A</a>
+                          </td>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">R</a>
+                          </td>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">E</a>
+                          </td>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">N</a>
+                          </td>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">E</a>
+                          </td>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">T</a>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+                
+                <!-- Footer Information -->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                  <tr>
+                    <td align="center">
+                      <p style="font-size: 14px; color: #02301a; margin: 0 0 5px 0;">Đây là email tự động, vui lòng không trả lời email này.</p>
+                      <p style="font-size: 14px; color: #02301a; margin: 0;">© {currentYear} CareNet. Tất cả các quyền được bảo lưu.</p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+  </html>
+  `,
 
   // Email refund amount
+  REFUND_AMOUNT_TEMPLATE: `
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông báo hoàn tiền CareNet</title>
+  </head>
+  <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #02301a; margin: 0; padding: 0; background-color: #f6f4ef;">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width: 650px; margin: 0 auto; background-color: #f6f4ef; padding: 20px;">
+      <tr>
+        <td>
+          <!-- Logo and Header Section -->
+          <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom: 20px;">
+            <tr>
+              <td align="center" style="padding: 0 0 20px 0;">
+                <img src="https://via.placeholder.com/180x60" alt="CareNet Logo" style="max-width: 180px; height: auto;" />
+              </td>
+            </tr>
+          </table>
+          
+          <!-- Main Content Container -->
+          <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(2, 48, 26, 0.08);">
+            <!-- Header Banner -->
+            <tr>
+              <td style="background: linear-gradient(135deg, #0A6B3D 0%, #5db996 100%); padding: 35px 0; text-align: center;">
+                <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600; letter-spacing: 0.5px;">Thông báo hoàn tiền</h1>
+                <p style="color: #e3f0af; margin: 10px 0 0 0; font-size: 16px;">Cảm ơn bạn đã sử dụng dịch vụ CareNet</p>
+              </td>
+            </tr>
+            
+            <!-- Email Content -->
+            <tr>
+              <td style="padding: 40px 50px;">
+                <p style="font-size: 17px; margin-top: 0; color: #02301a;">Xin chào {userName},</p>
+                
+                <p style="font-size: 17px; color: #02301a; line-height: 1.7;">Chúng tôi xin thông báo rằng yêu cầu hoàn tiền của bạn cho sự kiện <span style="font-weight: 600; color: #0A6B3D;">{eventName}</span> trên nền tảng <span style="font-weight: 600; color: #0A6B3D;">CareNet</span> đã được xử lý thành công.</p>
+                
+                <!-- Refund Details -->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin: 25px 0; background-color: #f5f5f5; padding: 20px; border-radius: 8px;">
+                  <tr>
+                    <td>
+                      <p style="font-size: 16px; font-weight: 600; color: #0A6B3D; margin: 0 0 10px 0;">Chi tiết hoàn tiền</p>
+                      <p style="font-size: 15px; color: #02301a; margin: 5px 0;"><strong>Số tiền hoàn:</strong> {refundAmount}</p>
+                      <p style="font-size: 15px; color: #02301a; margin: 5px 0;"><strong>Phương thức:</strong> {refundMethod}</p>
+                      <p style="font-size: 15px; color: #02301a; margin: 5px 0;"><strong>Ngày xử lý:</strong> {refundDate}</p>
+                      <p style="font-size: 15px; color: #02301a; margin: 5px 0;"><strong>Lý do:</strong> {refundReason}</p>
+                    </td>
+                  </tr>
+                </table>
+                
+                <p style="font-size: 17px; color: #02301a; line-height: 1.7;">Số tiền hoàn lại sẽ được chuyển đến tài khoản của bạn trong vòng {refundProcessingTime}. Nếu bạn không nhận được tiền hoàn lại trong thời gian này, vui lòng liên hệ với chúng tôi qua <a href="mailto:support@carenet.org" style="color: #0A6B3D; text-decoration: none; font-weight: 600;">support@carenet.org</a>.</p>
+                
+                <p style="font-size: 17px; color: #02301a; line-height: 1.7;">Chúng tôi hy vọng bạn sẽ tiếp tục tham gia các sự kiện khác trên CareNet. Cảm ơn bạn đã đồng hành cùng chúng tôi!</p>
+                
+                <!-- Action Button -->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin: 35px 0;">
+                  <tr>
+                    <td align="center">
+                      <table cellpadding="0" cellspacing="0" border="0">
+                        <tr>
+                          <td align="center" style="background-color: #0A6B3D; border-radius: 8px; box-shadow: 0 4px 12px rgba(10, 107, 61, 0.2);">
+                            <a href="{eventsLink}" target="_blank" style="display: inline-block; padding: 16px 36px; color: white; text-decoration: none; font-size: 17px; font-weight: 600; letter-spacing: 0.5px; border-radius: 8px;">Khám phá sự kiện mới</a>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+                
+                <!-- Important Notice -->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom: 30px;">
+                  <tr>
+                    <td style="background-color: #e3f0af30; padding: 20px; border-radius: 8px; border: 1px solid #e3f0af;">
+                      <p style="font-size: 15px; color: #02301a; margin: 0; line-height: 1.6;">
+                        <span style="font-weight: 600;">Lưu ý:</span> Vui lòng kiểm tra tài khoản hoặc phương thức thanh toán của bạn để xác nhận hoàn tiền. Nếu bạn có thắc mắc, vui lòng liên hệ ngay với chúng tôi.
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+                
+                <!-- Signature -->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="border-top: 1px solid #e3f0af; padding-top: 25px; margin-bottom: 30px;">
+                  <tr>
+                    <td>
+                      <p style="font-size: 16px; margin: 0 0 5px 0; color: #02301a;">Trân trọng,</p>
+                      <p style="font-size: 18px; margin: 0; font-weight: 600; color: #0A6B3D;">Đội ngũ CareNet</p>
+                    </td>
+                  </tr>
+                </table>
+                
+                <!-- Social Icons -->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom: 20px;">
+                  <tr>
+                    <td align="center">
+                      <p style="margin: 0 0 10px 0; font-size: 14px; color: #02301a; font-weight: 600;">Kết nối với chúng tôi</p>
+                      <table cellpadding="0" cellspacing="0" border="0" align="center">
+                        <tr>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">C</a>
+                          </td>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">A</a>
+                          </td>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">R</a>
+                          </td>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">E</a>
+                          </td>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">N</a>
+                          </td>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">E</a>
+                          </td>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">T</a>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+                
+                <!-- Footer Information -->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                  <tr>
+                    <td align="center">
+                      <p style="font-size: 14px; color: #02301a; margin: 0 0 5px 0;">Đây là email tự động, vui lòng không trả lời email này.</p>
+                      <p style="font-size: 14px; color: #02301a; margin: 0;">© {currentYear} CareNet. Tất cả các quyền được bảo lưu.</p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+  </html>
+  `,
+
+  // Email approve register
+  APPROVE_REGISTER_TEMPLATE: `
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác nhận phê duyệt đăng ký sự kiện CareNet</title>
+  </head>
+  <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #02301a; margin: 0; padding: 0; background-color: #f6f4ef;">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width: 650px; margin: 0 auto; background-color: #f6f4ef; padding: 20px;">
+      <tr>
+        <td>
+          <!-- Logo and Header Section -->
+          <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom: 20px;">
+            <tr>
+              <td align="center" style="padding: 0 0 20px 0;">
+                <img src="../../frontend_carenet/public/volunteer_img/Carenet.png" alt="CareNet Logo" style="max-width: 180px; height: auto;" />
+              </td>
+            </tr>
+          </table>
+          
+          <!-- Main Content Container -->
+          <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(2, 48, 26, 0.08);">
+            <!-- Header Banner -->
+            <tr>
+              <td style="background: linear-gradient(135deg, #0A6B3D 0%, #5db996 100%); padding: 35px 0; text-align: center;">
+                <h1 style="color: white; margin: 0; font-size: 24px; font-weight: 600; letter-spacing: 0.5px;">Đăng ký sự kiện đã được phê duyệt</h1>
+                <p style="color: #e3f0af; margin: 10px 0 0 0; font-size: 14px;">Chào mừng bạn đến với sự kiện của CareNet!</p>
+              </td>
+            </tr>
+            
+            <!-- Email Content -->
+            <tr>
+              <td style="padding: 40px 50px;">
+                <p style="font-size: 15px; margin-top: 0; color: #02301a;">Xin chào {userName},</p>
+                
+                <p style="font-size: 15px; color: #02301a; line-height: 1.7;">Chúng tôi rất vui mừng thông báo rằng đăng ký của bạn cho sự kiện đã được phê duyệt. Chúng tôi rất mong được gặp bạn tại sự kiện!</p>
+                
+                <!-- Event Details -->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin: 25px 0; background-color: #f5f5f5; padding: 20px; border-radius: 8px;">
+                  <tr>
+                    <td>
+                      <p style="font-size: 14px; font-weight: 600; color: #0A6B3D; margin: 0 0 10px 0;">Chi tiết sự kiện</p>
+                      <p style="font-size: 13px; color: #02301a; margin: 5px 0;"><strong>Tên sự kiện:</strong> {eventName}</p>
+                      <p style="font-size: 13px; color: #02301a; margin: 5px 0;"><strong>Thời gian bắt đầu:</strong> {eventStartAt}</p>
+                      <p style="font-size: 13px; color: #02301a; margin: 5px 0;"><strong>Thời gian kết thúc:</strong> {eventEndAt}</p>
+                      <p style="font-size: 13px; color: #02301a; margin: 5px 0;"><strong>Địa điểm:</strong> {eventLocation}</p>
+                    </td>
+                  </tr>
+                </table>
+                
+                <p style="font-size: 15px; color: #02301a; line-height: 1.7;">Vui lòng đến đúng giờ và mang theo các vật dụng cần thiết theo yêu cầu của sự kiện. Nếu bạn có bất kỳ câu hỏi nào, hãy liên hệ với chúng tôi qua <a href="mailto:support@carenet.org" style="color: #0A6B3D; text-decoration: none; font-weight: 600;">support@carenet.org</a>.</p>
+                
+                <!-- Action Button -->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin: 35px 0;">
+                  <tr>
+                    <td align="center">
+                      <table cellpadding="0" cellspacing="0" border="0">
+                        <tr>
+                          <td align="center" style="background-color: #0A6B3D; border-radius: 8px; box-shadow: 0 4px 12px rgba(10, 107, 61, 0.2);">
+                            <a href="{eventDetailsLink}" target="_blank" style="display: inline-block; padding: 16px 36px; color: white; text-decoration: none; font-size: 15px; font-weight: 600; letter-spacing: 0.5px; border-radius: 8px;">Xem chi tiết sự kiện</a>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+                
+                <!-- Important Notice -->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom: 30px;">
+                  <tr>
+                    <td style="background-color: #e3f0af30; padding: 20px; border-radius: 8px; border: 1px solid #e3f0af;">
+                      <p style="font-size: 13px; color: #02301a; margin: 0; line-height: 1.6;">
+                        <span style="font-weight: 600;">Lưu ý:</span> Vui lòng lưu email này để tham khảo thông tin sự kiện. Nếu bạn không thể tham dự, vui lòng hủy đăng ký trước 24 giờ.
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+                
+                <!-- Signature -->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="border-top: 1px solid #e3f0af; padding-top: 25px; margin-bottom: 30px;">
+                  <tr>
+                    <td>
+                      <p style="font-size: 14px; margin: 0 0 5px 0; color: #02301a;">Trân trọng,</p>
+                      <p style="font-size: 16px; margin: 0; font-weight: 600; color: #0A6B3D;">Đội ngũ CareNet</p>
+                    </td>
+                  </tr>
+                </table>
+                
+                <!-- Social Icons -->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom: 20px;">
+                  <tr>
+                    <td align="center">
+                      <p style="margin: 0 0 10px 0; font-size: 12px; color: #02301a; font-weight: 600;">Kết nối với chúng tôi</p>
+                      <table cellpadding="0" cellspacing="0" border="0" align="center">
+                        <tr>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">C</a>
+                          </td>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">A</a>
+                          </td>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">R</a>
+                          </td>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">E</a>
+                          </td>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">N</a>
+                          </td>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">E</a>
+                          </td>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">T</a>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+                
+                <!-- Footer Information -->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                  <tr>
+                    <td align="center">
+                      <p style="font-size: 12px; color: #02301a; margin: 0 0 5px 0;">Đây là email tự động, vui lòng không trả lời email này.</p>
+                      <p style="font-size: 12px; color: #02301a; margin: 0;">© {currentYear} CareNet. Tất cả các quyền được bảo lưu.</p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+  </html>
+  `,
 };

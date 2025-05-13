@@ -36,6 +36,9 @@ import AuthenGatePage from './pages/login_page/AuthenGatePage';
 import ProtectedRoute from './layout/ProtectedLayout';
 import GuestLayout from './layout/GuestLayout';
 import OnBoardingPage from './pages/onboarding_page/OnBoardingPage';
+import PaymentSuccessPage from './pages/payment_status_page/PaymentSuccessPage';
+import PaymentCancelPage from './pages/payment_status_page/PaymentCancelPage';
+import MyEventsPage from './pages/my_events_page/MyEventsPage';
 
 const guestRoutes = [
   { path: '/', element: <LandingPage /> },
@@ -46,6 +49,8 @@ const guestRoutes = [
 const publicRoutes = [
   { path: '/login', element: <AuthenGatePage /> },
   { path: '/forgot-password', element: <ForgotPasswordPage /> },
+  { path: '/payment-success', element: <PaymentSuccessPage/> },
+  { path: '/payment-cancel', element: <PaymentCancelPage/> },
 ]
 
 const privateCustomerRoutes = [
@@ -55,13 +60,14 @@ const privateCustomerRoutes = [
   { path: '/profile-favourite', element: <ProfileFavourite /> },
   { path: '/failed-register', element: <FailedRegister /> },
   { path: '/success-register', element: <SuccessRegister /> },
-  { path: '/form-register', element: <FormRegisterPage /> },
-  { path: '/event-detail', element: <EventDetail /> },
+  { path: '/form-register/:id', element: <FormRegisterPage /> },
+  { path: '/event-detail/:id', element: <EventDetail /> },
   { path: '/feedback', element: <FeedbackManagement /> },
   { path: '/support', element: <SupportRequestPage /> },
   { path: '/profile-score', element: <ProfileScore /> },
   { path: '/profile-certificate', element: <ProfileCertificate /> },
   { path: '/feedback-page', element: <FeedbackPage /> },
+  { path: '/my-events', element: <MyEventsPage /> },
 ];
 
 const privateAdminRoutes = [
@@ -141,7 +147,7 @@ function App() {
                 key={path}
                 path={path}
                 element={
-                  <ProtectedRoute allowedRoles={['owner']}>
+                  <ProtectedRoute allowedRoles={['organization']}>
                     {element}
                   </ProtectedRoute>
                 }

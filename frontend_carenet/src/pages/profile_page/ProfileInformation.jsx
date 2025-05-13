@@ -22,6 +22,11 @@ import {
 import defaultAvatar from "../../assets/defaultAvatar.png";
 
 const ProfileInfo = () => {
+
+  // Get current user
+  const currentUser = useAuthStore((state) => state.currentUser);
+  const {updateUser} = useAuthStore();
+
   // CSS styles defined directly in the component
   const styles = {
     root: {
@@ -215,8 +220,7 @@ const ProfileInfo = () => {
     };
   }, []);
 
-  const currentUser = useAuthStore((state) => state.currentUser);
-  const { updateUser } = useAuthStore();
+  
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 

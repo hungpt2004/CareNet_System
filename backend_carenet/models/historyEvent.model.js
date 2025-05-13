@@ -15,13 +15,14 @@ const historyEventSchema = new Schema({
   status: {
     type: String,
     enum: [
+      "waiting", //chờ duyệt
       "completed", //duoc phep feedback
       "finished",  //sau khi feedback
-      "processing",
-      "rejected",
-      "approved",
-      "pending",
-      "cancelled",
+      "processing",//sk đang diễn ra
+      "rejected",  //đã bị từ chối 
+      "approved",  //đã được chấp nhận 
+      "pending",   //yêu cầu hủy tham gia
+      "cancelled", //sau khi được duyệt hủy tham gia
     ],
     default: "waiting",
   },
@@ -31,15 +32,16 @@ const historyEventSchema = new Schema({
   },
   attendedAt: {
     type: Date,
+    default: null,
   },
   completedAt: {
     type: Date,
     default: null,
   },
-  earnedPoints: {
-    type: Number,
-    default: 0,
-  },
+  // earnedPoints: {
+  //   type: Number,
+  //   default: 0,
+  // },
   earnedHours: {
     type: Number,
     default: 0,

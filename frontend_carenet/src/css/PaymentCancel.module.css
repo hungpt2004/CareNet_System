@@ -1,0 +1,93 @@
+.cancelContainer {
+   padding: 40px 0;
+ }
+ 
+ .cancelCard {
+   border-radius: 15px;
+   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+   overflow: hidden;
+   border: none;
+   padding: 20px;
+ }
+ 
+ .iconContainer {
+   display: flex;
+   justify-content: center;
+   margin-bottom: 20px;
+ }
+ 
+ .cancelIcon {
+   width: 80px;
+   height: 80px;
+   border-radius: 50%;
+   background-color: #dc3545;
+   color: white;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   font-size: 40px;
+   animation: shakeAnimation 0.5s ease-out;
+ }
+ 
+ .cancelTitle {
+   color: #dc3545;
+   margin-bottom: 20px;
+   font-weight: 700;
+ }
+ 
+ .cancelMessage {
+   font-size: 18px;
+   margin-bottom: 30px;
+   color: #555;
+ }
+ 
+ .reasonContainer {
+   background-color: #f8f9fa;
+   padding: 20px;
+   border-radius: 10px;
+   margin-bottom: 30px;
+   text-align: left;
+ }
+ 
+ .reasonContainer h4 {
+   margin-bottom: 15px;
+   color: #555;
+   font-size: 18px;
+ }
+ 
+ .reasonList {
+   padding-left: 20px;
+   margin-bottom: 0;
+ }
+ 
+ .reasonList li {
+   margin-bottom: 8px;
+   color: #666;
+ }
+ 
+ .reasonList li:last-child {
+   margin-bottom: 0;
+ }
+ 
+ .actionsContainer {
+   display: flex;
+   justify-content: center;
+   flex-wrap: wrap;
+   gap: 15px;
+   margin-top: 20px;
+ }
+ 
+ .actionButton {
+   min-width: 140px;
+   border-radius: 8px;
+   padding: 10px 20px;
+   font-weight: 500;
+ }
+ 
+ @keyframes shakeAnimation {
+   0% { transform: translateX(0); }
+   25% { transform: translateX(-10px); }
+   50% { transform: translateX(10px); }
+   75% { transform: translateX(-10px); }
+   100% { transform: translateX(0); }
+ }

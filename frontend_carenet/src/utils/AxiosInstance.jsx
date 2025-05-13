@@ -26,7 +26,6 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   (error) => {
-    // Handle 401 or 403 errors (unauthorized or forbidden)
     if (
       error.response &&
       (error.response.status === 401 || error.response.status === 403)
@@ -35,7 +34,6 @@ axiosInstance.interceptors.response.use(
       localStorage.removeItem("token");
       localStorage.removeItem("user");
 
-      // Redirect to login page
       window.location.href = "/";
     }
     return Promise.reject(error);

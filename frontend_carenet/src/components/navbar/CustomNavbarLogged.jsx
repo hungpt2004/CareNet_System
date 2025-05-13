@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 
 const CustomNavbarLogged = () => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
@@ -14,7 +13,9 @@ const CustomNavbarLogged = () => {
   // Giả sử người dùng đã đăng nhập
   const [isLoggedIn, setIsLoggedIn] = useState(true);
 
+  // Get current user information
   const currentUser = useAuthStore((state) => state.currentUser);
+
 
   const {logout} = useAuthStore();
 
@@ -49,9 +50,6 @@ const CustomNavbarLogged = () => {
     };
   }, []);
 
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
-  };
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
@@ -147,6 +145,8 @@ const CustomNavbarLogged = () => {
                   <Nav className="flex-column">
                     <Nav.Link href="/profile-information" className="px-4 py-2">Thông tin cá nhân</Nav.Link>
                     <Nav.Link href="/support" className="px-4 py-2">CSKH</Nav.Link>
+                    <Nav.Link href="/my-events" className="px-4 py-2">Quản Lý Ghi Danh</Nav.Link>
+                    <Nav.Link href="/feedback-page" className="px-4 py-2">Quản Lý Đánh Giá</Nav.Link>
                     <Nav.Link href="/owner-post" className="px-4 py-2">Tài khoản Organization</Nav.Link>
                     <Nav.Link href="/dashboard" className="px-4 py-2">Tài khoản Admin</Nav.Link>
                     <Nav.Link onClick={handleLogout} className="px-4 py-2 text-danger">Đăng xuất</Nav.Link>

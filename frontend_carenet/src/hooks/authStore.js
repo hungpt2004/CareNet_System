@@ -24,6 +24,7 @@ const useAuthStore = create((set) => ({
         email,
         password,
       });
+      
       const user = res.data.user;
       const token = res.data.accessToken;
       const message = res.data.message;
@@ -62,6 +63,11 @@ const useAuthStore = create((set) => ({
       set({ loading: false });
     }
   },
+  updateUser: (updatedUser) => {
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+    set({ currentUser: updatedUser });
+  },
+
   updateUser: (updatedUser) => {
     localStorage.setItem("user", JSON.stringify(updatedUser));
     set({ currentUser: updatedUser });

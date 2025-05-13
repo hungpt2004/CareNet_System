@@ -66,8 +66,7 @@ const FeedbackPage = () => {
       }
       
       .ant-table-thead > tr > th {
-        background-color: #0E606E !important;
-        color: white !important;
+        color: black !important;
       }
       
       .ant-table-tbody > tr:hover > td {
@@ -75,8 +74,7 @@ const FeedbackPage = () => {
       }
       
       .ant-btn-primary {
-        background-color: #0E606E !important;
-        border-color: #0E606E !important;
+        background-color: #5DB996 !important;
       }
       
       .ant-btn-primary:hover {
@@ -85,7 +83,7 @@ const FeedbackPage = () => {
       }
       
       .ant-rate-star-full .ant-rate-star-second {
-        color: #0E606E !important;
+        color: yellow !important;
       }
       
       .table-row-light {
@@ -214,12 +212,12 @@ const FeedbackPage = () => {
             onClick={() => handleEdit(record)}
             size="small" // Adjust size for better fit
             style={{
-              backgroundColor: "#0E606E",
-              borderColor: "#0E606E",
+              backgroundColor: "#5DB996",
+              borderColor: "#5DB996",
               color: "white",
             }}
           >
-            Update
+            Thay đổi
           </Button>
 
           <Button
@@ -233,7 +231,7 @@ const FeedbackPage = () => {
               backgroundColor: "white",
             }}
           >
-            Delete
+            Xóa
           </Button>
         </Space>
       ),
@@ -327,10 +325,9 @@ const FeedbackPage = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
+        <h2 className="text-center mb-4">Quản lý đánh giá</h2>
         <Card
-          title="FEEDBACK"
           style={styles.card}
-          headStyle={{ backgroundColor: "#0E606E", color: "white",textAlign:"center" }}
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -356,6 +353,7 @@ const FeedbackPage = () => {
       <Modal
         title="Edit Feedback"
         visible={isModalVisible}
+        className="mt-5"
         onOk={handleOk}
         onCancel={handleCancel}
         footer={[

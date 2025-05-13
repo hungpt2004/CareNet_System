@@ -6,6 +6,9 @@ const userRouter = require("./routes/user.routes");
 const profileRouter = require("./routes/profile.routes");
 const searchRouter = require("./routes/search.routes");
 const eventRegistrationRouter = require("./routes/eventRegistration.routes");
+const eventRouter = require("./routes/event.routes");
+const feedbackRouter = require("./routes/feedback.routes");
+const organizationRouter = require("./routes/organization.routes");
 
 const app = express();
 app.use(cors());
@@ -17,4 +20,11 @@ app.use("/volunteer", userRouter);
 app.use("/profile", profileRouter);
 app.use("/search", searchRouter);
 app.use("/eventRegistration", eventRegistrationRouter);
+app.use('/auth', authRouter)
+app.use('/volunteer', userRouter)
+app.use('/search', searchRouter);
+app.use('/event', eventRouter);
+app.use('/feedback', feedbackRouter);
+app.use('/organization', organizationRouter);
+
 module.exports = app;
