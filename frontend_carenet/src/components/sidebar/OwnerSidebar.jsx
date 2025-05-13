@@ -43,7 +43,8 @@ const OwnerSidebar = ({ showSidebar, isMobile }) => {
       title: "Quản Lý Nội Bộ ",
       icon: <Award size={20} />,
       submenu: [
-        { title: "Quản Lý Bài Viết", path: "/owner-post" },
+        { title: "Quản Lý Sự Kiện", path: "#" },
+        { title: "Tạo bài viết", path: "/owner-post" },
         { title: "Quản Lý Thành Viên", path: "/owner-user" },
       ],
     },

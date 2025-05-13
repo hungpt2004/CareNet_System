@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Container, Button, Modal, Badge } from "react-bootstrap";
 import { Calendar, MapPin, Users, Clock, Award, Eye, ChevronRight } from "lucide-react";
 import { Table, Tag, Space, Image } from "antd";
@@ -7,6 +7,7 @@ import axiosInstance from "../../utils/AxiosInstance";
 import useAuthStore from "../../hooks/authStore";
 import { CustomToast } from "../../components/toast/CustomToast";
 import CustomSpinner from "../../components/spinner/CustomSpinner";
+import io from 'socket.io-client';
 
 // Custom styles
 const customStyles = {
@@ -41,6 +42,8 @@ function MyEventsPage() {
    const [selectedEvent, setSelectedEvent] = useState(null);
    const [showModal, setShowModal] = useState(false);
    const [isLoading, setIsLoading] = useState(false);
+   const socketRef = useRef(null);
+   const currentUser = useAuthStore((state) => state.currentUser);
 
    // Fetch user's registered events
    const fetchUserEvents = async () => {
@@ -56,6 +59,45 @@ function MyEventsPage() {
          }, 1500);
       }
    };
+
+   // Socket.IO setup
+   useEffect(() => {
+      // Kết nối Socket.IO
+      socketRef.current = io('http://localhost:5000', {
+         withCredentials: true
+      });
+
+      // Debug log khi kết nối thành công
+      socketRef.current.on('connect', () => {
+         console.log('Socket.IO connected successfully in MyEventsPage');
+      });
+
+      // Debug log khi có lỗi kết nối
+      socketRef.current.on('connect_error', (error) => {
+         console.error('Socket.IO connection error in MyEventsPage:', error);
+      });
+
+      // Join vào room của user
+      if (currentUser?._id) {
+         console.log('Joining user room in MyEventsPage:', currentUser._id);
+         socketRef.current.emit('joinUserRoom', currentUser._id);
+      }
+
+      // Lắng nghe sự kiện requestApproved
+      socketRef.current.on('requestApproved', (data) => {
+         console.log('Received requestApproved event in MyEventsPage:', data);
+         // Refresh danh sách sự kiện khi có thông báo mới
+         fetchUserEvents();
+      });
+
+      return () => {
+         if (currentUser?._id) {
+            console.log('Leaving user room in MyEventsPage:', currentUser._id);
+            socketRef.current.emit('leaveUserRoom', currentUser._id);
+         }
+         socketRef.current.disconnect();
+      };
+   }, [currentUser?._id]);
 
    useEffect(() => {
       fetchUserEvents();
