@@ -88,12 +88,10 @@ exports.uploadAvatar = [
       });
     } catch (err) {
       console.error("Error:", err);
-      return res
-        .status(500)
-        .json({
-          error: true,
-          message: "Tải ảnh đại diện lên không thành công.",
-        });
+      return res.status(500).json({
+        error: true,
+        message: "Tải ảnh đại diện lên không thành công.",
+      });
     }
   },
 ];
@@ -117,13 +115,11 @@ exports.getHistoryEventById = asyncHandler(async (req, res) => {
   console.log(historyEvent.event.startAt);
   console.log(historyEvent.status);
 
-  return res
-    .status(200)
-    .json({
-      status: "success",
-      message: "Get history event successfully",
-      historyEvent: historyEvent,
-    });
+  return res.status(200).json({
+    status: "success",
+    message: "Get history event successfully",
+    historyEvent: historyEvent,
+  });
 });
 
 exports.getAllHistoryEvent = asyncHandler(async (req, res) => {
@@ -131,13 +127,11 @@ exports.getAllHistoryEvent = asyncHandler(async (req, res) => {
   const historyEvents = await HistoryEvent.find({ user: user._id }).populate(
     "event"
   ); //return array
-  return res
-    .status(200)
-    .json({
-      status: "success",
-      message: "Get all history event successfully",
-      historyEvents: historyEvents,
-    });
+  return res.status(200).json({
+    status: "success",
+    message: "Get all history event successfully",
+    historyEvents: historyEvents,
+  });
 });
 
 exports.sendFeedbackHistoryEvents = async (req, res) => {
