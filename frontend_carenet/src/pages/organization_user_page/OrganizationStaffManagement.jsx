@@ -1,40 +1,42 @@
-import React, { useState } from 'react';
-import { Table, Tag, Space, Button, Card, Modal, Descriptions, Avatar, Typography } from 'antd';
-import { User, Mail, Phone, MapPin, Calendar, Eye, Award, BookOpen } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Table, Tag, Space, Button, Card, Modal, Descriptions, Avatar, Typography, message } from 'antd';
+import { User, Mail, Phone, MapPin, Calendar, Eye, Award, BookOpen, X } from 'lucide-react';
 import styles from '../../css/AppColors.module.css';
 import { formatDateVN } from '../../utils/FormatDateVN';
+import axios from 'axios';
+import axiosInstance from '../../utils/AxiosInstance';
 
 const { Title } = Typography;
 
-const UserManagement = () => {
+const OrganizationStaffManagement = () => {
   const [loading, setLoading] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [staffData, setStaffData] = useState([]);
 
-  // Mock data - sẽ thay thế bằng API call
-  const mockUsers = [
-    {
-      _id: '1',
-      fullname: 'Nguyễn Văn A',
-      email: 'nguyenvana@example.com',
-      phone: '0123456789',
-      avatar: 'https://i.pinimg.com/736x/8a/a9/c5/8aa9c5d8429f561000f1de8e7f6d5a32.jpg',
-      role: 'volunteer',
-      status: 'active',
-      address: {
-        street: '123 Đường ABC',
-        ward: 'Phường XYZ',
-        district: 'Quận 1',
-        province: 'TP.HCM'
-      },
-      dateOfBirth: '1990-01-01',
-      gender: 'male',
-      score: 100,
-      certificates: ['Chứng chỉ tình nguyện', 'Chứng chỉ kỹ năng mềm'],
-      createdAt: '2024-01-01T00:00:00.000Z'
-    },
-    // Thêm mock data khác ở đây
-  ];
+  useEffect(() => {
+    fetchStaffData();
+  }, []);
+
+  const fetchStaffData = async () => {
+    try {
+      setLoading(true);
+      const response = await axiosInstance.get('/organization/get-owned-staff');
+      
+      if (response.data.status === 'success' && response.data.staff) {
+        setStaffData(response.data.staff);
+      } else {
+        message.error('Failed to fetch staff data');
+      }
+    } catch (error) {
+      console.error('Error fetching staff data:', error);
+      message.error('Failed to fetch staff data');
+    } finally {
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
+    }
+  };
 
   const showUserDetail = (user) => {
     setSelectedUser(user);
@@ -89,6 +91,10 @@ const UserManagement = () => {
             color = 'green';
             text = 'Tổ chức';
             break;
+          case 'staff':
+            color = 'purple';
+            text = 'Nhân viên';
+            break;
           default:
             color = 'blue';
             text = 'Tình nguyện viên';
@@ -102,19 +108,19 @@ const UserManagement = () => {
       dataIndex: 'status',
       key: 'status',
       render: (status) => {
-        let color = status === 'active' ? 'green' : 'red';
-        let text = status === 'active' ? 'Hoạt động' : 'Không hoạt động';
+        let color = status === 'ready' ? 'green' : 'red';
+        let text = status === 'ready' ? 'Sẵn sàng' : 'Bận';
         return <Tag color={color}>{text}</Tag>;
       },
     },
     {
-      title: 'Điểm',
-      dataIndex: 'score',
-      key: 'score',
-      render: (score) => (
+      title: 'Điểm uy tín',
+      dataIndex: 'reputationPoints',
+      key: 'reputationPoints',
+      render: (points) => (
         <Space>
           <Award size={16} />
-          <span>{score}</span>
+          <span>{points}</span>
         </Space>
       ),
     },
@@ -130,6 +136,14 @@ const UserManagement = () => {
           >
             Xem chi tiết
           </Button>
+          <Button 
+            type="primary"
+            danger 
+            icon={<X size={16} />}
+            onClick={() => showUserDetail(record)}
+          >
+            Xóa thông tin
+          </Button>
         </Space>
       ),
     },
@@ -137,28 +151,28 @@ const UserManagement = () => {
 
   return (
     <div className="p-6">
-      <Card>
+      <div>
         <div className="mb-4">
-          <h2 className={`${styles.textPrimary} display-4`}>Quản lý người dùng</h2>
+          <h3 className={`${styles.textPrimary} display-4`}>Quản lý nhân viên</h3>
         </div>
         <Table
           columns={columns}
-          dataSource={mockUsers}
+          dataSource={staffData}
           loading={loading}
           rowKey="_id"
           pagination={{
             pageSize: 10,
             showSizeChanger: true,
-            showTotal: (total) => `Tổng số ${total} người dùng`,
+            showTotal: (total) => `Tổng số ${total} nhân viên`,
           }}
         />
-      </Card>
+      </div>
 
       <Modal
         title={
           <div className="d-flex align-items-center">
             <User size={20} className="me-2" />
-            <span>Chi tiết người dùng</span>
+            <span>Chi tiết nhân viên</span>
           </div>
         }
         open={isModalVisible}
@@ -194,18 +208,15 @@ const UserManagement = () => {
               <Space>
                 <MapPin size={16} />
                 <span>
-                  {`${selectedUser.address.street}, ${selectedUser.address.ward}, ${selectedUser.address.district}, ${selectedUser.address.province}`}
+                  {selectedUser.address && `${selectedUser.address.province}, ${selectedUser.address.country}`}
                 </span>
               </Space>
             </Descriptions.Item>
             <Descriptions.Item label="Ngày sinh">
               <Space>
                 <Calendar size={16} />
-                <span>{formatDateVN(selectedUser.dateOfBirth)}</span>
+                <span>{formatDateVN(selectedUser.dob)}</span>
               </Space>
-            </Descriptions.Item>
-            <Descriptions.Item label="Giới tính">
-              {selectedUser.gender === 'male' ? 'Nam' : 'Nữ'}
             </Descriptions.Item>
             <Descriptions.Item label="Vai trò">
               {(() => {
@@ -221,6 +232,10 @@ const UserManagement = () => {
                     color = 'green';
                     text = 'Tổ chức';
                     break;
+                  case 'staff':
+                    color = 'purple';
+                    text = 'Nhân viên';
+                    break;
                   default:
                     color = 'blue';
                     text = 'Tình nguyện viên';
@@ -231,31 +246,34 @@ const UserManagement = () => {
             </Descriptions.Item>
             <Descriptions.Item label="Trạng thái">
               {(() => {
-                let color = selectedUser.status === 'active' ? 'green' : 'red';
-                let text = selectedUser.status === 'active' ? 'Hoạt động' : 'Không hoạt động';
+                let color = selectedUser.status === 'ready' ? 'green' : 'red';
+                let text = selectedUser.status === 'ready' ? 'Sẵn sàng' : 'Bận';
                 return <Tag color={color}>{text}</Tag>;
               })()}
             </Descriptions.Item>
-            <Descriptions.Item label="Điểm">
+            <Descriptions.Item label="Điểm uy tín">
               <Space>
                 <Award size={16} />
-                <span>{selectedUser.score}</span>
+                <span>{selectedUser.reputationPoints}</span>
               </Space>
             </Descriptions.Item>
-            <Descriptions.Item label="Ngày tham gia">
+            <Descriptions.Item label="Tổng giờ tham gia">
               <Space>
                 <Calendar size={16} />
-                <span>{formatDateVN(selectedUser.createdAt)}</span>
+                <span>{selectedUser.totalHours} giờ</span>
               </Space>
             </Descriptions.Item>
-            {selectedUser.certificates && selectedUser.certificates.length > 0 && (
-              <Descriptions.Item label="Chứng chỉ" span={2}>
-                <Space direction="vertical">
-                  {selectedUser.certificates.map((cert, index) => (
-                    <Space key={index}>
-                      <BookOpen size={16} />
-                      <span>{cert}</span>
-                    </Space>
+            <Descriptions.Item label="Điểm hoạt động">
+              <Space>
+                <Award size={16} />
+                <span>{selectedUser.activityPoints}</span>
+              </Space>
+            </Descriptions.Item>
+            {selectedUser.hobbies && selectedUser.hobbies.length > 0 && (
+              <Descriptions.Item label="Sở thích" span={2}>
+                <Space wrap>
+                  {selectedUser.hobbies.map((hobby, index) => (
+                    <Tag key={index} color="blue">{hobby}</Tag>
                   ))}
                 </Space>
               </Descriptions.Item>
@@ -267,4 +285,4 @@ const UserManagement = () => {
   );
 };
 
-export default UserManagement;
+export default OrganizationStaffManagement;

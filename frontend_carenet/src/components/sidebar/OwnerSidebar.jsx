@@ -49,7 +49,7 @@ const OwnerSidebar = ({ showSidebar, isMobile }) => {
       submenu: [
         { title: "Quản Lý Sự Kiện", path: "/owner-finished-events" },
         { title: "Tạo bài viết", path: "/owner-post" },
-        { title: "Quản Lý Thành Viên", path: "/owner-user" },
+        { title: "Quản Lý Thành Viên", path: "/owner-staff" },
       ],
     },
     {

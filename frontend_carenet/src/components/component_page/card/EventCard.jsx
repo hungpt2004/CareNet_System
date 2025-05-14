@@ -57,7 +57,7 @@ export default function EventCard({ event, currentUser, customStyles, formatDate
       </div>
 
 
-      <div className={styles.cardBody} style={{ backgroundColor: customStyles.secondaryColor }}>
+      <div className={styles.cardBody} style={{ backgroundColor: '#f5f5f5' }}>
         <div className={styles.mainContent}>
 
           <h3 className={styles.eventTitle}>{event.title}</h3>

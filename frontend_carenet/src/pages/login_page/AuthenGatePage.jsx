@@ -102,6 +102,7 @@ function AuthenGatePage() {
     setShowConfirmPassword(!showConfirmPassword)
   }
 
+
   // Handle login form submission
   const handleLoginSubmit = async (values) => {
     try {
@@ -109,12 +110,27 @@ function AuthenGatePage() {
       await login(values.email, values.password)
       CustomSuccessToast("Đăng nhập thành công")
       
-      // Navigate based on user state
+      // Navigate based on user role
       setTimeout(() => {
         if (currentUser?.hobbies?.length <= 0) {
           navigate("/onboarding")
         } else {
-          navigate("/")
+          switch (currentUser?.role?.toLowerCase()) {
+            case 'volunteer':
+              navigate("/")
+              break
+            case 'organization':
+              navigate("/owner-dashboard")
+              break
+            case 'admin':
+              navigate("/dashboard")
+              break
+            case 'staff':
+              navigate("/staff-attendance")
+              break
+            default:
+              navigate("/")
+          }
         }
       }, 800)
     } catch (err) {

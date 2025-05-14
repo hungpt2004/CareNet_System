@@ -42,6 +42,8 @@ import MyEventsPage from './pages/my_events_page/MyEventsPage';
 import OrganizationEvents from './pages/organization_post_page/OrganizationEventManagement';
 import OrganizationDashboardPage from './pages/organization_dashboard_page/OrganizationDashboardPage';
 import StaffAttendancePage from './pages/staff_attendance_page/StaffAttendancePage';
+import OrganizationStaffManagement from './pages/organization_user_page/OrganizationStaffManagement';
+import StaffLayout from './layout/StaffLayout';
 
 const guestRoutes = [
   { path: '/', element: <LandingPage /> },
@@ -91,8 +93,8 @@ const privateOwnerRoutes = [
   { path: '/admin-participant', element: <AdminEventParticipants /> },
   { path: '/upgrade-pro', element: <UpgradePro /> },
   { path: '/owner-finished-events', element: <OrganizationEvents /> },
+  { path: '/owner-staff', element: <OrganizationStaffManagement /> },
 ];
-
 
 const privateStaffRoutes = [
   { path: '/staff-attendance', element: <StaffAttendancePage /> },
@@ -103,8 +105,7 @@ function App() {
     <ToastProvider>
       <Router>
         <Routes>
-
-          {/* Customer Routes - Requires login with 'customer' role */}
+          {/* Customer Routes */}
           <Route element={<CustomerLayout />}>
             {privateCustomerRoutes.map(({ path, element }) => (
               <Route
@@ -119,10 +120,22 @@ function App() {
             ))}
           </Route>
 
-          {/* STAFF */}
+          {/* Staff Routes - Separate layout for staff */}
+          <Route element={<StaffLayout />}>
+            {privateStaffRoutes.map(({ path, element }) => (
+              <Route
+                key={path}
+                path={path}
+                element={
+                  <ProtectedRoute allowedRoles={['staff']}>
+                    {element}
+                  </ProtectedRoute>
+                }
+              />
+            ))}
+          </Route>
 
-
-          {/* Admin Routes - Requires login with 'admin' role */}
+          {/* Admin Routes */}
           <Route element={<AdminLayout />}>
             {privateAdminRoutes.map(({ path, element }) => (
               <Route
@@ -137,7 +150,7 @@ function App() {
             ))}
           </Route>
 
-          {/* Owner Routes - Requires login with 'owner' role */}
+          {/* Owner Routes */}
           <Route element={<OwnerLayout />}>
             {privateOwnerRoutes.map(({ path, element }) => (
               <Route
@@ -152,29 +165,12 @@ function App() {
             ))}
           </Route>
 
-
-          {/* Staff Routes - Requires login with 'staff' role */}
-          <Route element={<CustomerLayout />}>
-            {privateStaffRoutes.map(({ path, element }) => (
-              <Route
-                key={path}
-                path={path}
-                element={
-                  <ProtectedRoute allowedRoles={['staff']}>
-                    {element}
-                  </ProtectedRoute>
-                }
-              />
-            ))}
-          </Route>
-
           {/* Public Routes */}
           {publicRoutes.map(({ path, element }) => (
               <Route key={path} path={path} element={element} />
           ))}
 
-
-          {/* Guest */}
+          {/* Guest Routes */}
           <Route element={<GuestLayout />}>
             {guestRoutes.map(({ path, element }) => (
               <Route key={path} path={path} element={element} />

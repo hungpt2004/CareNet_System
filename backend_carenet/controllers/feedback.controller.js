@@ -26,6 +26,9 @@ exports.createFeedback = asyncHandler (async (req, res) => {
        rating,
        comment,
      });
+
+     // Tính trung bình điểm rating của event và điểm rating của organization
+
  
      return res.status(201).json({
        status: "success",
