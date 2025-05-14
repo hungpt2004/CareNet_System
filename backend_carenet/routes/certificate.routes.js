@@ -1,9 +1,9 @@
 // routes/certificate.routes.js
 const express = require('express');
 const router = express.Router();
-const { getCertificateHistory } = require('../controllers/certificatehistorycontroller');
+const certificateHistoryController = require('../controllers/certificateHistory.controller');
 
 // Route: GET /api/certificates/history/:userId
-router.get('/history/:userId', getCertificateHistory);
+router.get('/history/:userId', certificateHistoryController.getCertificateHistory);
 
 module.exports = router;
