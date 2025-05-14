@@ -116,14 +116,6 @@ const CustomNavbarLogged = () => {
     setIsLoggedIn(false);
   };
 
-  const storedUser = localStorage.getItem("user");
-  if (storedUser) {
-    console.log("User object from localStorage:");
-    console.log(JSON.stringify(storedUser, null, 2));
-  } else {
-    console.log("No user data in localStorage.");
-  }
-  
 
   return (
     <Navbar

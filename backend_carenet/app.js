@@ -8,6 +8,7 @@ const eventRouter = require("./routes/event.routes");
 const feedbackRouter = require("./routes/feedback.routes");
 const organizationRouter = require("./routes/organization.routes");
 const certificateRoutes = require('./routes/certificate.routes');
+const attendanceRouter = require("./routes/attendance.routes");
 
 const app = express();
 app.use(cors());
@@ -21,4 +22,6 @@ app.use('/event', eventRouter);
 app.use('/feedback', feedbackRouter);
 app.use('/organization', organizationRouter);
 app.use('/api/certificates', certificateRoutes);
+app.use('/attendance', attendanceRouter);
+
 module.exports = app;
