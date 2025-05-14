@@ -45,6 +45,7 @@ import StaffAttendancePage from './pages/staff_attendance_page/StaffAttendancePa
 import OrganizationStaffManagement from './pages/organization_user_page/OrganizationStaffManagement';
 import StaffLayout from './layout/StaffLayout';
 
+import CertificatePurchasePage from './pages/profile_page/CertificatePurchasePage';
 const guestRoutes = [
   { path: '/', element: <LandingPage /> },
   { path: '/search', element: <VolunteerEventSearch /> },
@@ -73,6 +74,7 @@ const privateCustomerRoutes = [
   { path: '/profile-certificate', element: <ProfileCertificate /> },
   { path: '/feedback-page', element: <FeedbackPage /> },
   { path: '/my-events', element: <MyEventsPage /> },
+  { path: '/profile-certificate-purchases', element: <CertificatePurchasePage /> },
 ];
 
 const privateAdminRoutes = [

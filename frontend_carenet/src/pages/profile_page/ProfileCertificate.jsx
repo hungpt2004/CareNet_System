@@ -67,6 +67,7 @@ const ProfileCertificate = () => {
                     { name: "Favourite", path: "/profile-favourite" },
                     { name: "Score", path: "/profile-score" },
                     { name: "Certificate", path: "/profile-certificate", active: true },
+                    { name: "Certificate Purchases", path: "/profile-certificate-purchases"},
                     { name: "Log Out", path: "/" }
                   ].map((item, index) => (
                     <div
