@@ -302,3 +302,26 @@ exports.filterRequestsBySkills = asyncHandler(async (req, res) => {
     });
   }
 });
+
+exports.getOwnStaff = asyncHandler(async (req, res) => {
+  const currentUser = req.user.user;
+
+  try {
+    const organizer = await User.findOne({_id: currentUser._id})
+    const organization = await Organization.findOne({_id: organizer.organizationId})
+    const staff = await User.find({
+      organizationId: organization._id,
+      role: "staff"
+    })
+    return res.status(200).json({
+      status: "success",
+      staff: staff,
+    })
+  } catch (error) {
+    return res.status(500).json({
+      status: "fail",
+      message: "Lỗi khi lấy nhân viên",
+    });
+  }
+});
+

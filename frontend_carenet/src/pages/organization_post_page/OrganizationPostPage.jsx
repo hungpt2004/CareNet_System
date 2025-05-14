@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Info, MapPin, Upload, Users, Target, 
   ArrowRight, ArrowLeft, Check, Calendar,
@@ -17,6 +17,7 @@ import CustomProgressBar from '../../components/progressbar/CustomProgressBar';
 import axiosInstance from '../../utils/AxiosInstance';
 import { CustomToast } from '../../components/toast/CustomToast';
 import { IoMdPerson } from 'react-icons/io';
+import { PlusOutlined } from '@ant-design/icons';
 
 const { TextArea } = Input;
 const { RangePicker } = DatePicker;
@@ -47,6 +48,9 @@ const OrganizationPostPage = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [questions, setQuestions] = useState([]);
+  const [staffList, setStaffList] = useState([]);
+  const [customCategories, setCustomCategories] = useState([]);
+  const [customSkills, setCustomSkills] = useState([]);
   const [location, setLocation] = useState({
     latitude: 10.7756,
     longitude: 106.7137,
@@ -55,6 +59,23 @@ const OrganizationPostPage = () => {
     district: '',
     province: ''
   });
+
+  // Fetch staff list when component mounts
+  useEffect(() => {
+    fetchStaffList();
+  }, []);
+
+  const fetchStaffList = async () => {
+    try {
+      const response = await axiosInstance.get('/organization/get-own-staff');
+      if (response.data.status === 'success') {
+        setStaffList(response.data.staff);
+      }
+    } catch (error) {
+      console.error('Error fetching staff:', error);
+      message.error('Không thể tải danh sách nhân viên');
+    }
+  };
 
   const handleLocationChange = (lat, lng) => {
     setLocation(prev => ({
@@ -89,28 +110,69 @@ const OrganizationPostPage = () => {
           <Form.Item
             name="category"
             label="Danh mục"
-            rules={[{ required: true, message: 'Vui lòng chọn danh mục!' }]}
+            rules={[{ required: true, message: 'Vui lòng chọn hoặc tạo danh mục!' }]}
           >
-            <Select placeholder="Chọn danh mục">
-              <Select.Option value="education">Giáo dục</Select.Option>
-              <Select.Option value="health">Y tế</Select.Option>
-              <Select.Option value="environment">Môi trường</Select.Option>
-              <Select.Option value="community">Cộng đồng</Select.Option>
-              <Select.Option value="children">Trẻ em</Select.Option>
-            </Select>
+            <Select
+              placeholder="Chọn hoặc tạo danh mục mới"
+              mode="tags"
+              style={{ width: '100%' }}
+              tokenSeparators={[',']}
+              options={[
+                { value: 'education', label: 'Giáo dục' },
+                { value: 'health', label: 'Y tế' },
+                { value: 'environment', label: 'Môi trường' },
+                { value: 'community', label: 'Cộng đồng' },
+                { value: 'children', label: 'Trẻ em' },
+                ...customCategories.map(cat => ({ value: cat, label: cat }))
+              ]}
+              onSelect={(value) => {
+                if (!customCategories.includes(value)) {
+                  setCustomCategories([...customCategories, value]);
+                }
+              }}
+            />
           </Form.Item>
 
           <Form.Item
             name="skills"
             label="Kỹ năng yêu cầu"
-            rules={[{ required: true, message: 'Vui lòng chọn kỹ năng!' }]}
+            rules={[{ required: true, message: 'Vui lòng chọn hoặc tạo kỹ năng!' }]}
           >
-            <Select mode="tags" placeholder="Nhập kỹ năng cần thiết">
-              <Select.Option value="communication">Giao tiếp</Select.Option>
-              <Select.Option value="leadership">Lãnh đạo</Select.Option>
-              <Select.Option value="teamwork">Làm việc nhóm</Select.Option>
-              <Select.Option value="teaching">Giảng dạy</Select.Option>
-              <Select.Option value="medical">Y tế</Select.Option>
+            <Select
+              mode="tags"
+              placeholder="Nhập kỹ năng cần thiết"
+              style={{ width: '100%' }}
+              tokenSeparators={[',']}
+              options={[
+                { value: 'communication', label: 'Giao tiếp' },
+                { value: 'leadership', label: 'Lãnh đạo' },
+                { value: 'teamwork', label: 'Làm việc nhóm' },
+                { value: 'teaching', label: 'Giảng dạy' },
+                { value: 'medical', label: 'Y tế' },
+                ...customSkills.map(skill => ({ value: skill, label: skill }))
+              ]}
+              onSelect={(value) => {
+                if (!customSkills.includes(value)) {
+                  setCustomSkills([...customSkills, value]);
+                }
+              }}
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="staffId"
+            label="Nhân viên phụ trách"
+            rules={[{ required: true, message: 'Vui lòng chọn nhân viên phụ trách!' }]}
+          >
+            <Select
+              placeholder="Chọn nhân viên phụ trách"
+              style={{ width: '100%' }}
+            >
+              {staffList.map(staff => (
+                <Select.Option key={staff._id} value={staff._id}>
+                  {staff.fullname} - {staff.email}
+                </Select.Option>
+              ))}
             </Select>
           </Form.Item>
         </>
@@ -314,7 +376,7 @@ const OrganizationPostPage = () => {
                 <Select.Option value="dropdown">Câu hỏi dropdown</Select.Option>
               </Select>
               <Tooltip title="Thêm câu hỏi mới">
-                <Button type="primary" icon={<Plus size={16} />}>
+                <Button type="primary" icon={<PlusOutlined />}>
                   Thêm câu hỏi
                 </Button>
               </Tooltip>
@@ -393,7 +455,7 @@ const OrganizationPostPage = () => {
                           newQuestions[index].options.push('');
                           setQuestions(newQuestions);
                         }}
-                        icon={<Plus size={16} />}
+                        icon={<PlusOutlined />}
                         style={{ marginTop: 8 }}
                       >
                         Thêm lựa chọn
@@ -434,7 +496,10 @@ const OrganizationPostPage = () => {
         formData: {
           questions: questions
         },
-        status: 'hiring'
+        status: 'hiring',
+        staffId: values.staffId,
+        categories: values.category,
+        skills: values.skills
       };
 
       const response = await axiosInstance.post('/event/create', formData);

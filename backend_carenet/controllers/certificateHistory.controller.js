@@ -1,12 +1,13 @@
 // controllers/certificateHistoryController.js
 const Certificate = require('../models/certificate.model');
+const asyncHandler = require('../middleware/asyncHandler');
 
 /**
  * @desc Get certificate history for a specific user
  * @route GET /api/certificates/history/:userId
  * @access Private
  */
-const getCertificateHistory = async (req, res) => {
+exports.getCertificateHistory = asyncHandler(async (req, res) => {
   try {
     const { userId } = req.params;
 
@@ -22,8 +23,5 @@ const getCertificateHistory = async (req, res) => {
     console.error('Error fetching certificate history:', error);
     return res.status(500).json({ message: 'Server error' });
   }
-};
+});
 
-module.exports = {
-  getCertificateHistory,
-};
