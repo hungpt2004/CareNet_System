@@ -182,17 +182,17 @@ exports.approveRequest = asyncHandler(async (req, res) => {
 
 exports.rejectRequest = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { cancellationReason } = req.body; // Lấy lý do từ chối từ body request
+  const { cancellationReason } = req.body;
 
   try {
     const updateData = {
       status: "rejected",
-      ...(cancellationReason && { cancellationReason }), // Chỉ thêm cancellationReason nếu có
+      ...(cancellationReason && { cancellationReason }),
     };
 
     const request = await EventRegistration.findByIdAndUpdate(id, updateData, {
       new: true,
-    });
+    }).populate('event');
 
     if (!request) {
       return res.status(404).json({
@@ -200,6 +200,28 @@ exports.rejectRequest = asyncHandler(async (req, res) => {
         message: "Không tìm thấy yêu cầu",
       });
     }
+
+    // Gửi thông báo realtime qua Socket.IO
+    const notificationData = {
+      type: "request_rejected",
+      message: `Đơn đăng ký tham gia sự kiện "${request.event.title}" đã bị từ chối${cancellationReason ? ` với lý do: ${cancellationReason}` : ''}`,
+      eventId: request.event._id,
+      eventTitle: request.event.title,
+      cancellationReason: cancellationReason,
+      timestamp: new Date(),
+    };
+
+    const io = getIO();
+    if (!io) {
+      console.error("Socket.IO instance not found");
+      return res.status(500).json({
+        status: "fail",
+        message: "Lỗi kết nối thông báo",
+      });
+    }
+
+    io.to(request.user.toString()).emit("requestRejected", notificationData);
+    console.log("Socket.IO rejection notification sent successfully");
 
     return res.status(200).json({
       status: "success",

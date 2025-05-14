@@ -1,8 +1,5 @@
 const emailTransporter = require("../services/transporterEmail");
-const User = require("../models/user.model");
-const AppError = require("../utils/appError");
-const asyncHandler = require("../middleware/asyncHandler");
-const { VERIFICATION_EMAIL_TEMPLATE, SUCCESS_REGISTER_TEMPLATE, APPROVE_REGISTER_TEMPLATE } = require("../mail_templates/emailTemplates");
+const { VERIFICATION_EMAIL_TEMPLATE, SUCCESS_REGISTER_TEMPLATE, APPROVE_REGISTER_TEMPLATE, THANK_YOU_TEMPLATE } = require("../mail_templates/emailTemplates");
 const { formatDateVN } = require("../utils/formatDateVN");
 require('dotenv').config();
 
@@ -76,6 +73,36 @@ exports.sendApproveRequest = async (
          .replace("{currentYear}", new Date().getFullYear())
       });
       console.log("Đã gửi email duyệt yêu cầu thành công");
+   } catch (error) {
+      console.log(error)
+   }
+}
+
+exports.sendThankYouMail = async (
+   userName,
+   email,
+   eventName,
+   eventStartAt,
+   eventEndAt,
+   eventLocation,
+   participants,
+   organizationName,
+) => {
+   try {
+      await emailTransporter.sendMail({
+         from: process.env.EMAIL_USERNAME,
+         to: email,
+         subject: "Cảm ơn bạn đã tham gia sự kiện",
+         html: THANK_YOU_TEMPLATE
+         .replace("{userName}", userName)
+         .replace("{eventName}", eventName)
+         .replace("{organizationName}", organizationName)
+         .replace("{eventStartAt}", formatDateVN(eventStartAt))
+         .replace("{eventEndAt}", formatDateVN(eventEndAt))
+         .replace("{location}", eventLocation)
+         .replace("{participants}", participants)
+         .replace("{currentYear}", new Date().getFullYear())
+      })
    } catch (error) {
       console.log(error)
    }

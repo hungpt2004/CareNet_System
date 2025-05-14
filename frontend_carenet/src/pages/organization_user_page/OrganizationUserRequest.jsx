@@ -106,11 +106,11 @@ const OrganizationUserRequests = () => {
         console.log('Emitting Socket.IO notification:', notificationData);
         socketRef.current.emit('requestApproved', notificationData);
 
-        // Đóng modal chi tiết nếu đang mở
+        // Đóng modal chi tiết 
         setDetailVisible(false);
         setSelectedRequest(null);
         
-        // Refresh data và hiển thị thông báo
+        
         await fetchEventRegistrations(selectedEventId);
         console.log('Event registrations refreshed');
         

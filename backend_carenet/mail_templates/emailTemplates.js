@@ -8,8 +8,8 @@ module.exports = {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Xác minh tài khoản CareNet</title>
 </head>
-<body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #02301a; margin: 0; padding: 0; background-color: #f6f4ef;">
-  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width: 650px; margin: 0 auto; background-color: #f6f4ef; padding: 10px;">
+<body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #02301a; margin: 0; padding: 0; background-color: #ffffff;">
+  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width: 650px; margin: 0 auto; background-color: #ffffff; padding: 10px;">
     <tr>
       <td>
         <!-- Logo and Header Section -->
@@ -140,8 +140,8 @@ module.exports = {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Đặt lại mật khẩu CareNet của bạn</title>
 </head>
-<body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #02301a; margin: 0; padding: 0; background-color: #f6f4ef;">
-  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width: 650px; margin: 0 auto; background-color: #f6f4ef; padding: 20px;">
+<body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #02301a; margin: 0; padding: 0; background-color: #ffffff;">
+  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width: 650px; margin: 0 auto; background-color: #ffffff; padding: 20px;">
     <tr>
       <td>
         <!-- Logo and Header Section -->
@@ -288,358 +288,134 @@ module.exports = {
 
   // Email thank you after finish event
   THANK_YOU_TEMPLATE: `
-   <!DOCTYPE html>
-<html lang="vi">
-<head>
+  <!DOCTYPE html>
+  <html lang="vi">
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thư Cảm Ơn</title>
-    <style>
-        /* Reset CSS for email clients */
-        body, html {
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            line-height: 1.6;
-            color: #333333;
-            background-color: #f6f4ef;
-        }
-        
-        /* Main container */
-        .email-container {
-            max-width: 650px;
-            margin: 0 auto;
-            background-color: #ffffff;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        /* Header styling */
-        .header {
-            background-color: #118b50;
-            padding: 20px 0;
-            text-align: center;
-            border-bottom: 5px solid #5db996;
-        }
-        
-        .header img {
-            height: 60px;
-            width: auto;
-        }
-        
-        /* Content area */
-        .content {
-            padding: 30px 40px;
-            background-color: #ffffff;
-        }
-        
-        /* Event info box */
-        .event-box {
-            background-color: #f5f5f5;
-            border-left: 4px solid #5db996;
-            padding: 20px;
-            margin: 25px 0;
-        }
-        
-        .event-title {
-            color: #118b50;
-            font-size: 20px;
-            font-weight: bold;
-            margin: 0 0 10px 0;
-        }
-        
-        .event-details {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 15px;
-        }
-        
-        .event-detail-item {
-            display: flex;
-            align-items: center;
-            font-size: 14px;
-        }
-        
-        .event-detail-item img {
-            width: 16px;
-            height: 16px;
-            margin-right: 8px;
-        }
-        
-        /* Special message */
-        .special-message {
-            background-color: #e3f0af;
-            padding: 20px;
-            border-radius: 6px;
-            margin: 25px 0;
-            position: relative;
-        }
-        
-        .special-message:before {
-            content: """;
-            font-size: 60px;
-            color: #5db996;
-            position: absolute;
-            top: -15px;
-            left: 10px;
-            opacity: 0.3;
-        }
-        
-        /* Signature area */
-        .signature-area {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 40px;
-            align-items: flex-end;
-        }
-        
-        .signature {
-            flex: 1;
-            text-align: right;
-            padding-right: 30px;
-        }
-        
-        .signature-name {
-            font-weight: bold;
-            color: #118b50;
-            font-size: 18px;
-            margin-bottom: 5px;
-        }
-        
-        .signature-title {
-            color: #02301a;
-            font-style: italic;
-            margin-bottom: 15px;
-        }
-        
-        .signature-line {
-            width: 120px;
-            height: 2px;
-            background-color: #118b50;
-            margin-left: auto;
-            margin-bottom: 10px;
-        }
-        
-        /* Stamp/Seal */
-        .stamp {
-            width: 130px;
-            height: 130px;
-            border-radius: 50%;
-            background-color: #f6f4ef;
-            border: 2px dashed #118b50;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            padding: 5px;
-        }
-        
-        .stamp-inner {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: 1px solid #5db996;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background-color: rgba(227, 240, 175, 0.4);
-        }
-        
-        .stamp-title {
-            font-weight: bold;
-            color: #118b50;
-            font-size: 16px;
-            margin-bottom: 5px;
-        }
-        
-        .stamp-subtitle {
-            font-size: 10px;
-            color: #02301a;
-            text-align: center;
-            margin-bottom: 5px;
-        }
-        
-        .stamp-divider {
-            width: 40px;
-            height: 1px;
-            background-color: #5db996;
-            margin: 5px 0;
-        }
-        
-        .stamp-signature {
-            font-family: 'Brush Script MT', cursive;
-            color: #118b50;
-            font-size: 18px;
-        }
-        
-        /* Footer */
-        .footer {
-            background-color: #f5f5f5;
-            padding: 20px;
-            text-align: center;
-            font-size: 12px;
-            color: #666;
-            border-top: 3px solid #e3f0af;
-        }
-        
-        .footer-logo {
-            color: #118b50;
-            font-weight: bold;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-        
-        .social-links {
-            margin: 15px 0;
-        }
-        
-        .social-links a {
-            display: inline-block;
-            margin: 0 5px;
-            color: #118b50;
-            text-decoration: none;
-        }
-        
-        /* Typography */
-        h1 {
-            color: #ffffff;
-            font-size: 28px;
-            margin: 10px 0;
-            font-weight: 600;
-            letter-spacing: 1px;
-        }
-        
-        h2 {
-            color: #118b50;
-            font-size: 22px;
-            margin: 25px 0 15px 0;
-            font-weight: 600;
-            border-bottom: 2px solid #e3f0af;
-            padding-bottom: 8px;
-        }
-        
-        p {
-            margin: 15px 0;
-            color: #333333;
-        }
-        
-        .greeting {
-            font-size: 18px;
-            color: #02301a;
-            font-weight: 500;
-        }
-        
-        .highlight {
-            color: #118b50;
-            font-weight: 600;
-        }
-        
-        /* Responsive adjustments */
-        @media only screen and (max-width: 650px) {
-            .content {
-                padding: 20px;
-            }
+  </head>
+  <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #02301a; margin: 0; padding: 0; background-color: #ffffff;">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width: 650px; margin: 0 auto; background-color: #ffffff; padding: 20px;">
+      <tr>
+        <td>
+          <!-- Logo and Header Section -->
+          <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom: 20px;">
+            <tr>
+              <td align="center" style="padding: 0 0 20px 0;">
+                <img src="../../frontend_carenet/public/volunteer_img/Carenet.png" alt="CareNet Logo" style="max-width: 180px; height: auto;" />
+              </td>
+            </tr>
+          </table>
+          
+          <!-- Main Content Container -->
+          <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(2, 48, 26, 0.08);">
+            <!-- Header Banner -->
+            <tr>
+              <td style="background: linear-gradient(135deg, #0A6B3D 0%, #5db996 100%); padding: 35px 0; text-align: center;">
+                <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600; letter-spacing: 0.5px;">THƯ CẢM ƠN</h1>
+                <p style="color: #e3f0af; margin: 10px 0 0 0; font-size: 16px;">Cảm ơn sự đóng góp của bạn</p>
+              </td>
+            </tr>
             
-            .signature-area {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .signature {
-                text-align: center;
-                padding-right: 0;
-                margin-bottom: 30px;
-                order: 2;
-            }
-            
-            .signature-line {
-                margin: 0 auto 10px auto;
-            }
-            
-            .stamp {
-                order: 1;
-                margin-bottom: 20px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="email-container">
-        <!-- Header -->
-        <div class="header">
-            <h1>THƯ CẢM ƠN</h1>
-        </div>
-        
-        <!-- Main Content -->
-        <div class="content">
-            <p class="greeting">Kính gửi <span class="highlight">[Tên Người Tham Gia]</span>,</p>
-            
-            <p>CareNet xin chân thành cảm ơn Quý khách đã dành thời gian quý báu tham dự sự kiện của chúng tôi. Sự hiện diện và đóng góp của Quý khách đã góp phần quan trọng vào thành công chung của sự kiện.</p>
-            
-            <div class="event-box">
-                <div class="event-title">[TÊN SỰ KIỆN]</div>
-                <p>Chúng tôi rất vinh dự được đón tiếp Quý khách tại sự kiện này và hy vọng rằng những thông tin được chia sẻ sẽ mang lại giá trị cho Quý khách.</p>
+            <!-- Email Content -->
+            <tr>
+              <td style="padding: 40px 50px;">
+                <p style="font-size: 17px; margin-top: 0; color: #02301a;">Kính gửi <span style="font-weight: 600; color: #0A6B3D;">{userName}</span>,</p>
                 
-                <div class="event-details">
-                    <div class="event-detail-item">
-                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23118b50' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E" alt="Calendar">
-                        <span>[Ngày Tháng Năm]</span>
-                    </div>
-                    <div class="event-detail-item">
-                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23118b50' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z'%3E%3C/path%3E%3Ccircle cx='12' cy='10' r='3'%3E%3C/circle%3E%3C/svg%3E" alt="Location">
-                        <span>[Địa Điểm]</span>
-                    </div>
-                    <div class="event-detail-item">
-                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23118b50' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'%3E%3C/path%3E%3Ccircle cx='9' cy='7' r='4'%3E%3C/circle%3E%3Cpath d='M23 21v-2a4 4 0 0 0-3-3.87'%3E%3C/path%3E%3Cpath d='M16 3.13a4 4 0 0 1 0 7.75'%3E%3C/path%3E%3C/svg%3E" alt="Participants">
-                        <span>[Số Người Tham Dự]</span>
-                    </div>
-                </div>
-            </div>
-            
-            <h2>Lời Cảm Ơn Đặc Biệt</h2>
-            
-            <p>Chúng tôi đặc biệt đánh giá cao sự tham gia nhiệt tình và những đóng góp quý báu của Quý khách trong suốt thời gian diễn ra sự kiện. Những ý kiến và câu hỏi sâu sắc của Quý khách đã góp phần làm phong phú thêm nội dung chương trình.</p>
-            
-            <div class="special-message">
-                <p><em>[Thông điệp đặc biệt hoặc lời chúc mừng cá nhân dành cho người tham gia. Đây có thể là lời cảm ơn về một đóng góp cụ thể hoặc ghi nhận sự tham gia tích cực của họ trong sự kiện.]</em></p>
-            </div>
-            
-            <p>CareNet tự hào được hợp tác cùng <span class="highlight">[Tên Tổ Chức]</span> trong việc thúc đẩy sức khỏe cộng đồng và nâng cao chất lượng dịch vụ y tế. Chúng tôi hy vọng sẽ tiếp tục nhận được sự ủng hộ và đồng hành của Quý khách trong các hoạt động sắp tới.</p>
-            
-            <p>Một lần nữa, xin chân thành cảm ơn Quý khách đã dành thời gian tham dự sự kiện. Chúng tôi mong được gặp lại Quý khách trong những sự kiện tiếp theo.</p>
-            
-            <!-- Signature Area -->
-            <div class="signature-area">
-                <div class="signature">
-                    <div class="signature-line"></div>
-                    <div class="signature-name">Ngo Nhu Phuong</div>
-                    <div class="signature-title">CEO CareNet</div>
-                </div>
+                <p style="font-size: 17px; color: #02301a; line-height: 1.7;">CareNet xin chân thành cảm ơn Quý khách đã dành thời gian quý báu tham dự sự kiện của chúng tôi. Sự hiện diện và đóng góp của Quý khách đã góp phần quan trọng vào thành công chung của sự kiện.</p>
                 
-                <div class="stamp">
-                    <div class="stamp-inner">
-                        <div class="stamp-title">CARENET</div>
-                        <div class="stamp-subtitle">CHỨNG NHẬN THAM DỰ</div>
-                        <div class="stamp-divider"></div>
-                        <div class="stamp-subtitle">Đối tác chính thức của</div>
-                        <div class="stamp-subtitle" style="font-weight: bold">FPT Education</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Footer -->
-        <div class="footer">
-            <div class="footer-logo">CARENET</div>
-            <p>Kết nối thiện nguyện cộng đồng</p>
-            <p>© 2025 CareNet. Tất cả các quyền được bảo lưu.</p>
-            <p>[Địa chỉ] | [Số điện thoại] | [Email]</p>
-        </div>
-    </div>
-</body>
-</html>
+                <!-- Event Details Box -->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin: 25px 0; background-color: #f5f5f5; padding: 20px; border-radius: 8px;">
+                  <tr>
+                    <td>
+                      <p style="font-size: 16px; font-weight: 600; color: #0A6B3D; margin: 0 0 10px 0;">Chi tiết sự kiện</p>
+                      <p style="font-size: 15px; color: #02301a; margin: 5px 0;"><strong>Tên sự kiện:</strong> {eventName}</p>
+                      <p style="font-size: 15px; color: #02301a; margin: 5px 0;"><strong>Ngày bắt đầu:</strong> {eventStartAt}</p>
+                      <p style="font-size: 15px; color: #02301a; margin: 5px 0;"><strong>Ngày kết thúc:</strong> {eventEndAt}</p>
+                      <p style="font-size: 15px; color: #02301a; margin: 5px 0;"><strong>Địa điểm:</strong> {location}</p>
+                      <p style="font-size: 15px; color: #02301a; margin: 5px 0;"><strong>Số người tham gia:</strong> {participants}</p>
+                    </td>
+                  </tr>
+                </table>
+                
+                <p style="font-size: 17px; color: #02301a; line-height: 1.7;">{organizationName} rất vinh dự được đón tiếp Quý khách tại sự kiện này và hy vọng rằng những thông tin được chia sẻ sẽ mang lại giá trị cho Quý khách.</p>
+                
+                <!-- Special Message Box -->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin: 25px 0; background-color: #e3f0af30; padding: 20px; border-radius: 8px; border: 1px solid #e3f0af;">
+                  <tr>
+                    <td>
+                      <p style="font-size: 15px; color: #02301a; margin: 0; line-height: 1.6;">
+                        <span style="font-weight: 600;">Lời cảm ơn đặc biệt:</span> Chúng tôi đặc biệt đánh giá cao sự tham gia nhiệt tình và những đóng góp quý báu của Quý khách trong suốt thời gian diễn ra sự kiện. Những ý kiến và câu hỏi sâu sắc của Quý khách đã góp phần làm phong phú thêm nội dung chương trình.
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+                
+                <p style="font-size: 17px; color: #02301a; line-height: 1.7;">CareNet tự hào được hợp tác cùng <span style="font-weight: 600; color: #0A6B3D;">{organizationName}</span> trong việc thúc đẩy sức khỏe cộng đồng và nâng cao chất lượng dịch vụ y tế. Chúng tôi hy vọng sẽ tiếp tục nhận được sự ủng hộ và đồng hành của Quý khách trong các hoạt động sắp tới.</p>
+                
+                <!-- Signature -->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="border-top: 1px solid #e3f0af; padding-top: 25px; margin-bottom: 30px;">
+                  <tr>
+                    <td>
+                      <p style="font-size: 16px; margin: 0 0 5px 0; color: #02301a;">Trân trọng,</p>
+                      <p style="font-size: 18px; margin: 0; font-weight: 600; color: #0A6B3D;">Ngo Nhu Phuong</p>
+                      <p style="font-size: 16px; margin: 5px 0 0 0; color: #02301a;">CEO CareNet</p>
+                    </td>
+                  </tr>
+                </table>
+                
+                <!-- Social Icons -->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom: 20px;">
+                  <tr>
+                    <td align="center">
+                      <p style="margin: 0 0 10px 0; font-size: 14px; color: #02301a; font-weight: 600;">Kết nối với chúng tôi</p>
+                      <table cellpadding="0" cellspacing="0" border="0" align="center">
+                        <tr>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">C</a>
+                          </td>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">A</a>
+                          </td>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">R</a>
+                          </td>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">E</a>
+                          </td>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">N</a>
+                          </td>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">E</a>
+                          </td>
+                          <td style="padding: 0 8px;">
+                            <a href="#" target="_blank" style="display: inline-block; width: 20px; height: 20px; background-color: #0A6B3D; border-radius: 50%; text-align: center; line-height: 20px; color: white; text-decoration: none; font-size: 10px;">T</a>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+                
+                <!-- Footer Information -->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                  <tr>
+                    <td align="center">
+                      <p style="font-size: 14px; color: #02301a; margin: 0 0 5px 0;">Đây là email tự động, vui lòng không trả lời email này.</p>
+                      <p style="font-size: 14px; color: #02301a; margin: 0;">© {currentYear} CareNet. Tất cả các quyền được bảo lưu.</p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+  </html>
   `,
 
   // Email success register event
@@ -651,8 +427,8 @@ module.exports = {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Xác nhận đăng ký sự kiện CareNet</title>
   </head>
-  <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #02301a; margin: 0; padding: 0; background-color: #f6f4ef;">
-    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width: 650px; margin: 0 auto; background-color: #f6f4ef; padding: 20px;">
+  <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #02301a; margin: 0; padding: 0; background-color: #ffffff;">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width: 650px; margin: 0 auto; background-color: #ffffff; padding: 20px;">
       <tr>
         <td>
           <!-- Logo and Header Section -->
@@ -794,8 +570,8 @@ module.exports = {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thông báo từ chối đăng ký sự kiện CareNet</title>
   </head>
-  <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #02301a; margin: 0; padding: 0; background-color: #f6f4ef;">
-    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width: 650px; margin: 0 auto; background-color: #f6f4ef; padding: 20px;">
+  <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #02301a; margin: 0; padding: 0; background-color: #ffffff;">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width: 650px; margin: 0 auto; background-color: #ffffff; padding: 20px;">
       <tr>
         <td>
           <!-- Logo and Header Section -->
@@ -925,8 +701,8 @@ module.exports = {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thông báo hoàn tiền CareNet</title>
   </head>
-  <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #02301a; margin: 0; padding: 0; background-color: #f6f4ef;">
-    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width: 650px; margin: 0 auto; background-color: #f6f4ef; padding: 20px;">
+  <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #02301a; margin: 0; padding: 0; background-color: #ffffff;">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width: 650px; margin: 0 auto; background-color: #ffffff; padding: 20px;">
       <tr>
         <td>
           <!-- Logo and Header Section -->
@@ -1070,8 +846,8 @@ module.exports = {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Xác nhận phê duyệt đăng ký sự kiện CareNet</title>
   </head>
-  <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #02301a; margin: 0; padding: 0; background-color: #f6f4ef;">
-    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width: 650px; margin: 0 auto; background-color: #f6f4ef; padding: 20px;">
+  <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #02301a; margin: 0; padding: 0; background-color: #ffffff;">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width: 650px; margin: 0 auto; background-color: #ffffff; padding: 20px;">
       <tr>
         <td>
           <!-- Logo and Header Section -->

@@ -14,7 +14,7 @@ const AttendanceSchema = new Schema({
    },
    status: {
      type: String,
-     enum: ["registered", "attended", "cancelled"],
+     enum: ["registered", "attended", "absent"],
      default: "registered"
    },
    checkInTime: {type: Date, default:  Date.now},
