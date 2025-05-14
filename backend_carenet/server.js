@@ -10,7 +10,7 @@ const app = require("./app");
 require('dotenv').config();
 
 
-// Create HTTP server
+// Create HTTP server for Socket.IO
 const server = http.createServer(app);
 
 // Initialize Socket.IO
