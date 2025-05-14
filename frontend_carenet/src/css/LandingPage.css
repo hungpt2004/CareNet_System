@@ -16,13 +16,13 @@
    left: 0;
    width: 0%;
    height: 2px;
-   background-color: #80CBC4; /* Màu xanh primary */
+   background-color: #118B50; /* Màu xanh primary */
    transition: width 0.3s ease-in-out;
  }
  
  /* Hiệu ứng khi hover */
  .hover-underline:hover {
-   color: #80CBC4; /* Đổi màu chữ */
+   color: #118B50; /* Đổi màu chữ */
  }
  
  /* Tăng độ dài đường gạch khi hover */
@@ -71,7 +71,7 @@
  .button {
    background-color: #FBF6E9;
    border-color: #FBF6E9;
-   color: #5DB996;
+   color: #118B50;
    transform: translateY(-5px);
    transition: 1s ease-in inherit;
  }
@@ -79,7 +79,7 @@
    transition: 1s ease-in inherit;
    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
    transform: translateY(0px);
-   background-color: #5DB996;
-   border-color: #5DB996;
+   background-color: #118B50;
+   border-color: #118B50;
    color: #FBF6E9;
  }

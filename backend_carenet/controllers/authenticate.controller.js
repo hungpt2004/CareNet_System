@@ -1,10 +1,8 @@
 const User = require("../models/user.model");
 const asyncHandler = require("../middleware/asyncHandler");
-const emailTransporter = require("../services/transporterEmail");
 const jwt = require("jsonwebtoken");
 const AppError = require("../utils/appError");
 const { sendVerificationLink } = require("./email.controller");
-const { default: mongoose } = require("mongoose");
 const bcrypt = require("bcryptjs");
 require("dotenv").config();
 

@@ -5,7 +5,13 @@ import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
 import { motion } from "framer-motion";
 // import CustomNavbar from "../../components/navbar/CustomNavbar";
 import { useNavigate } from "react-router-dom";
+import useAuthStore from "../../hooks/authStore";
 const ProfileInfo = () => {
+
+  // Get current user
+  const currentUser = useAuthStore((state) => state.currentUser);
+  const {updateUser} = useAuthStore();
+
   // CSS styles defined directly in the component
   const styles = {
     root: {
@@ -200,14 +206,17 @@ const ProfileInfo = () => {
   }, []);
 
   const [formData, setFormData] = useState({
-    fullname: "Hung Pham Trong",
-    gender: "Male",
-    birthdate: "20/02/2004",
-    cmnd: "1234567891",
-    phone: "0947811575",
-    email: "hungpham1603@hcmut.edu.vn",
-    address: "123 Street ABC, DEF District, Laha City",
+    fullname: currentUser?.fullname,
+    gender: currentUser?.gender,
+    birthdate: currentUser?.dob,
+    cmnd: currentUser.cmnd,
+    phone: currentUser.phone,
+    email: currentUser.email,
+    address: currentUser.address.country,
   });
+
+  // handle update
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;

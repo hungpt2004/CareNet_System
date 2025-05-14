@@ -1,0 +1,294 @@
+/* Biến màu sắc */
+:root {
+   --primary-color: #5db996;
+   --secondary-color: #fbf6e9;
+   --hover-color: #4ca885;
+   --light-bg: #f8f9fa;
+   --border-color: #dee2e6;
+   --text-color: #212529;
+   --text-muted: #6c757d;
+ }
+ 
+ /* Container chính */
+ .pageContainer {
+   min-height: 100vh;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   padding: 3rem 0;
+   background-color: var(--light-bg);
+ }
+ 
+ /* Card chính */
+ .mainCard {
+   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+   border-radius: 12px;
+   overflow: hidden;
+   border: none;
+   transition: all 0.3s ease;
+ }
+ 
+ .cardHeader {
+   background-color: white;
+   border-bottom: none;
+   padding: 1.5rem 1.5rem 0;
+ }
+ 
+ .cardBody {
+   padding: 1.5rem;
+   position: relative;
+   overflow: hidden;
+ }
+ 
+ .cardFooter {
+   background-color: white;
+   display: flex;
+   justify-content: space-between;
+   padding: 1.5rem;
+   border-top: 1px solid var(--border-color);
+ }
+ 
+ /* Tiêu đề và phụ đề */
+ .pageTitle {
+   font-size: 1.75rem;
+   font-weight: 600;
+   margin-bottom: 0;
+ }
+ 
+ .stepBadge {
+   padding: 0.5rem 1rem;
+   font-size: 1rem;
+   font-weight: 500;
+   border-radius: 50px;
+   background-color: var(--light-bg);
+   color: var(--text-color);
+ }
+ 
+ .stepTitle {
+   font-size: 1.5rem;
+   font-weight: 600;
+   margin-bottom: 1rem;
+ }
+ 
+ .stepDescription {
+   color: var(--text-muted);
+   margin-bottom: 1.5rem;
+   font-size: 1.1rem;
+ }
+ 
+ /* Progress bar */
+ .progressBar {
+   height: 10px;
+   background-color: var(--light-bg);
+   border-radius: 5px;
+   overflow: hidden;
+   margin-bottom: 1rem;
+ }
+ 
+ .progressBarFill {
+   height: 100%;
+   background-color: var(--primary-color);
+   border-radius: 5px;
+   transition: width 0.3s ease;
+ }
+ 
+ /* Card lựa chọn */
+ .optionCard {
+   height: 100%;
+   cursor: pointer;
+   border-radius: 10px;
+   transition: all 0.3s ease;
+   border: 1px solid var(--border-color);
+   background-color: white;
+   padding: 1rem;
+   display: flex;
+   align-items: center;
+ }
+ 
+ .optionCard:hover {
+   transform: translateY(-5px);
+   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+   border-color: var(--primary-color);
+ }
+ 
+ .optionCardSelected {
+   border: 2px solid var(--primary-color);
+   background-color: var(--secondary-color);
+ }
+ 
+ .optionCardSelected:hover {
+   transform: translateY(-5px);
+   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+ }
+ 
+ /* Icon container */
+ .iconContainer {
+   width: 60px;
+   height: 60px;
+   border-radius: 50%;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   margin-right: 1rem;
+   background-color: var(--light-bg);
+   color: var(--text-color);
+   transition: all 0.3s ease;
+ }
+ 
+ .iconContainerSelected {
+   background-color: var(--primary-color);
+   color: white;
+ }
+ 
+ /* Nội dung card */
+ .cardContent {
+   flex: 1;
+ }
+ 
+ .cardTitle {
+   font-size: 1.2rem;
+   font-weight: 600;
+   margin-bottom: 0.25rem;
+ }
+ 
+ .cardDescription {
+   color: var(--text-muted);
+   font-size: 0.9rem;
+   margin-bottom: 0;
+ }
+ 
+ /* Check icon */
+ .checkIcon {
+   margin-left: auto;
+   color: var(--primary-color);
+ }
+ 
+ /* Buttons */
+ .buttonPrimary {
+   background-color: var(--primary-color);
+   border-color: var(--primary-color);
+   color: white;
+   font-weight: 500;
+   padding: 0.75rem 1.5rem;
+   border-radius: 50px;
+   display: flex;
+   align-items: center;
+   transition: all 0.3s ease;
+ }
+ 
+ .buttonPrimary:hover:not(:disabled) {
+   background-color: var(--hover-color);
+   border-color: var(--hover-color);
+   transform: translateY(-2px);
+ }
+ 
+ .buttonPrimary:disabled {
+   background-color: var(--primary-color);
+   border-color: var(--primary-color);
+   opacity: 0.6;
+ }
+ 
+ .buttonSecondary {
+   background-color: white;
+   border-color: var(--border-color);
+   color: var(--text-color);
+   font-weight: 500;
+   padding: 0.75rem 1.5rem;
+   border-radius: 50px;
+   display: flex;
+   align-items: center;
+   transition: all 0.3s ease;
+ }
+ 
+ .buttonSecondary:hover:not(:disabled) {
+   background-color: var(--light-bg);
+   transform: translateY(-2px);
+ }
+ 
+ .buttonSecondary:disabled {
+   opacity: 0.6;
+ }
+ 
+ .skipButton {
+   color: var(--text-muted);
+   text-decoration: none;
+   font-size: 1rem;
+   transition: all 0.3s ease;
+   margin-top: 1.5rem;
+   display: inline-block;
+ }
+ 
+ .skipButton:hover {
+   color: var(--primary-color);
+   text-decoration: underline;
+ }
+ 
+ /* Warning text */
+ .warningText {
+   color: #dc3545;
+   margin-top: 1rem;
+   font-size: 0.9rem;
+ }
+ 
+ /* Grid layout */
+ .optionsGrid {
+   display: grid;
+   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+   gap: 1rem;
+   margin-bottom: 1rem;
+ }
+ 
+ /* Animation */
+ @keyframes fadeInRight {
+   from {
+     opacity: 0;
+     transform: translateX(50px);
+   }
+   to {
+     opacity: 1;
+     transform: translateX(0);
+   }
+ }
+ 
+ @keyframes fadeInLeft {
+   from {
+     opacity: 0;
+     transform: translateX(-50px);
+   }
+   to {
+     opacity: 1;
+     transform: translateX(0);
+   }
+ }
+ 
+ .fadeInRight {
+   animation: fadeInRight 0.5s ease forwards;
+ }
+ 
+ .fadeInLeft {
+   animation: fadeInLeft 0.5s ease forwards;
+ }
+ 
+ .stepContent {
+   width: 100%;
+   position: relative;
+ }
+ 
+ /* Responsive adjustments */
+ @media (max-width: 768px) {
+   .optionsGrid {
+     grid-template-columns: 1fr;
+   }
+ 
+   .cardFooter {
+     flex-direction: column;
+     gap: 1rem;
+   }
+ 
+   .buttonPrimary,
+   .buttonSecondary {
+     width: 100%;
+     justify-content: center;
+   }
+ }
+ 

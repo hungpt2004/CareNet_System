@@ -1,20 +1,98 @@
 :root {
   --color-background: #f0f0ef;
   --color-accent-light: #E3F0AF;
-  --color-accent: #5DB996;
-  --color-primary: #118B50;
+  --color-accent: #118B50;
+  --color-primary: #2e8b57;
+  --font-primary: 'Rubik', sans-serif;
+  --font-secondary: 'Mulish', sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
   background-color: var(--color-background);
   color: var(--color-primary);
+  font-family: var(--font-primary);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-secondary);
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 1rem;
+}
+
+p {
+  font-family: var(--font-primary);
+  font-weight: 400;
 }
 
 a {
   color: var(--color-accent);
+  text-decoration: none;
+  transition: color 0.3s ease;
+  font-family: var(--font-primary);
+}
+
+a:hover {
+  color: var(--color-primary);
 }
 
 button {
+  font-family: var(--font-primary);
   background-color: var(--color-accent-light);
   color: var(--color-primary);
+  font-weight: 600;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  background-color: var(--color-accent);
+  color: white;
+}
+
+/* Thêm các class tiện ích cho font */
+.font-primary {
+  font-family: var(--font-primary);
+}
+
+.font-secondary {
+  font-family: var(--font-secondary);
+}
+
+.font-light {
+  font-weight: 300;
+}
+
+.font-regular {
+  font-weight: 400;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.font-bold {
+  font-weight: 700;
 }

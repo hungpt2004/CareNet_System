@@ -1,12 +1,24 @@
 /* AppColors.module.css */
 
 :global(:root) {
-  --color-background: #f6f4ef;
-  --color-subBackground: #f5f5f5;
-  --color-accent-light: #e3f0af;
-  --color-accent: #5db996;
-  --color-primary: #118b50;
-  --color-secondary: #02301a;
+  /* Core Colors */
+  --color-background: #ffffff;       /* Slightly warmer background */
+  --color-subBackground: #ffffff;     /* Pure white for sub-background */
+  --color-accent-light: #ffffff;      /* Softer light green */
+  --color-accent: #118B50;            /* More vibrant mid-green */
+  --color-primary: #2e8b57;           /* Sea green - trustworthy and calming */
+  --color-secondary: #1a4731;         /* Richer dark green */
+  
+  /* Additional Colors */
+  --color-success: #66bb6a;           /* Success messages */
+  --color-warning: #ffa726;           /* Warning notifications */
+  --color-error: #ef5350;             /* Error states */
+  --color-info: #42a5f5;              /* Information highlights */
+  --color-text-primary: #2c3e50;      /* Main text color */
+  --color-text-secondary: #546e7a;    /* Secondary text */
+  --color-text-light: #ffffff;        /* Text on dark backgrounds */
+  --color-border: #e0e0e0;            /* Subtle borders */
+  --color-highlight: #fff9c4;         /* Subtle highlighting */
 }
 
 .backgroundPrimary {
@@ -15,7 +27,7 @@
 
 .body {
   background-color: var(--color-background);
-  color: var(--color-primary);
+  color: var(--color-text-primary);
 }
 
 .subBody {
@@ -23,7 +35,7 @@
 }
 
 .textPrimary {
-   color: var(--color-primary)
+   color: var(--color-primary);
 }
 
 .textSecondary {
@@ -36,17 +48,77 @@
 
 .containerPrimary {
    background-color: var(--color-accent);
+   color: var(--color-text-light);
 }
 
 .containerSecondary {
    background-color: var(--color-subBackground);
+   border: 1px solid var(--color-border);
 }
 
 .link {
   color: var(--color-accent);
+  transition: color 0.2s ease;
+}
+
+.link:hover {
+  color: var(--color-primary);
+  text-decoration: underline;
 }
 
 .button {
-  background-color: var(--color-accent-light);
-  color: var(--color-primary);
+  background-color: var(--color-accent);
+  color: var(--color-text-light);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.button:hover {
+  background-color: var(--color-primary);
+}
+
+.buttonOutline {
+  background-color: transparent;
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent);
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.buttonOutline:hover {
+  background-color: var(--color-accent);
+  color: var(--color-text-light);
+}
+
+.messageContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.careNetMessage {
+  background-color: var(--color-subBackground);
+  color: var(--color-text-primary);
+  padding: 12px 16px;
+  margin-bottom: 10px;
+  border-radius: 16px 16px 16px 4px;
+  border-left: 3px solid var(--color-accent);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  align-self: flex-start;  /* Đưa tin nhắn CareNet vào bên trái */
+  max-width: 80%;
+}
+
+.userMessage {
+  background-color: var(--color-accent);
+  color: var(--color-text-light);
+  padding: 12px 16px;
+  margin-bottom: 10px;
+  border-radius: 16px 16px 4px 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  align-self: flex-end;  /* Đưa tin nhắn người dùng vào bên phải */
+  max-width: 80%;
 }

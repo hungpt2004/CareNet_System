@@ -51,19 +51,6 @@ const OwnerLayout = () => {
         </main>
       </div>
 
-      {/* Footer */}
-      <footer className="bg-white border-top py-3">
-        <Container fluid className="px-4">
-          <div className="d-flex justify-content-between align-items-center">
-            <div>
-              <p className="mb-0 text-muted">&copy; 2025 EduAdmin. All rights reserved.</p>
-            </div>
-            <div>
-              <small className="text-muted">Version 1.0.0</small>
-            </div>
-          </div>
-        </Container>
-      </footer>
 
       {/* Custom CSS */}
       <style>{`

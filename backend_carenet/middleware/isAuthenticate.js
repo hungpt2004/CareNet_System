@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+require('dotenv').config();
 
 // Lấy người dùng từ việc kiểm tra access token
 exports.authenticateToken = (req, res, next) => {
@@ -28,9 +29,12 @@ exports.authenticateToken = (req, res, next) => {
 };
 
 // Phân quyền route
-exports.authorizeRoles = (...allowedRoles) => {
+exports.authorizeRoles = (allowedRoles) => {
   return (req, res, next) => {
-    if (!allowedRoles.includes(req.user.role)) {
+    console.log(`Lay tu middleware ${req.user.user.role}`);
+    if (!allowedRoles.includes(req.user.user.role)) {
+      console.log(allowedRoles);
+      console.log(req.user.user.role)
       return res.status(403).json({ message: "Bạn không có quyền truy cập" });
     }
     next();

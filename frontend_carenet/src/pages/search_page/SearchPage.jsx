@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, use, useRef } from "react"
 import { Container, Row, Col, Form, Button, Card, Dropdown, InputGroup, Badge, FormCheck, Spinner, Alert } from "react-bootstrap"
 import { Search, Calendar, MapPin, Filter, ArrowUpDown, Users } from "lucide-react"
 import CustomNavbar from "../../components/navbar/CustomNavbar"
@@ -10,6 +10,16 @@ import { formatDateVN } from "../../utils/FormatDateVN"
 import { useNavigate } from "react-router-dom"
 import styles from '../../css/AppColors.module.css'
 import useAuthStore from "../../hooks/authStore"
+import { BsStarFill, BsStar } from 'react-icons/bs';
+import { Sparkles } from "lucide-react"
+import searchStyles from '../../css/SearchPage.module.css'
+import EventCard from "../../components/component_page/card/EventCard"
+import axiosInstance from "../../utils/AxiosInstance"
+import { CustomFailedToast, CustomSuccessToast, CustomToast } from "../../components/toast/CustomToast"
+import EventCardSlider from "../../components/component_page/card/EventCardSlider"
+import CareNetLoading from "../../components/loading/CareNetLoading"
+import axios from "axios"
+import CustomSpinner from "../../components/spinner/CustomSpinner"
 
 // Custom CSS variables for the color scheme
 const customStyles = {
@@ -17,100 +27,165 @@ const customStyles = {
   secondaryColor: "#FBF6E9",
 }
 
-// Mock data for demonstration
-const categories = [
-  "Giáo dục",
-  "Môi trường",
-  "Y tế",
-  "Động vật",
-  "Cộng đồng",
-  "Cứu trợ thiên tai",
-  "Nghệ thuật & Văn hóa",
-  "Thể thao",
-]
-
-const mockEvents = [
-  {
-    id: 1,
-    name: "Chiến dịch dọn dẹp bãi biển",
-    location: "Công viên bãi biển Coastal",
-    startDate: "2025-04-15",
-    endDate: "2025-04-15",
-    category: "Môi trường",
-    description: "Tham gia cùng chúng tôi để dọn dẹp bãi biển, bảo vệ sinh vật biển và giữ cho bãi biển luôn đẹp.",
-    organizer: "Nhóm Bảo tồn Đại dương",
-    participants: 45,
-    coordinates: { lat: 10.762622, lng: 106.660172 },
-  },
-  {
-    id: 2,
-    name: "Dạy kỹ năng máy tính",
-    location: "Trung tâm cộng đồng",
-    startDate: "2025-04-20",
-    endDate: "2025-05-20",
-    category: "Giáo dục",
-    description: "Hỗ trợ người lớn tuổi và thanh thiếu niên khó khăn học các kỹ năng máy tính cơ bản.",
-    organizer: "Tổ chức Học vấn Số",
-    participants: 12,
-    coordinates: { lat: 10.772622, lng: 106.670172 },
-  },
-  {
-    id: 3,
-    name: "Hỗ trợ ngân hàng thực phẩm",
-    location: "Ngân hàng thực phẩm trung tâm",
-    startDate: "2025-04-10",
-    endDate: "2025-04-30",
-    category: "Cộng đồng",
-    description: "Giúp phân loại và phân phát thực phẩm cho các gia đình có hoàn cảnh khó khăn trong thành phố.",
-    organizer: "Mạng lưới Thực phẩm Thành phố",
-    participants: 30,
-    coordinates: { lat: 10.782622, lng: 106.650172 },
-  },
-  {
-    id: 4,
-    name: "Trồng cây xanh trong công viên",
-    location: "Công viên Rừng Đô thị",
-    startDate: "2025-05-01",
-    endDate: "2025-05-02",
-    category: "Môi trường",
-    description: "Hãy cùng chúng tôi tăng cường không gian xanh đô thị bằng cách trồng cây bản địa trong công viên.",
-    organizer: "Sáng kiến Thành phố Xanh",
-    participants: 60,
-    coordinates: { lat: 10.752622, lng: 106.680172 },
-  },
-  {
-    id: 5,
-    name: "Chương trình tình nguyện tại bệnh viện",
-    location: "Bệnh viện Đa khoa",
-    startDate: "2025-04-01",
-    endDate: "2025-06-30",
-    category: "Y tế",
-    description: "Mang lại sự an ủi và hỗ trợ cho bệnh nhân và nhân viên bệnh viện.",
-    organizer: "Hiệp hội Tình nguyện Y tế",
-    participants: 25,
-    coordinates: { lat: 10.792622, lng: 106.690172 },
-  },
-]
+const locationApi = axios.create({
+  baseURL: 'https://provinces.open-api.vn/api/',
+  timeout: 5000
+})
 
 export default function VolunteerEventSearch() {
 
   // Current user
-  const {currentUser} = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   // State for search filters
   const [searchFilters, setSearchFilters] = useState({
     name: "",
-    location: "",
+    province: "",
+    provinceName: "",
+    district: "",
+    districtName: "",
+    ward: "",
+    wardName: "",
     startDate: "",
     endDate: "",
     category: "",
   })
 
-  const navigate = useNavigate();
-
   // State for events and filtered events
-  const [events, setEvents] = useState(mockEvents)
-  const [filteredEvents, setFilteredEvents] = useState(mockEvents)
+  const [events, setEvents] = useState([])
+  const [filteredEvents, setFilteredEvents] = useState([])
+  const [aiFilterEvents, setAiFilterEvents] = useState([]);
+  const [aiFilterShowed, setAiFilterShowed] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [searchRating, setSearchRating] = useState(0);
+
+  // Use Ref
+  const searchFilterRef = useRef(searchFilters);
+
+  // Location 
+  const [provinces, setProvinces] = useState([])
+  const [districts, setDistricts] = useState([])
+  const [wards, setWards] = useState([])
+
+  // Category
+  const [categories, setCategories] = useState([])
+
+  console.log(categories.length)
+
+  // Get category in select
+  const getAllCategory = async () => {
+    try {
+      const response = await axios.get(`http://localhost:5000/search/all-category`);
+      if (response.data && response.data.mapCategory) {
+        setCategories(response.data.mapCategory);
+      }
+    } catch (error) {
+      console.log(error.response?.data?.message);
+    }
+  }
+  // API get location in VN
+  const fetchProvinces = async () => {
+    try {
+      const response = await locationApi.get('p/')
+      setProvinces(response.data)
+    } catch (error) {
+      console.error('Error fetching provinces:', error)
+    }
+  }
+
+  const fetchDistricts = async (provinceCode) => {
+    try {
+      const response = await locationApi.get(`p/${provinceCode}?depth=2`)
+      setDistricts(response.data.districts || [])
+    } catch (error) {
+      console.error('Error fetching districts:', error)
+    }
+  }
+
+  const fetchWards = async (districtCode) => {
+    try {
+      const response = await locationApi.get(`d/${districtCode}?depth=2`)
+      setWards(response.data.wards || [])
+    } catch (error) {
+      console.error('Error fetching wards:', error)
+    }
+  }
+
+  // Get name location
+  const extractLocationName = (fullName) => {
+    return fullName
+      .replace(/^Tỉnh\s*/i, '')
+      .replace(/^Thành phố\s*/i, '')
+      .replace(/^Quận\s*/i, '')
+      .replace(/^Huyện\s*/i, '')
+      .replace(/^Phường\s*/i, '')
+      .replace(/^Xã\s*/i, '')
+      .trim();
+  }
+
+  // API request event from AI
+  const geminiSuggestionRequest = async () => {
+    setAiLoading(true)
+    setAiFilterShowed(true);
+    try {
+      const response = await axiosInstance.get('/search/ai-search');
+      if (response.status && response.data.matchedEvents) {
+        setAiFilterEvents(response.data.matchedEvents);
+        CustomSuccessToast(response.data.message);
+      }
+    } catch (error) {
+      CustomFailedToast(error.response.data.message);
+    } finally {
+      setTimeout(() => {
+        setAiLoading(false);
+      }, 10000);
+    }
+  }
+
+  const handleSearchByRating = async () => {
+    // Kiểm tra nếu searchRating là 0 (chưa chọn mức đánh giá)
+    if (searchRating === 0) {
+      // Không làm gì khi searchRating là 0, tránh gửi yêu cầu không cần thiết
+      return;
+    }
+  
+    try {
+      setIsLoading(true);
+      setFilteredEvents([]);
+  
+      const response = await axios.get(`http://localhost:5000/search/rating-search`, {
+        params: { rating: searchRating } // Gửi rating như một tham số rõ ràng
+      });
+  
+      if (response.data.status === 'success' && response.data.mapEvents) {
+        setFilteredEvents(response.data.mapEvents);
+        if (response.data.mapEvents.length === 0) {
+          console.log("Không tìm thấy sự kiện phù hợp với mức đánh giá này!");
+        } else {
+          console.log(response.data.message);
+        }
+      } else {
+        setFilteredEvents([]);
+        CustomFailedToast(response.data.message || "Không tìm thấy sự kiện!");
+      }
+    } catch (error) {
+      console.error("Lỗi ở hàm handleSearchByRating:", {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+      setEvents([]);
+      CustomFailedToast("Đã xảy ra lỗi khi tìm kiếm theo đánh giá!");
+    } finally {
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 1000);
+    }
+  };
+
+  console.log(JSON.stringify(searchFilters, null, 2))
+
+  console.log(aiFilterEvents.length)
 
   // State for sort option
   const [sortOption, setSortOption] = useState("startDate")
@@ -123,12 +198,40 @@ export default function VolunteerEventSearch() {
 
   // Handle input changes
   const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setSearchFilters({
-      ...searchFilters,
-      [name]: value,
-    })
-  }
+    const { name, value } = e.target;
+
+    // Nếu là provinceName thì xử lý lại giá trị
+    if (name === "province") {
+      setSearchFilters(prev => ({
+        ...prev,
+        province: extractLocationName(value),  // Lưu tên tỉnh đã được xử lý
+        provinceName: value
+      }));
+    } else if (name === 'district') {
+      setSearchFilters(prev => ({
+        ...prev,
+        district: extractLocationName(value),  // Lưu tên tỉnh đã được xử lý
+        districtName: value
+      }));
+    } else if (name === 'ward') {
+      setSearchFilters(prev => ({
+        ...prev,
+        ward: extractLocationName(value),  // Lưu tên tỉnh đã được xử lý
+        wardName: value
+      }));
+    } else {
+      setSearchFilters(prev => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+  };
+
+  console.log(`Length filter event: ${filteredEvents.length}`)
+
+  useEffect(() => {
+    getAllCategory();
+  }, [])
 
   // Handle search submission
   const handleSearch = (e) => {
@@ -137,50 +240,41 @@ export default function VolunteerEventSearch() {
   }
 
   // Filter events based on search criteria
-  const filterEvents = () => {
-    setIsLoading(true) // Bắt đầu loading
+  const filterEvents = async () => {
+    try {
+      setIsLoading(true);
 
-    setTimeout(() => { // Giả lập thời gian xử lý
-      const filtered = events.filter((event) => {
-        // Filter by name
-        if (searchFilters.name && !event.name.toLowerCase().includes(searchFilters.name.toLowerCase())) {
-          return false
-        }
+      const params = {};
 
-        // Filter by location
-        if (searchFilters.location && !event.location.toLowerCase().includes(searchFilters.location.toLowerCase())) {
-          return false
-        }
+      if (searchFilters.name) params.name = searchFilters.name;
+      if (searchFilters.province) params.province = searchFilters.province;
+      if (searchFilters.district) params.district = searchFilters.district;
+      if (searchFilters.ward) params.ward = searchFilters.ward;
+      if (searchFilters.startDate) params.startDate = searchFilters.startDate;
+      if (searchFilters.endDate) params.endDate = searchFilters.endDate;
+      if (searchFilters.category) params.category = searchFilters.category;
 
-        // Filter by start date
-        if (searchFilters.startDate && new Date(event.startDate) < new Date(searchFilters.startDate)) {
-          return false
-        }
+      if (Object.keys(params).length === 0) {
+        CustomFailedToast("Vui lòng điền ít nhất một tiêu chí tìm kiếm!");
+        setIsLoading(false);
+        return;
+      }
 
-        // Filter by end date
-        if (searchFilters.endDate && new Date(event.endDate) > new Date(searchFilters.endDate)) {
-          return false
-        }
-
-        // Filter by category
-        if (searchFilters.category && event.category !== searchFilters.category) {
-          return false
-        }
-
-        // Filter by map area (simplified)
-        if (mapArea) {
-          // In a real implementation, check if event coordinates are within the map bounds
-          // This is just a placeholder
-          return true
-        }
-
-        return true
+      const response = await axios.get(`http://localhost:5000/search/e-search`, {
+        params: params
       })
 
-      // Sort the filtered events
-      sortEvents(filtered, sortOption)
-      setIsLoading(false) // Kết thúc loading
-    }, 1000) // Giả lập trễ 1 giây (tùy chỉnh)
+      if (response.data && response.data.events) {
+        setFilteredEvents(response.data.events);
+      } 
+
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 1000)
+    }
   }
 
   // Sort events based on selected option
@@ -212,133 +306,270 @@ export default function VolunteerEventSearch() {
   const resetFilters = () => {
     setSearchFilters({
       name: "",
-      location: "",
+      province: "",
+      provinceName: "",
+      district: "",
+      districtName: "",
+      ward: "",
+      wardName: "",
       startDate: "",
       endDate: "",
       category: "",
+      rating: ""
     })
     setFilteredEvents(events)
     setSortOption("startDate")
   }
 
-  const handleGoToDetail = () => {
-    navigate('/event-detail');
+  const handleNavigate = (path, eventId) => {
+    console.log(`Navigating to ${path} for event ${eventId}`)
+    // In a real app with React Router, you would use:
+    // navigate(path, { state: { eventId } })
   }
+
+
+  useEffect(() => {
+    if (searchFilters.provinceName) {
+      const selectedProvince = provinces.find(p => p.name === searchFilters.provinceName);
+      if (selectedProvince) {
+        fetchDistricts(selectedProvince.code); // Gửi đúng code
+      }
+
+      setSearchFilters(prev => ({
+        ...prev,
+        district: '',
+        ward: ''
+      }));
+      setWards([]);
+    } else {
+      setDistricts([]);
+      setWards([]);
+    }
+  }, [searchFilters.province, provinces]); // <-- thêm 'provinces' để đảm bảo có dữ liệu
+
+
+  // Fetch wards when district changes
+  useEffect(() => {
+    if (searchFilters.districtName) {
+      const selectedDistrict = districts.find(d => d.name === searchFilters.districtName);
+      if (selectedDistrict) {
+        fetchWards(selectedDistrict.code);
+      }
+
+      setSearchFilters(prev => ({
+        ...prev,
+        ward: ''
+      }));
+    } else {
+      setWards([]);
+    }
+  }, [searchFilters.district, districts]); // <-- thêm 'districts' để đảm bảo có dữ liệu
+
+
 
   // Effect to filter events when search filters change
   useEffect(() => {
     filterEvents()
   }, [sortOption, mapArea])
 
+  // Fetch provinces on component mount
+  useEffect(() => {
+    fetchProvinces()
+  }, [])
+
+  // Cập nhật ref mỗi lần searchFilters thay đổi
+  useEffect(() => {
+    searchFilterRef.current = searchFilters;
+  }, [searchFilters]);
+
+  useEffect(() => {
+    handleSearchByRating();
+  }, [searchRating])
 
   return (
     <>
+    <CustomToast/>
       <Container fluid className={`py-4 p-5 mt-4`}>
-        <h1 className="mb-4 text-center" style={{ color: customStyles.primaryColor }}>
-          Tìm kiếm dịch vụ thiện nguyện
-        </h1>
+
+        {/* AI gợi ý */}
+        {
+          aiFilterShowed ? (aiLoading ? (
+            <CareNetLoading />
+          ) : aiFilterEvents.length > 0 ? (
+            <EventCardSlider
+              events={aiFilterEvents}
+              title="Sự kiện được gợi ý bởi AI CareNet"
+              subtitle="Khám phá các sự kiện phù hợp với bạn"
+              customStyles={customStyles}
+              currentUser={currentUser}
+              onNavigate={handleNavigate}
+            />
+          ) : (
+            <div className="text-center p-5 rounded" style={{ backgroundColor: "white" }}>
+              <Filter size={48} className="mb-3 text-muted" />
+              <h4>Không sự kiện phù hợp nào được tìm thấy</h4>
+              <p className="text-muted">Hãy thử tìm kiếm theo những tiêu chí khác</p>
+              <Button
+                onClick={resetFilters}
+                style={{
+                  backgroundColor: customStyles.primaryColor,
+                  borderColor: customStyles.primaryColor,
+                }}
+              >
+                Reset tìm kiếm
+              </Button>
+            </div>
+          ))
+            : null
+        }
 
         {/* Search Form */}
-        <Form onSubmit={handleSearch} className="mb-4 border-bottom-1 rounded shadow-sm" style={{ backgroundColor: "white" }}>
-          <Row className="g-3">
-            <Col md={4}>
-              <InputGroup>
-                <InputGroup.Text>
-                  <Search size={16} />
-                </InputGroup.Text>
-                <Form.Control
-                  name="name"
-                  value={searchFilters.name}
-                  onChange={handleInputChange}
-                  placeholder="Event name"
-                />
-              </InputGroup>
-            </Col>
+        <form onSubmit={handleSearch} className={searchStyles.searchForm}>
+          <div className={searchStyles.formGrid}>
+            <div className={searchStyles.inputGroup}>
+              <div className={searchStyles.iconWrapper}>
+                <Search className={searchStyles.icon} />
+              </div>
+              <input
+                type="text"
+                name="name"
+                value={searchFilters.name}
+                onChange={handleInputChange}
+                placeholder="Tên sự kiện"
+                className={searchStyles.input}
+              />
+            </div>
 
-            <Col md={4}>
-              <InputGroup>
-                <InputGroup.Text>
-                  <MapPin size={16} />
-                </InputGroup.Text>
-                <Form.Control
-                  name="location"
-                  value={searchFilters.location}
-                  onChange={handleInputChange}
-                  placeholder="Location"
-                />
-              </InputGroup>
-            </Col>
+            <div className={searchStyles.selectGroup}>
+              <div className={searchStyles.iconWrapper}>
+                <Filter className={searchStyles.icon} />
+              </div>
+              <select
+                name="province"
+                value={searchFilters.provinceName}  // Đảm bảo giá trị province được lưu dưới dạng tên đã xử lý
+                onChange={handleInputChange}
+                className={searchStyles.select}
+              >
+                <option value="">Thành phố / Tỉnh</option>
+                {provinces.map((province) => (
+                  <option key={province.code} value={province.name}>
+                    {province.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-            <Col md={4}>
-              <Form.Select name="category" value={searchFilters.category} onChange={handleInputChange}>
+            <div className={searchStyles.selectGroup}>
+              <div className={searchStyles.iconWrapper}>
+                <Filter className={searchStyles.icon} />
+              </div>
+              <select
+                name="district"
+                value={searchFilters.districtName}  // Đảm bảo giá trị district được lưu dưới dạng tên đã xử lý
+                onChange={handleInputChange}
+                className={searchStyles.select}
+                disabled={!searchFilters.province}
+              >
+                <option value="">Quận</option>
+                {districts.map((district) => (
+                  <option key={district.code} value={district.name}>
+                    {district.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className={searchStyles.selectGroup}>
+              <div className={searchStyles.iconWrapper}>
+                <Filter className={searchStyles.icon} />
+              </div>
+              <select
+                name="ward"
+                value={searchFilters.wardName}  // Đảm bảo giá trị ward được lưu dưới dạng tên đã xử lý
+                onChange={handleInputChange}
+                className={searchStyles.select}
+                disabled={!searchFilters.district}
+              >
+                <option value="">Phường / Xã</option>
+                {wards.map((ward) => (
+                  <option key={ward.code} value={ward.name}>
+                    {ward.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className={searchStyles.selectGroup}>
+              <div className={searchStyles.iconWrapper}>
+                <Filter className={searchStyles.icon} />
+              </div>
+              <select name="category" value={searchFilters.category} onChange={handleInputChange} className={searchStyles.select}>
                 <option value="">Tất cả các lĩnh vực</option>
                 {categories.map((category, index) => (
                   <option key={index} value={category}>
                     {category}
                   </option>
                 ))}
-              </Form.Select>
-            </Col>
+              </select>
+            </div>
 
-            <Col md={3}>
-              <InputGroup>
-                <InputGroup.Text>
-                  <Calendar size={16} />
-                </InputGroup.Text>
-                <Form.Control
-                  type="date"
-                  name="startDate"
-                  value={searchFilters.startDate}
-                  onChange={handleInputChange}
-                  placeholder="Start Date"
-                />
-              </InputGroup>
-            </Col>
+            <div className={searchStyles.inputGroup}>
+              <div className={searchStyles.iconWrapper}>
+                <Calendar className={searchStyles.icon} />
+              </div>
+              <input
+                type="date"
+                name="startDate"
+                value={searchFilters.startDate}
+                onChange={handleInputChange}
+                placeholder="Ngày bắt đầu"
+                className={searchStyles.input}
+              />
+            </div>
 
-            <Col md={3}>
-              <InputGroup>
-                <InputGroup.Text>
-                  <Calendar size={16} />
-                </InputGroup.Text>
-                <Form.Control
-                  type="date"
-                  name="endDate"
-                  value={searchFilters.endDate}
-                  onChange={handleInputChange}
-                  placeholder="End Date"
-                />
-              </InputGroup>
-            </Col>
+            <div className={searchStyles.inputGroup}>
+              <div className={searchStyles.iconWrapper}>
+                <Calendar className={searchStyles.icon} />
+              </div>
+              <input
+                type="date"
+                name="endDate"
+                value={searchFilters.endDate}
+                onChange={handleInputChange}
+                placeholder="Ngày kết thúc"
+                className={searchStyles.input}
+              />
+            </div>
 
-            <Col md={6} className="d-flex gap-2">
-              <Button
-                type="submit"
-                className="flex-grow-1"
-                style={{
-                  backgroundColor: customStyles.primaryColor,
-                  borderColor: customStyles.primaryColor,
-                }}
-              >
+            <div className={searchStyles.buttonGroup}>
+              <button type="submit" className={searchStyles.searchButton}>
+                <Search className={searchStyles.buttonIcon} />
                 Tìm kiếm sự kiện
-              </Button>
-              <Button variant="outline-secondary" onClick={resetFilters}>
-                Tải lại
-              </Button>
-            </Col>
-          </Row>
-        </Form>
+              </button>
+            </div>
+
+            <div className={searchStyles.buttonGroup}>
+              <button type="button" className={searchStyles.aiButton} onClick={() => geminiSuggestionRequest()}>
+                <Sparkles className={searchStyles.buttonIcon} />
+                CareNet tìm giúp
+              </button>
+            </div>
+          </div>
+        </form>
 
         <Row>
           {/* Map Filter (Left Side) */}
           <Col lg={3} className="mb-4">
             <Card className="">
-              <Card.Header style={{ backgroundColor: customStyles.primaryColor, color: "white" }}>
-                <h5 className="text-center mb-0">Chọn từ Map</h5>
-              </Card.Header>
+
               <Card.Body className="p-0">
                 {/* Placeholder for map - in a real implementation, you would integrate a map library here */}
                 <div>
-                  <MapComponent />
+                  <MapComponent
+                    province={searchFilters.province}
+                    district={searchFilters.district}
+                    ward={searchFilters.ward}
+                  />
                   {/* Simplified map markers for demonstration */}
                   {filteredEvents.map((event, index) => (
                     <div
@@ -348,8 +579,6 @@ export default function VolunteerEventSearch() {
                         width: "12px",
                         height: "12px",
                         backgroundColor: customStyles.primaryColor,
-                        left: `${(event.coordinates.lng - 106.65) * 500}px`,
-                        top: `${(10.8 - event.coordinates.lat) * 500}px`,
                         cursor: "pointer",
                       }}
                       title={event.name}
@@ -359,8 +588,117 @@ export default function VolunteerEventSearch() {
               </Card.Body>
             </Card>
 
+            {/* Rating */}
+            <form onSubmit={handleSearchByRating}>
+              <Card className="mt-3 shadow">
+                <Card.Header className="text-center fw-bold fs-5">
+                  Tìm kiếm theo đánh giá tổ chức
+                </Card.Header>
+                <Card.Body>
+                  {/* 5 sao */}
+                  <FormCheck
+                    type="radio"
+                    name="rating"
+                    id="rating-5"
+                    value={5}
+                    checked={searchRating === 5}
+                    onChange={(e) => setSearchRating(Number(e.target.value))}
+                    label={
+                      <span>
+                        {[...Array(5)].map((_, i) => (
+                          <BsStarFill key={i} color="#ffc107" />
+                        ))}
+                        <span> (5.0)</span>
+                      </span>
+                    }
+                  />
+
+                  {/* 4 sao trở lên */}
+                  <FormCheck
+                    type="radio"
+                    name="rating"
+                    id="rating-4"
+                    value={4}
+                    checked={searchRating === 4}
+                    onChange={(e) => setSearchRating(Number(e.target.value))}
+                    label={
+                      <span>
+                        {[...Array(4)].map((_, i) => (
+                          <BsStarFill key={i} color="#ffc107" />
+                        ))}
+                        <BsStar color="#ccc" /> <span> (4.0 trở lên)</span>
+                      </span>
+                    }
+                  />
+
+                  {/* 3 sao trở lên */}
+                  <FormCheck
+                    type="radio"
+                    name="rating"
+                    id="rating-3"
+                    value={3}
+                    checked={searchRating === 3}
+                    onChange={(e) => setSearchRating(Number(e.target.value))}
+                    label={
+                      <span>
+                        {[...Array(3)].map((_, i) => (
+                          <BsStarFill key={i} color="#ffc107" />
+                        ))}
+                        {[...Array(2)].map((_, i) => (
+                          <BsStar key={i} color="#ccc" />
+                        ))}
+                        <span> (3.0 trở lên)</span>
+                      </span>
+                    }
+                  />
+
+                  {/* 2 sao trở lên */}
+                  <FormCheck
+                    type="radio"
+                    name="rating"
+                    id="rating-2"
+                    value={2}
+                    checked={searchRating === 2}
+                    onChange={(e) => setSearchRating(Number(e.target.value))}
+                    label={
+                      <span>
+                        {[...Array(2)].map((_, i) => (
+                          <BsStarFill key={i} color="#ffc107" />
+                        ))}
+                        {[...Array(3)].map((_, i) => (
+                          <BsStar key={i} color="#ccc" />
+                        ))}
+                        <span> (2.0 trở lên)</span>
+                      </span>
+                    }
+                  />
+
+                  {/* 1 sao trở lên */}
+                  <FormCheck
+                    type="radio"
+                    name="rating"
+                    id="rating-1"
+                    value={1}
+                    checked={searchRating === 1}
+                    onChange={(e) => setSearchRating(Number(e.target.value))}
+                    label={
+                      <span>
+                        {[...Array(1)].map((_, i) => (
+                          <BsStarFill key={i} color="#ffc107" />
+                        ))}
+                        {[...Array(4)].map((_, i) => (
+                          <BsStar key={i} color="#ccc" />
+                        ))}
+                        <span> (1.0 trở lên)</span>
+                      </span>
+                    }
+                  />
+                </Card.Body>
+              </Card>
+            </form>
+
             {/* Position */}
-            <Card className="mt-3">
+            <Card className="mt-3 shadow">
               <Card.Header className="text-center fw-bold fs-5">Vị trí bạn muốn </Card.Header>
               <Card.Body>
                 <FormCheck // prettier-ignore
@@ -382,6 +720,8 @@ export default function VolunteerEventSearch() {
 
               </Card.Body>
             </Card>
+
+            {/* AI gợi ý */}
 
           </Col>
 
@@ -421,69 +761,16 @@ export default function VolunteerEventSearch() {
 
             {/* Event Cards */}
             {isLoading ? (
-              <div className="text-center">
-                <Spinner animation="border" color="primary" size="sm" role="status" />
-              </div>
+              <CustomSpinner/>
             ) : (filteredEvents.length > 0 ? (
               <div className="d-grid gap-3">
                 {filteredEvents.map((event) => (
-                  <Card key={event.id} className="hover-shadow shadow mb-2 bg-white rounded" style={{ borderColor: "#e0e0e0" }}>
-                    <Card.Header className={`${styles.backgroundPrimary}`}></Card.Header>
-                    <Card.Body>
-                      <Row>
-                        <Col md={8}>
-                          <h5 className="card-title">{event.name}</h5>
-                          <h6 className="text-muted mb-2">
-                            <MapPin size={16} className="me-1" />
-                            {event.location}
-                          </h6>
-                          <p className="mb-2">{event.description}</p>
-                          <p className="mb-2 text-muted">Được tổ chức bởi: {event.organizer}</p>
-                          <Badge
-                            className="me-2"
-                            style={{
-                              backgroundColor: customStyles.primaryColor,
-                              color: "white",
-                            }}
-                          >
-                            {event.category}
-                          </Badge>
-                        </Col>
-                        <Col md={4} className="border-start">
-                          <div className="d-flex flex-column h-100 justify-content-between">
-                            <div>
-                              <div className="d-flex align-items-center mb-2">
-                                <Calendar size={16} className="me-2" style={{ color: customStyles.primaryColor }} />
-                                <div>
-                                  <div>
-                                    <strong>Bắt đầu:</strong> {formatDateVN(event.startDate)}
-                                  </div>
-                                  <div>
-                                    <strong>Kết thúc:</strong> {formatDateVN(event.endDate)}
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="d-flex align-items-center mb-3">
-                                <Users size={16} className="me-2" style={{ color: customStyles.primaryColor }} />
-                                <div>{event.participants} thành viên</div>
-                              </div>
-                            </div>
-                            {currentUser ? <Button
-                              className="button w-100"
-                              onClick={() => handleGoToDetail()}
-                              style={{
-                                backgroundColor: "white",
-                                color: customStyles.primaryColor,
-                                borderColor: customStyles.primaryColor,
-                              }}
-                            >
-                              Xem thông tin
-                            </Button> : <Alert className="text-center alert alert-warning">Vui lòng đăng nhập</Alert>}
-                          </div>
-                        </Col>
-                      </Row>
-                    </Card.Body>
-                  </Card>
+                  <EventCard
+                    event={event}
+                    currentUser={currentUser}
+                    customStyles={customStyles}
+                    formatDateVN={formatDateVN}
+                  />
                 ))}
               </div>
             ) : (

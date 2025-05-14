@@ -8,7 +8,7 @@ const Achievements = () => {
       <Row>
         <Col md={6}>
           <div className="mb-4">
-            <h2 className="fw-bold">Thành tựu</h2>
+            <h2 className={`${styles.textPrimary} fw-bold`}>Thành tựu</h2>
             <h3 className={`fw-bold ${styles.textPrimary}`}>CareNet – Kết nối & Chia sẻ</h3>
           </div>
           

@@ -17,13 +17,9 @@ const OrganizationSchema = new Schema({
     default: "inactive",
     enum: ["active", "inactive"],
   },
-  members: [{ type: Schema.ObjectId, ref: "User" }],
-  createdAt: {type: Date},
+  createdAt: {type: Date, default: Date.now},
   licenseDocuments: [{type: String, default: []}],
-  contractDocuments: [{type: String, default: []}],
   rating: {type: Number},
-  subscribedAt: { type: Date }, // Ngày nâng cấp gói
-  expiresAt: { type: Date }, // null nếu basic
 });
 
 module.exports = mongoose.model('Organization', OrganizationSchema);
