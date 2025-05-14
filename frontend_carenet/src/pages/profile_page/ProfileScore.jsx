@@ -312,6 +312,13 @@ const ProfileScore = () => {
                   >
                     <span>Certificate</span>
                   </div>
+                   <div
+                    className="menu-item"
+                    style={styles.menuItem}
+                    onClick={() => navigate("/profile-certificate-purchases")}
+                  >
+                    <span>CertificatePurchases</span>
+                  </div>
                   <div className="menu-item" style={styles.menuItem}>
                     <span>Log Out</span>
                   </div>

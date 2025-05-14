@@ -10,6 +10,7 @@ const organizationRouter = require("./routes/organization.routes");
 const certificateRoutes = require('./routes/certificate.routes');
 const attendanceRouter = require("./routes/attendance.routes");
 
+const certificatePurchaseRoutes = require('./routes/certificatepurchase.routes');
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -24,4 +25,5 @@ app.use('/organization', organizationRouter);
 app.use('/api/certificates', certificateRoutes);
 app.use('/attendance', attendanceRouter);
 
+app.use('/api/certificate-purchases', certificatePurchaseRoutes);
 module.exports = app;

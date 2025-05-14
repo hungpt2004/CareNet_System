@@ -43,6 +43,7 @@ import OrganizationEvents from './pages/organization_post_page/OrganizationEvent
 import OrganizationDashboardPage from './pages/organization_dashboard_page/OrganizationDashboardPage';
 import StaffAttendancePage from './pages/staff_attendance_page/StaffAttendancePage';
 
+import CertificatePurchasePage from './pages/profile_page/CertificatePurchasePage';
 const guestRoutes = [
   { path: '/', element: <LandingPage /> },
   { path: '/search', element: <VolunteerEventSearch /> },
@@ -71,6 +72,7 @@ const privateCustomerRoutes = [
   { path: '/profile-certificate', element: <ProfileCertificate /> },
   { path: '/feedback-page', element: <FeedbackPage /> },
   { path: '/my-events', element: <MyEventsPage /> },
+  { path: '/profile-certificate-purchases', element: <CertificatePurchasePage /> },
 ];
 
 const privateAdminRoutes = [
