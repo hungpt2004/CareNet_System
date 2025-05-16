@@ -44,11 +44,13 @@ import OrganizationDashboardPage from './pages/organization_dashboard_page/Organ
 import StaffAttendancePage from './pages/staff_attendance_page/StaffAttendancePage';
 import OrganizationStaffManagement from './pages/organization_user_page/OrganizationStaffManagement';
 import StaffLayout from './layout/StaffLayout';
+import OrganizationRegisterPage from './pages/organization_register_page/OrganizationRegisterPage';
 
 const guestRoutes = [
   { path: '/', element: <LandingPage /> },
   { path: '/search', element: <VolunteerEventSearch /> },
   { path: '/onboarding', element: <OnBoardingPage /> },
+  { path: '/organization-register', element: <OrganizationRegisterPage /> },
 ];
 
 const publicRoutes = [

@@ -29,6 +29,15 @@ exports.signUpWithUsernamePassword = asyncHandler(async (req, res, next) => {
     });
   }
 
+  // Validate dob format
+  const dobDate = new Date(dob);
+  if (isNaN(dobDate.getTime())) {
+    return res.status(500).json({
+      status: "fail",
+      message: "Định dạng ngày sinh không hợp lệ",
+    });
+  }
+
   // Kiểm tra email đã tồn tại
   const existingUser = await User.findOne({ email: email });
   if (existingUser) {
@@ -48,7 +57,7 @@ exports.signUpWithUsernamePassword = asyncHandler(async (req, res, next) => {
       email: email,
       password: hashedPassword,
       phone: phone,
-      dob: dob,
+      dob: dobDate,
       isVerified: false,
     });
 
@@ -85,6 +94,8 @@ exports.signUpWithUsernamePassword = asyncHandler(async (req, res, next) => {
 // Đăng nhập
 exports.signInWithUsernamePassword = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
+
+  console.log(req.body)
 
   if (!email || !password) {
     // Trả về status và message ở front-end thì lấy ra bằng error.response.data.status và .message

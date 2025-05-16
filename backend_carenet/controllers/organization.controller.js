@@ -3,6 +3,7 @@ const User = require("../models/user.model");
 const Event = require("../models/event.model");
 const EventRegistration = require("../models/eventRegistration.model");
 const HistoryEvent = require("../models/historyEvent.model");
+const OrganizationLevel = require("../models/organizationLevel.model");
 const asyncHandler = require("../middleware/asyncHandler");
 const { sendApproveRequest, sendRejectRequest } = require("./email.controller");
 const { getIO } = require("../socket");
@@ -180,6 +181,19 @@ exports.approveRequest = asyncHandler(async (req, res) => {
       status: "fail",
       message: "Lỗi khi duyệt yêu cầu",
     });
+  }
+});
+
+exports.approveCancelledRequest = asyncHandler(async (req, res) => {
+  const { organizationId } = req.body;
+
+  try {
+    
+  } catch (error) {
+    return res.status(500).json({
+      status: 'fail',
+      message: 'Lỗi khi duyệt yêu cầu: ' + error.message
+    })
   }
 });
 
@@ -559,6 +573,55 @@ exports.createEvent = asyncHandler(async (req, res) => {
     return res.status(500).json({
       status: 'fail',
       message: 'Lỗi khi tạo sự kiện: ' + error.message
+    });
+  }
+});
+
+exports.registerOrganization = asyncHandler(async (req, res) => {
+ 
+  const currentUser = req.user.user;
+
+  console.log(JSON.stringify(req.body, null, 2));
+
+  try {
+
+    const {name, description, phone} = req.body;
+
+    
+    // Get organization level
+    const basicLevel = await OrganizationLevel.findOne({name: 'basic'});
+
+    // Create organization
+    const newOrganization = new Organization({
+      userId: currentUser._id,
+      levelId: basicLevel._id,
+      name: name,
+      description: description,
+      phone: phone,
+      status: 'pending',
+    })
+
+    await newOrganization.save();
+
+    await User.findOneAndUpdate(
+      {_id: currentUser._id},
+      {
+        $set: {
+          organizationId: newOrganization._id
+        }
+      }
+    )
+
+    return res.status(201).json({
+      status: 'success',
+      message: 'Yêu cầu tạo thành công! Đợi duyệt',
+      organization: newOrganization
+    })
+
+  } catch (error) {
+    return res.status(500).json({
+      status: 'fail',
+      message: 'Lỗi khi đăng ký tổ chức: ' + error.message
     });
   }
 });

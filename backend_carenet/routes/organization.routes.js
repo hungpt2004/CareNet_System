@@ -12,5 +12,6 @@ OrganizationRouter.post('/approve-request/:id', OrganizationController.approveRe
 OrganizationRouter.post('/reject-request/:id', OrganizationController.rejectRequest);
 OrganizationRouter.post('/events', authenticateToken, eventImageUpload, OrganizationController.createEvent);
 OrganizationRouter.post('/events/:eventId/certificates/:userId', authenticateToken, OrganizationController.generateEventCertificate);
+OrganizationRouter.post('/register-organization', authenticateToken, OrganizationController.registerOrganization);
 
 module.exports = OrganizationRouter;

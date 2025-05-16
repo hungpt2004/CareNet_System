@@ -3,17 +3,13 @@ const EventRegistration = require("../models/eventRegistration.model");
 const HistoryEvent = require("../models/historyEvent.model");
 const asyncHandler = require("../middleware/asyncHandler");
 
-exports.approveCancelRequest = asyncHandler(async (req, res) => {
-  const { eventId } = req.body;
+exports.approveOrganizationRegister = asyncHandler(async (req, res) => {
+
+  const { organizationId } = req.body;
 
   try {
     
-   // 1. Thay đổi status của history event -> cancelled
-   // 2. Thay đổi status của event registration -> rejected
-   // 3. Logic trừ điểm
-   // 4. Trừ đí số lượng người đang tham gia (event)
-   // 5. Thêm message vào penalty log
-   // 
+   
 
 
   } catch (error) {
