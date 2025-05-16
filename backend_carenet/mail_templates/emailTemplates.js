@@ -576,11 +576,7 @@ module.exports = {
         <td>
           <!-- Logo and Header Section -->
           <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom: 20px;">
-            <tr>
-              <td align="center" style="padding: 0 0 20px 0;">
-                <img src="https://via.placeholder.com/180x60" alt="CareNet Logo" style="max-width: 180px; height: auto;" />
-              </td>
-            </tr>
+           
           </table>
           
           <!-- Main Content Container -->
@@ -598,7 +594,9 @@ module.exports = {
               <td style="padding: 40px 50px;">
                 <p style="font-size: 17px; margin-top: 0; color: #02301a;">Xin chào {userName},</p>
                 
-                <p style="font-size: 17px; color: #02301a; line-height: 1.7;">Chúng tôi rất trân trọng sự quan tâm của bạn đối với sự kiện <span style="font-weight: 600; color: #0A6B3D;">{eventName}</span> trên nền tảng <span style="font-weight: 600; color: #0A6B3D;">CareNet</span>. Tuy nhiên, chúng tôi rất tiếc phải thông báo rằng đăng ký của bạn không được chấp thuận.</p>
+                <p style="font-size: 17px; color: #02301a; line-height: 1.7;">Trước tiên, chúng tôi xin gửi lời cảm ơn chân thành đến bạn vì đã dành sự quan tâm và mong muốn tham gia sự kiện <span style="font-weight: 600; color: #0A6B3D;">{eventName}</span> trên nền tảng <span style="font-weight: 600; color: #0A6B3D;">CareNet</span>. Sự nhiệt tình và tinh thần tình nguyện của bạn thực sự đáng trân trọng.</p>
+                
+                <p style="font-size: 17px; color: #02301a; line-height: 1.7;">Chúng tôi rất tiếc phải thông báo rằng, sau khi xem xét kỹ lưỡng, chúng tôi không thể chấp nhận đăng ký của bạn cho sự kiện này. Đây là một quyết định không dễ dàng đối với chúng tôi.</p>
                 
                 <!-- Rejection Reason -->
                 <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin: 25px 0; background-color: #f5f5f5; padding: 20px; border-radius: 8px;">
@@ -610,7 +608,7 @@ module.exports = {
                   </tr>
                 </table>
                 
-                <p style="font-size: 17px; color: #02301a; line-height: 1.7;">Chúng tôi rất mong bạn tiếp tục tham gia các sự kiện khác trên CareNet. Bạn có thể xem các sự kiện sắp tới và đăng ký lại bất kỳ lúc nào.</p>
+                <p style="font-size: 17px; color: #02301a; line-height: 1.7;">Chúng tôi rất mong bạn không vì điều này mà nản lòng. CareNet có rất nhiều sự kiện ý nghĩa khác đang chờ đón sự tham gia của bạn. Chúng tôi tin rằng với tinh thần tình nguyện và sự nhiệt huyết của mình, bạn sẽ tìm được những cơ hội phù hợp để cống hiến và phát triển.</p>
                 
                 <!-- Action Button -->
                 <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin: 35px 0;">
@@ -619,7 +617,7 @@ module.exports = {
                       <table cellpadding="0" cellspacing="0" border="0">
                         <tr>
                           <td align="center" style="background-color: #0A6B3D; border-radius: 8px; box-shadow: 0 4px 12px rgba(10, 107, 61, 0.2);">
-                            <a href="{eventsLink}" target="_blank" style="display: inline-block; padding: 16px 36px; color: white; text-decoration: none; font-size: 17px; font-weight: 600; letter-spacing: 0.5px; border-radius: 8px;">Xem các sự kiện khác</a>
+                            <a href="{eventsLink}" target="_blank" style="display: inline-block; padding: 16px 36px; color: white; text-decoration: none; font-size: 17px; font-weight: 600; letter-spacing: 0.5px; border-radius: 8px;">Khám phá các sự kiện khác</a>
                           </td>
                         </tr>
                       </table>
@@ -627,7 +625,7 @@ module.exports = {
                   </tr>
                 </table>
                 
-                <p style="font-size: 17px; color: #02301a; line-height: 1.7;">Nếu bạn có bất kỳ câu hỏi nào hoặc cần hỗ trợ, vui lòng liên hệ với chúng tôi qua <a href="mailto:support@carenet.org" style="color: #0A6B3D; text-decoration: none; font-weight: 600;">support@carenet.org</a>.</p>
+                <p style="font-size: 17px; color: #02301a; line-height: 1.7;">Nếu bạn có bất kỳ thắc mắc nào hoặc cần hỗ trợ thêm, đừng ngần ngại liên hệ với chúng tôi qua <a href="mailto:support@carenet.org" style="color: #0A6B3D; text-decoration: none; font-weight: 600;">support@carenet.org</a>. Chúng tôi luôn sẵn sàng lắng nghe và hỗ trợ bạn.</p>
                 
                 <!-- Signature -->
                 <table cellpadding="0" cellspacing="0" border="0" width="100%" style="border-top: 1px solid #e3f0af; padding-top: 25px; margin-bottom: 30px;">

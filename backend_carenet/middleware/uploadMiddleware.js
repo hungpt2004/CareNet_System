@@ -82,5 +82,4 @@ const eventImageUpload = createUploadMiddleware({
 module.exports = {
   avatarUpload,
   eventImageUpload,
-  postImageUpload
 };

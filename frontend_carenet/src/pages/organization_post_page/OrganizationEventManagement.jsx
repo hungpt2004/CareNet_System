@@ -126,8 +126,11 @@ const OrganizationEvents = () => {
       render: (_, record) => (
         <Space size="middle">
           <Button 
-            type="primary" 
-            icon={<Eye size={16} />}
+            type="default" 
+            style={{
+              backgroundColor: styles.primaryColor,
+              borderColor: styles.primaryColor,
+            }}
             onClick={() => showEventDetail(record)}
           >
             Xem chi tiết
@@ -143,7 +146,7 @@ const OrganizationEvents = () => {
       {/* Table danh sách sự kiện */}
       <Card>
         <div className="mb-4">
-          <h2 className={`${styles.textPrimary} fw-bold`}>Danh sách sự kiện của tổ chức</h2>
+          <h2>Danh sách sự kiện của tổ chức</h2>
         </div>
         <Spin spinning={loading}>
           <Table
@@ -173,14 +176,19 @@ const OrganizationEvents = () => {
           <Button key="close" onClick={handleCloseModal}>
             Đóng
           </Button>,
-          <Button 
-            key="view" 
-            type="primary" 
-            onClick={() => {
-              handleCloseModal();
-              navigate(`/event-detail/${selectedEvent?._id}`);
-            }}
-          >
+          <Button
+          loading={loading}
+          key="view"
+          type="default" // tránh conflict màu của "primary"
+          style={{
+            backgroundColor: styles.primaryColor,
+            borderColor: styles.primaryColor,
+          }}
+          onClick={() => {
+            handleCloseModal();
+            navigate(`/event-detail/${selectedEvent?._id}`);
+          }}
+        >
             Xem trang chi tiết
           </Button>
         ]}

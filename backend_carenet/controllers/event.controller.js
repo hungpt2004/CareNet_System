@@ -3,6 +3,7 @@ const EventRegistration = require("../models/eventRegistration.model");
 const Feedback = require("../models/feedback.model");
 const asyncHandler = require("../middleware/asyncHandler");
 const User = require("../models/user.model");
+const Attendance = require("../models/attendance.model");
 const mongoose = require("mongoose");
 const { sendSuccessRegisterEvent } = require("./email.controller");
 const HistoryEventModel = require("../models/historyEvent.model");
@@ -101,6 +102,8 @@ exports.registerEvent = asyncHandler(async (req, res) => {
       approvedAt: null,
     });
 
+
+
     const currentEvent = await Event.findOne({ _id: id });
 
     const eventDetailsLink = `http://localhost:3000/event-detail/${id}`;
@@ -132,9 +135,18 @@ exports.registerEvent = asyncHandler(async (req, res) => {
     });
 
 
+    // Lưu vào attendance
+    const newAttendance = new Attendance({
+      eventId: id,
+      userId: currentUser._id,
+      status: "registered",
+      registeredAt: newRegistration.registeredAt,
+    });
+
     // Lưu vào database
     await newRegistration.save();
     await newHistoryEvent.save();
+    await newAttendance.save();
 
     // Update số lượng người tham gia tăng lên
     await Event.findByIdAndUpdate(id, { $inc: { currentParticipants: 1 } });

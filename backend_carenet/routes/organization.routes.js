@@ -2,6 +2,7 @@ const express = require('express');
 const OrganizationController = require('../controllers/organization.controller');
 const OrganizationRouter = express.Router();
 const { authenticateToken } = require('../middleware/isAuthenticate');
+const { eventImageUpload } = require('../middleware/uploadMiddleware');
 
 OrganizationRouter.get('/get-filtered-request/:id', OrganizationController.filterRequestsBySkills);
 OrganizationRouter.get('/get-request-event/:id', OrganizationController.getRequestEventById);
@@ -9,6 +10,7 @@ OrganizationRouter.get('/get-owned-event', authenticateToken, OrganizationContro
 OrganizationRouter.get('/get-owned-staff', authenticateToken, OrganizationController.getOwnStaff);
 OrganizationRouter.post('/approve-request/:id', OrganizationController.approveRequest);
 OrganizationRouter.post('/reject-request/:id', OrganizationController.rejectRequest);
-
+OrganizationRouter.post('/events', authenticateToken, eventImageUpload, OrganizationController.createEvent);
+OrganizationRouter.post('/events/:eventId/certificates/:userId', authenticateToken, OrganizationController.generateEventCertificate);
 
 module.exports = OrganizationRouter;

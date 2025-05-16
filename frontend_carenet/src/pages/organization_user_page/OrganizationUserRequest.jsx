@@ -4,6 +4,7 @@ import axiosInstance from "../../utils/AxiosInstance";
 import { CustomSuccessToast, CustomToast } from "../../components/toast/CustomToast";
 import CustomSpinner from "../../components/spinner/CustomSpinner";
 import io from 'socket.io-client';
+import axios from "axios";
 
 const OrganizationUserRequests = () => {
   const [loading, setLoading] = useState(false);
@@ -87,7 +88,8 @@ const OrganizationUserRequests = () => {
         return;
       }
 
-      const response = await axiosInstance.post(`/organization/approve-request/${requestId}`, {
+      // Tương tác API duyệt yêu cầu
+      const response = await axios.post(`http://localhost:5000/organization/approve-request/${requestId}`, {
         fullname: requestToApprove.user?.fullname,
         email: requestToApprove.user?.email,
       });
@@ -129,7 +131,7 @@ const OrganizationUserRequests = () => {
     try {
       setLoading(true);
       const values = await rejectForm.validateFields();
-      const response = await axiosInstance.post(`/organization/reject-request/${requestId}`, {
+      const response = await axios.post(`http://localhost:5000/organization/reject-request/${requestId}`, {
         cancellationReason: values.reason
       });
       if (response.data.status === "success") {

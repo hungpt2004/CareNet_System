@@ -62,6 +62,23 @@ const CustomNavbarLogged = () => {
       setNotifications(prev => [newNotification, ...prev]);
     });
 
+    // Lắng nghe sự kiện requestRejected
+    socketRef.current.on('requestRejected', (data) => {
+      console.log('Received requestRejected event:', data);
+      const newNotification = {
+        id: Date.now(),
+        message: data.message,
+        time: 'Vừa xong',
+        eventId: data.eventId,
+        eventTitle: data.eventTitle,
+        startAt: data.startAt,
+        endAt: data.endAt,
+        location: data.location
+      };
+
+      setNotifications(prev => [newNotification, ...prev]);
+    });
+
     return () => {
       if (currentUser?._id) {
         console.log('Leaving user room:', currentUser._id);

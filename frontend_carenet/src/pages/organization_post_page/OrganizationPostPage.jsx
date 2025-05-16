@@ -15,9 +15,11 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import CustomProgressBar from '../../components/progressbar/CustomProgressBar';
 import axiosInstance from '../../utils/AxiosInstance';
-import { CustomToast } from '../../components/toast/CustomToast';
+import { CustomFailedToast, CustomSuccessToast, CustomToast } from '../../components/toast/CustomToast';
 import { IoMdPerson } from 'react-icons/io';
 import { PlusOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
+import useAuthStore from "../../hooks/authStore";
 
 const { TextArea } = Input;
 const { RangePicker } = DatePicker;
@@ -45,8 +47,12 @@ const LocationSelector = ({ onLocationChange }) => {
 
 const OrganizationPostPage = () => {
   const [form] = Form.useForm();
+  const [eventImageForm] = Form.useForm();
+  const [certificateImageForm] = Form.useForm();
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [eventImageLoading, setEventImageLoading] = useState(false);
+  const [certificateImageLoading, setCertificateImageLoading] = useState(false);
   const [questions, setQuestions] = useState([]);
   const [staffList, setStaffList] = useState([]);
   const [customCategories, setCustomCategories] = useState([]);
@@ -59,6 +65,11 @@ const OrganizationPostPage = () => {
     district: '',
     province: ''
   });
+  const navigate = useNavigate();
+  const currentUser = useAuthStore((state) => state.currentUser);
+  const [selectedStaff, setSelectedStaff] = useState(null);
+  const [eventImages, setEventImages] = useState([]);
+  const [certificateImage, setCertificateImage] = useState(null);
 
   // Fetch staff list when component mounts
   useEffect(() => {
@@ -67,7 +78,7 @@ const OrganizationPostPage = () => {
 
   const fetchStaffList = async () => {
     try {
-      const response = await axiosInstance.get('/organization/get-own-staff');
+      const response = await axiosInstance.get('/organization/get-owned-staff');
       if (response.data.status === 'success') {
         setStaffList(response.data.staff);
       }
@@ -83,6 +94,12 @@ const OrganizationPostPage = () => {
       latitude: lat,
       longitude: lng
     }));
+  };
+
+  // Handle staff selection change
+  const handleStaffChange = (staffId) => {
+    const staff = staffList.find(s => s._id === staffId);
+    setSelectedStaff(staff);
   };
 
   const steps = [
@@ -118,11 +135,11 @@ const OrganizationPostPage = () => {
               style={{ width: '100%' }}
               tokenSeparators={[',']}
               options={[
-                { value: 'education', label: 'Giáo dục' },
-                { value: 'health', label: 'Y tế' },
-                { value: 'environment', label: 'Môi trường' },
-                { value: 'community', label: 'Cộng đồng' },
-                { value: 'children', label: 'Trẻ em' },
+                { value: 'Giáo dục', label: 'Giáo dục' },
+                { value: 'Y tế', label: 'Y tế' },
+                { value: 'Môi trường', label: 'Môi trường' },
+                { value: 'Cộng đồng', label: 'Cộng đồng' },
+                { value: 'Trẻ em', label: 'Trẻ em' },
                 ...customCategories.map(cat => ({ value: cat, label: cat }))
               ]}
               onSelect={(value) => {
@@ -144,11 +161,11 @@ const OrganizationPostPage = () => {
               style={{ width: '100%' }}
               tokenSeparators={[',']}
               options={[
-                { value: 'communication', label: 'Giao tiếp' },
-                { value: 'leadership', label: 'Lãnh đạo' },
-                { value: 'teamwork', label: 'Làm việc nhóm' },
-                { value: 'teaching', label: 'Giảng dạy' },
-                { value: 'medical', label: 'Y tế' },
+                { value: 'Giao tiếp', label: 'Giao tiếp' },
+                { value: 'Lãnh đạo', label: 'Lãnh đạo' },
+                { value: 'Làm việc nhóm', label: 'Làm việc nhóm' },
+                { value: 'Giảng dạy', label: 'Giảng dạy' },
+                { value: 'Y tế', label: 'Y tế' },
                 ...customSkills.map(skill => ({ value: skill, label: skill }))
               ]}
               onSelect={(value) => {
@@ -167,6 +184,7 @@ const OrganizationPostPage = () => {
             <Select
               placeholder="Chọn nhân viên phụ trách"
               style={{ width: '100%' }}
+              onChange={handleStaffChange}
             >
               {staffList.map(staff => (
                 <Select.Option key={staff._id} value={staff._id}>
@@ -249,22 +267,39 @@ const OrganizationPostPage = () => {
       icon: <Upload size={20} />,
       content: (
         <>
-          <Form.Item
-            name="images"
-            label="Hình ảnh sự kiện"
-            rules={[{ required: true, message: 'Vui lòng tải lên ít nhất 1 hình ảnh!' }]}
+          <Form
+            form={eventImageForm}
+            onFinish={handleEventImageSubmit}
+            layout="vertical"
           >
-            <AntUpload
-              listType="picture-card"
-              multiple
-              beforeUpload={() => false}
+            <Form.Item
+              name="images"
+              label="Hình ảnh sự kiện"
+              rules={[{ required: true, message: 'Vui lòng tải lên ít nhất 1 hình ảnh!' }]}
             >
-              <div>
-                <Upload size={20} />
-                <div style={{ marginTop: 8 }}>Tải lên</div>
-              </div>
-            </AntUpload>
-          </Form.Item>
+              <AntUpload
+                listType="picture-card"
+                multiple
+                beforeUpload={() => false}
+              >
+                <div>
+                  <Upload size={20} />
+                  <div style={{ marginTop: 8 }}>Tải lên</div>
+                </div>
+              </AntUpload>
+            </Form.Item>
+
+            <Form.Item>
+              <Button 
+                type="primary" 
+                htmlType="submit" 
+                loading={eventImageLoading}
+                style={{ marginBottom: 24 }}
+              >
+                Tải lên ảnh sự kiện
+              </Button>
+            </Form.Item>
+          </Form>
 
           <Form.Item
             name="requiredItems"
@@ -299,6 +334,73 @@ const OrganizationPostPage = () => {
               style={{ width: '100%' }}
             />
           </Form.Item>
+
+          <Divider>Thông tin chứng chỉ</Divider>
+
+          <Form.Item
+            name="certificateTitle"
+            label="Tiêu đề chứng chỉ"
+            rules={[{ required: true, message: 'Vui lòng nhập tiêu đề chứng chỉ!' }]}
+          >
+            <Input placeholder="Ví dụ: Chứng nhận tham gia tình nguyện" />
+          </Form.Item>
+
+          <Form.Item
+            name="certificateDescription"
+            label="Nội dung chứng chỉ"
+            rules={[{ required: true, message: 'Vui lòng nhập nội dung chứng chỉ!' }]}
+          >
+            <TextArea 
+              rows={4} 
+              placeholder="Ví dụ: Chứng nhận [Tên tình nguyện viên] đã tham gia và hoàn thành xuất sắc sự kiện [Tên sự kiện]..."
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="certificateTemplate"
+            label="Mẫu chứng chỉ"
+          >
+            <Select
+              placeholder="Chọn mẫu chứng chỉ"
+              style={{ width: '100%' }}
+            >
+              <Select.Option value="classic">Mẫu cổ điển</Select.Option>
+              <Select.Option value="modern">Mẫu hiện đại</Select.Option>
+              <Select.Option value="minimal">Mẫu tối giản</Select.Option>
+            </Select>
+          </Form.Item>
+
+          <Form
+            form={certificateImageForm}
+            onFinish={handleCertificateImageSubmit}
+            layout="vertical"
+          >
+            <Form.Item
+              name="certificateLogo"
+              label="Logo chứng chỉ"
+            >
+              <AntUpload
+                listType="picture-card"
+                maxCount={1}
+                beforeUpload={() => false}
+              >
+                <div>
+                  <Upload size={20} />
+                  <div style={{ marginTop: 8 }}>Tải lên logo</div>
+                </div>
+              </AntUpload>
+            </Form.Item>
+
+            <Form.Item>
+              <Button 
+                type="primary" 
+                htmlType="submit" 
+                loading={certificateImageLoading}
+              >
+                Tải lên logo chứng chỉ
+              </Button>
+            </Form.Item>
+          </Form>
         </>
       )
     },
@@ -310,44 +412,46 @@ const OrganizationPostPage = () => {
           <Form.Item
             name={['contact', 'name']}
             label="Tên người liên hệ"
+            initialValue={currentUser?.fullname}
             rules={[{ required: true, message: 'Vui lòng nhập tên!' }]}
           >
-            <Input prefix={<Info size={16} />} />
+            <Input prefix={<Info size={16} />} disabled />
           </Form.Item>
 
           <Form.Item
             name={['contact', 'phone']}
             label="Số điện thoại"
+            initialValue={currentUser?.phone}
             rules={[
               { required: true, message: 'Vui lòng nhập số điện thoại!' },
               { pattern: /^[0-9]{10}$/, message: 'Số điện thoại không hợp lệ!' }
             ]}
           >
-            <Input prefix={<Phone size={16} />} />
+            <Input prefix={<Phone size={16} />} disabled />
           </Form.Item>
 
           <Form.Item
             name={['contact', 'email']}
             label="Email"
+            initialValue={currentUser?.email}
             rules={[
               { required: true, message: 'Vui lòng nhập email!' },
               { type: 'email', message: 'Email không hợp lệ!' }
             ]}
           >
-            <Input prefix={<Mail size={16} />} />
+            <Input prefix={<Mail size={16} />} disabled />
           </Form.Item>
 
           <Form.Item
             name={['contact', 'checker']}
             label="Người phụ trách"
+            initialValue={selectedStaff?.email}
             rules={[
-              { required: true, message: 'Vui lòng nhập email!' },
-              { type: 'email', message: 'Email không hợp lệ!' }
+              { required: true, message: 'Vui lòng chọn người phụ trách!' }
             ]}
           >
-            <Input prefix={<IoMdPerson size={16} />} />
+            <Input prefix={<IoMdPerson size={16} />} disabled />
           </Form.Item>
-
         </>
       )
     },
@@ -471,6 +575,17 @@ const OrganizationPostPage = () => {
     }
   ];
 
+  // Update contact info when staff is selected
+  useEffect(() => {
+    if (selectedStaff) {
+      form.setFieldsValue({
+        contact: {
+          checker: selectedStaff.email
+        }
+      });
+    }
+  }, [selectedStaff, form]);
+
   const handleNext = () => {
     form.validateFields().then(() => {
       setCurrentStep(currentStep + 1);
@@ -481,37 +596,116 @@ const OrganizationPostPage = () => {
     setCurrentStep(currentStep - 1);
   };
 
+  const handleEventImageSubmit = async (values) => {
+    try {
+      setEventImageLoading(true);
+      const formData = new FormData();
+      
+      if (values.images && values.images.length > 0) {
+        values.images.forEach((image) => {
+          if (image.originFileObj) {
+            formData.append('images', image.originFileObj);
+          }
+        });
+      }
+
+      const response = await axiosInstance.post('/organization/upload-event-images', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      if (response.data.status === 'success') {
+        CustomSuccessToast("Tải lên ảnh sự kiện thành công!");
+        setEventImages(response.data.images);
+        eventImageForm.resetFields();
+      }
+    } catch (error) {
+      console.error('Error uploading event images:', error);
+      CustomFailedToast("Tải lên ảnh sự kiện thất bại!");
+    } finally {
+      setEventImageLoading(false);
+    }
+  };
+
+  const handleCertificateImageSubmit = async (values) => {
+    try {
+      setCertificateImageLoading(true);
+      const formData = new FormData();
+      
+      if (values.certificateLogo && values.certificateLogo.length > 0) {
+        formData.append('certificateLogo', values.certificateLogo[0].originFileObj);
+      }
+
+      const response = await axiosInstance.post('/organization/upload-certificate-logo', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      if (response.data.status === 'success') {
+        CustomSuccessToast("Tải lên logo chứng chỉ thành công!");
+        setCertificateImage(response.data.imageUrl);
+        certificateImageForm.resetFields();
+      }
+    } catch (error) {
+      console.error('Error uploading certificate logo:', error);
+      CustomFailedToast("Tải lên logo chứng chỉ thất bại!");
+    } finally {
+      setCertificateImageLoading(false);
+    }
+  };
+
   const handleSubmit = async (values) => {
     try {
       setLoading(true);
-      const formData = {
-        ...values,
-        startAt: values.timeRange[0].toISOString(),
-        endAt: values.timeRange[1].toISOString(),
-        location: {
-          ...values.location,
-          latitude: location.latitude,
-          longitude: location.longitude
-        },
-        formData: {
-          questions: questions
-        },
-        status: 'hiring',
-        staffId: values.staffId,
-        categories: values.category,
-        skills: values.skills
-      };
+      
+      const formData = new FormData();
+      
+      // Thêm các trường cơ bản
+      formData.append('title', values.title);
+      formData.append('description', values.description);
+      formData.append('category', JSON.stringify(values.category));
+      formData.append('skills', JSON.stringify(values.skills));
+      formData.append('staffId', values.staffId);
+      formData.append('timeRange', JSON.stringify(values.timeRange));
+      formData.append('location', JSON.stringify({
+        ...values.location,
+        latitude: location.latitude,
+        longitude: location.longitude
+      }));
+      formData.append('maxParticipants', values.maxParticipants);
+      formData.append('donationTarget', values.donationTarget);
+      formData.append('contact', JSON.stringify(values.contact));
+      formData.append('formData', JSON.stringify({ questions }));
+      
+      // Thêm thông tin chứng chỉ
+      formData.append('certificateTitle', values.certificateTitle);
+      formData.append('certificateDescription', values.certificateDescription);
+      formData.append('certificateTemplate', values.certificateTemplate);
+      formData.append('eventImages', JSON.stringify(eventImages));
+      formData.append('certificateImage', certificateImage);
 
-      const response = await axiosInstance.post('/event/create', formData);
-      if (response.data.status === 'success') {
-        message.success('Tạo sự kiện thành công!');
+      const response = await axiosInstance.post('/organization/events', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      if (response.data.status === 'success' && response.data.event) {
+        CustomSuccessToast("Tạo sự kiện thành công!")
         form.resetFields();
+        eventImageForm.resetFields();
+        certificateImageForm.resetFields();
         setQuestions([]);
+        setEventImages([]);
+        setCertificateImage(null);
         setCurrentStep(0);
+        navigate('/owner-finished-events');
       }
     } catch (error) {
       console.error('Error creating event:', error);
-      message.error('Có lỗi xảy ra khi tạo sự kiện!');
+      CustomFailedToast("Tạo sự kiện thất bại!")
     } finally {
       setLoading(false);
     }

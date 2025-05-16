@@ -51,9 +51,11 @@ function MyEventsPage() {
 
    // Fetch user's registered events
    const fetchUserEvents = async () => {
+      console.log('Fetching user events...');
       setIsLoading(true);
       try {
          const response = await axiosInstance.get("/event/get-my-events");
+         console.log('Fetch user events response:', response.data);
          setEvents(response.data.events);
       } catch (error) {
          console.error("Error fetching events:", error);
@@ -90,7 +92,13 @@ function MyEventsPage() {
       // Lắng nghe sự kiện requestApproved
       socketRef.current.on('requestApproved', (data) => {
          console.log('Received requestApproved event in MyEventsPage:', data);
-         // Refresh danh sách sự kiện khi có thông báo mới
+         fetchUserEvents();
+      });
+
+      // Lắng nghe sự kiện requestRejected
+      socketRef.current.on('requestRejected', (data) => {
+         console.log('Received requestRejected event in MyEventsPage:', data);
+         console.log('Calling fetchUserEvents after rejection...');
          fetchUserEvents();
       });
 
@@ -206,6 +214,23 @@ function MyEventsPage() {
       setSelectedEventForCancel(null);
    };
 
+   // Handle certificate generation
+   const handleGenerateCertificate = async (eventId, userId) => {
+      try {
+         const response = await axiosInstance.post(`/organization/events/${eventId}/certificates/${userId}`);
+         if (response.data.status === 'success') {
+            CustomToast.success('Tạo chứng chỉ thành công');
+            // Mở chứng chỉ trong tab mới
+            window.open(response.data.certificateUrl, '_blank');
+            // Refresh danh sách sự kiện
+            fetchUserEvents();
+         }
+      } catch (error) {
+         console.error('Error generating certificate:', error);
+         CustomToast.error('Không thể tạo chứng chỉ');
+      }
+   };
+
    // Table columns configuration
    const columns = [
       {
@@ -277,7 +302,7 @@ function MyEventsPage() {
                >
                   Chi tiết
                </Button>
-               {record.status === "approved" && (
+               {record.status === "approved" || record.status === "waiting" && (
                   <Button
                      variant="outline-danger"
                      size="sm"
@@ -287,13 +312,24 @@ function MyEventsPage() {
                   </Button>
                )}
                {record.status === "approved" && (
-                  <Button
-                     variant="outline-success"
-                     size="sm"
-                     onClick={() => handlePurchaseCertificate(record._id)}
-                  >
-                     <Award size={16} className="me-1" /> Chứng chỉ
-                  </Button>
+                  <>
+                     <Button
+                        variant="outline-success"
+                        size="sm"
+                        onClick={() => handleGenerateCertificate(record.event._id, currentUser._id)}
+                     >
+                        <Award size={16} className="me-1" /> Tạo chứng chỉ
+                     </Button>
+                     {record.certificateUrl && (
+                        <Button
+                           variant="outline-info"
+                           size="sm"
+                           onClick={() => window.open(record.certificateUrl, '_blank')}
+                        >
+                           <Eye size={16} className="me-1" /> Xem chứng chỉ
+                        </Button>
+                     )}
+                  </>
                )}
             </Space>
          ),

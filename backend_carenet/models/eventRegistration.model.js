@@ -15,6 +15,14 @@ const EventRegistrationSchema = new Schema({
    cancellationReason: { type: String, default: null},
    approvedBy: { type: mongoose.Schema.Types.ObjectId, ref: "Admin", default: null},
    approvedAt: { type: Date, default: null},
+   certificateUrl: {
+     type: String
+   },
+   certificateGeneratedAt: {
+     type: Date
+   }
+ }, {
+   timestamps: true,
  });
 
  

@@ -1,5 +1,11 @@
 const emailTransporter = require("../services/transporterEmail");
-const { VERIFICATION_EMAIL_TEMPLATE, SUCCESS_REGISTER_TEMPLATE, APPROVE_REGISTER_TEMPLATE, THANK_YOU_TEMPLATE } = require("../mail_templates/emailTemplates");
+const { 
+   VERIFICATION_EMAIL_TEMPLATE, 
+   SUCCESS_REGISTER_TEMPLATE, 
+   APPROVE_REGISTER_TEMPLATE, 
+   THANK_YOU_TEMPLATE, 
+   REJECT_REGISTER_TEMPLATE 
+} = require("../mail_templates/emailTemplates");
 const { formatDateVN } = require("../utils/formatDateVN");
 require('dotenv').config();
 
@@ -108,4 +114,30 @@ exports.sendThankYouMail = async (
    }
 }
 
-
+exports.sendRejectRequest = async (
+   userName,
+   email,
+   eventName,
+   eventStartAt,
+   eventEndAt,
+   eventLocation,
+   rejectionReason,
+   eventsLink
+) => {
+   try { 
+      await emailTransporter.sendMail({
+         from: process.env.EMAIL_USERNAME,
+         to: email,
+         subject: "Thông báo từ chối tham gia sự kiện",
+         html: REJECT_REGISTER_TEMPLATE
+         .replace("{userName}", userName)
+         .replace("{eventName}", eventName)
+         .replace("{eventStartAt}", formatDateVN(eventStartAt))
+         .replace("{eventEndAt}", formatDateVN(eventEndAt))
+         .replace("{eventLocation}", eventLocation)
+         .replace("{rejectionReason}", rejectionReason)
+      })
+   } catch (error) {
+      console.log(error)
+   }
+}
