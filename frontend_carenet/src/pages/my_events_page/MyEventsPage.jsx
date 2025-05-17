@@ -5,7 +5,7 @@ import { Table, Tag, Space, Image } from "antd";
 import { motion, AnimatePresence } from "framer-motion";
 import axiosInstance from "../../utils/AxiosInstance";
 import useAuthStore from "../../hooks/authStore";
-import { CustomToast } from "../../components/toast/CustomToast";
+import { CustomFailedToast, CustomSuccessToast, CustomToast } from "../../components/toast/CustomToast";
 import CustomSpinner from "../../components/spinner/CustomSpinner";
 import io from 'socket.io-client';
 import { formatDateVN } from "../../utils/FormatDateVN";
@@ -43,6 +43,10 @@ function MyEventsPage() {
    const [selectedEvent, setSelectedEvent] = useState(null);
    const [showModal, setShowModal] = useState(false);
    const [isLoading, setIsLoading] = useState(false);
+   const [certificateLink, setCertificateLink] = useState(null);
+   const [showCertificateModal, setShowCertificateModal] = useState(false);
+   const [selectedCertificate, setSelectedCertificate] = useState(null);
+   const [isGeneratingCertificate, setIsGeneratingCertificate] = useState(false);
    const socketRef = useRef(null);
    const currentUser = useAuthStore((state) => state.currentUser);
    const [showCancelModal, setShowCancelModal] = useState(false);
@@ -63,6 +67,49 @@ function MyEventsPage() {
          setTimeout(() => {
             setIsLoading(false);
          }, 1500);
+      }
+   };
+
+   const handleGenerateCertificate = async (eventId) => {
+      console.log("Generating certificate for event:", eventId);
+      setIsGeneratingCertificate(true);
+      try {
+         const response = await axiosInstance.post('/certificates/create-certificate', {
+            eventId: eventId
+         });
+
+         if(response.data.status === 'success' && response.data.certificate){
+            setCertificateLink(response.data.certificate.certificateUrl);
+            setSelectedCertificate(response.data.certificate);
+            CustomSuccessToast('Tạo chứng chỉ thành công');
+            fetchUserEvents();
+         }
+      } catch (error) {
+         console.error('Error generating certificate:', error);
+         CustomFailedToast('Không thể tạo chứng chỉ');
+      } finally {
+         setIsGeneratingCertificate(false);
+      }
+   };
+
+   const handleViewCertificate = (certificate) => {
+      setSelectedCertificate(certificate);
+      setShowCertificateModal(true);
+   };
+
+   const handlePurchaseCertificate = async (certificateId) => {
+      try {
+         const response = await axiosInstance.post('/certificates/purchase', {
+            certificateId: certificateId
+         });
+         if (response.data.status === 'success') {
+            CustomSuccessToast('Thanh toán thành công');
+            // Refresh certificate data
+            fetchUserEvents();
+         }
+      } catch (error) {
+         console.error('Error purchasing certificate:', error);
+         CustomFailedToast('Không thể thanh toán chứng chỉ');
       }
    };
 
@@ -163,14 +210,10 @@ function MyEventsPage() {
       setShowModal(true);
    };
 
-   // Handle certificate purchase
-   const handlePurchaseCertificate = async (eventId) => {
-      // Implement certificate purchase logic here
-      console.log("Purchase certificate for event:", eventId);
-   };
-
-   const fullAddressGenerate = (address) => {
-      return `${address.street}, ${address.ward}, ${address.district}, ${address.province}`;
+   // Handle cancel button click
+   const handleCancelClick = (record) => {
+      setSelectedEventForCancel(record);
+      setShowCancelModal(true);
    };
 
    // Calculate reputation penalty based on time difference
@@ -183,12 +226,6 @@ function MyEventsPage() {
       if (hoursDiff > 24) return 2;
       if (hoursDiff > 0) return 10;
       return 15; // For no-show
-   };
-
-   // Handle cancel button click
-   const handleCancelClick = (record) => {
-      setSelectedEventForCancel(record);
-      setShowCancelModal(true);
    };
 
    // Handle cancel confirmation
@@ -212,23 +249,6 @@ function MyEventsPage() {
       setShowCancelModal(false);
       setCancelReason('');
       setSelectedEventForCancel(null);
-   };
-
-   // Handle certificate generation
-   const handleGenerateCertificate = async (eventId, userId) => {
-      try {
-         const response = await axiosInstance.post(`/organization/events/${eventId}/certificates/${userId}`);
-         if (response.data.status === 'success') {
-            CustomToast.success('Tạo chứng chỉ thành công');
-            // Mở chứng chỉ trong tab mới
-            window.open(response.data.certificateUrl, '_blank');
-            // Refresh danh sách sự kiện
-            fetchUserEvents();
-         }
-      } catch (error) {
-         console.error('Error generating certificate:', error);
-         CustomToast.error('Không thể tạo chứng chỉ');
-      }
    };
 
    // Table columns configuration
@@ -308,7 +328,7 @@ function MyEventsPage() {
                      size="sm"
                      onClick={() => handleCancelClick(record)}
                   >
-                     <X size={16} className="me-1" /> Hủy
+                      Hủy
                   </Button>
                )}
                {record.status === "approved" && (
@@ -316,17 +336,25 @@ function MyEventsPage() {
                      <Button
                         variant="outline-success"
                         size="sm"
-                        onClick={() => handleGenerateCertificate(record.event._id, currentUser._id)}
+                        onClick={() => handleGenerateCertificate(record.event._id)}
+                        disabled={isGeneratingCertificate}
                      >
-                        <Award size={16} className="me-1" /> Tạo chứng chỉ
+                        {isGeneratingCertificate ? (
+                           <>
+                              <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                              Đang tạo...
+                           </>
+                        ) : (
+                           'Tạo chứng chỉ'
+                        )}
                      </Button>
-                     {record.certificateUrl && (
+                     {certificateLink && (
                         <Button
                            variant="outline-info"
                            size="sm"
-                           onClick={() => window.open(record.certificateUrl, '_blank')}
+                           onClick={() => handleViewCertificate(record)}
                         >
-                           <Eye size={16} className="me-1" /> Xem chứng chỉ
+                            Xem chứng chỉ
                         </Button>
                      )}
                   </>
@@ -421,7 +449,7 @@ function MyEventsPage() {
                                              <MapPin size={18} className="me-2" style={{ color: customStyles.primaryColor }} />
                                              <div>
                                                 <div className="fw-bold">Địa điểm</div>
-                                                <div>{fullAddressGenerate(selectedEvent.location) || "Không xác định"}</div>
+                                                <div>{(selectedEvent.location.province) || "Không xác định"}</div>
                                              </div>
                                           </div>
 
@@ -542,6 +570,92 @@ function MyEventsPage() {
                            disabled={!cancelReason.trim()}
                         >
                            Xác nhận hủy
+                        </Button>
+                     </Modal.Footer>
+                  </Modal>
+
+                  {/* Certificate Preview Modal */}
+                  <Modal
+                     show={showCertificateModal}
+                     onHide={() => setShowCertificateModal(false)}
+                     size="lg"
+                     centered
+                  >
+                     <Modal.Header closeButton>
+                        <Modal.Title>Xem trước chứng chỉ</Modal.Title>
+                     </Modal.Header>
+                     <Modal.Body>
+                        {selectedCertificate && (
+                           <div className="text-center">
+                              <div className="position-relative mb-4">
+                                 <Image
+                                    src={certificateLink}
+                                    alt="Certificate Preview"
+                                    style={{
+                                       width: '100%',
+                                       height: 'auto',
+                                       filter: 'blur(4px)',
+                                       transition: 'filter 0.3s ease'
+                                    }}
+                                    preview={false}
+                                 />
+                                 <div 
+                                    className="position-absolute top-50 start-50 translate-middle text-center w-100"
+                                    style={{
+                                       background: 'rgba(255, 255, 255, 0.95)',
+                                       padding: '2rem',
+                                       borderRadius: '1rem',
+                                       boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                                    }}
+                                 >
+                                    <h4 className="mb-3" style={{ color: '#5DB996' }}>Chứng chỉ đã sẵn sàng</h4>
+                                    <p className="text-muted mb-4">
+                                       Để tải xuống và in chứng chỉ với chất lượng cao, vui lòng thanh toán phí 30.000đ
+                                    </p>
+                                    <div className="d-flex justify-content-center gap-3">
+                                       <Button
+                                          variant="primary"
+                                          size="lg"
+                                          onClick={() => handlePurchaseCertificate(selectedCertificate._id)}
+                                          style={{
+                                             backgroundColor: '#5DB996',
+                                             borderColor: '#5DB996',
+                                             padding: '0.5rem 2rem'
+                                          }}
+                                       >
+                                          Thanh toán ngay
+                                       </Button>
+                                       <Button
+                                          variant="outline-secondary"
+                                          size="lg"
+                                          disabled
+                                          style={{
+                                             padding: '0.5rem 2rem'
+                                          }}
+                                       >
+                                          <i className="fas fa-download me-2"></i>
+                                          Tải xuống
+                                       </Button>
+                                       <Button
+                                          variant="outline-secondary"
+                                          size="lg"
+                                          disabled
+                                          style={{
+                                             padding: '0.5rem 2rem'
+                                          }}
+                                       >
+                                          <i className="fas fa-print me-2"></i>
+                                          In chứng chỉ
+                                       </Button>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                        )}
+                     </Modal.Body>
+                     <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setShowCertificateModal(false)}>
+                           Đóng
                         </Button>
                      </Modal.Footer>
                   </Modal>

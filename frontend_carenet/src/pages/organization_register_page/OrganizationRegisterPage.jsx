@@ -10,7 +10,6 @@ import {
 import { PlusOutlined } from '@ant-design/icons';
 import axiosInstance from '../../utils/AxiosInstance';
 import { CustomFailedToast, CustomSuccessToast, CustomToast } from '../../components/toast/CustomToast';
-import { useNavigate } from 'react-router-dom';
 import styles from '../../css/AppColors.module.css';
 
 const { TextArea } = Input;
@@ -24,7 +23,7 @@ const OrganizationRegisterPage = () => {
    const [licenseDocuments, setLicenseDocuments] = useState([]);
    const [currentStep, setCurrentStep] = useState(0);
    const [organizationId, setOrganizationId] = useState(null);
-   const navigate = useNavigate();
+   const [fileList, setFileList] = useState([]);
 
    const handleSubmit = async (values) => {
       try {
@@ -63,10 +62,14 @@ const OrganizationRegisterPage = () => {
          setLicenseLoading(true);
          const formData = new FormData();
          
-         if (values.documents && values.documents.length > 0) {
-            values.documents.forEach((doc) => {
-               if (doc.originFileObj) {
-                  formData.append('documents', doc.originFileObj);
+         console.log('Debug - Values:', values);
+         console.log('Debug - FileList:', fileList);
+         
+         if (fileList && fileList.length > 0) {
+            fileList.forEach((file, index) => {
+               console.log(`Debug - File ${index}:`, file);
+               if (file.originFileObj) {
+                  formData.append('documents', file.originFileObj);
                }
             });
          } else {
@@ -75,19 +78,26 @@ const OrganizationRegisterPage = () => {
             return;
          }
 
+         // Log FormData contents
+         for (let pair of formData.entries()) {
+            console.log('Debug - FormData:', pair[0], pair[1]);
+         }
+
          formData.append('organizationId', organizationId);
 
-         const response = await axiosInstance.post('/api/images/upload-organization-documents', formData, {
+         const response = await axiosInstance.post('/images/upload-organization-documents', formData, {
             headers: {
                'Content-Type': 'multipart/form-data'
             }
          });
 
+         console.log('Debug - Response:', response.data);
+
          if (response.data.status === 'success' && response.data.documents) {
             CustomSuccessToast("Tải lên giấy phép thành công!");
             setLicenseDocuments(response.data.documents.map(doc => doc.url));
+            setFileList([]);
             licenseForm.resetFields();
-            navigate('/organization/login');
          } else {
             throw new Error('Upload failed');
          }
@@ -197,15 +207,16 @@ const OrganizationRegisterPage = () => {
                      name="documents"
                      label={<Text strong>Giấy phép hoạt động</Text>}
                      rules={[
-                        { required: true, message: 'Vui lòng tải lên ít nhất 1 giấy phép!' },
+                        { required: true, message: 'Vui lòng tải lên ít nhất 1 giấy tờ!' },
                         {
                            validator: (_, value) => {
-                              if (value && value.length > 0) {
-                                 const isLt5M = value.every(file => file.size / 1024 / 1024 < 5);
+                              console.log('Debug - Validator value:', value);
+                              if (fileList && fileList.length > 0) {
+                                 const isLt5M = fileList.every(file => file.size / 1024 / 1024 < 5);
                                  if (!isLt5M) {
                                     return Promise.reject('Kích thước file không được vượt quá 5MB!');
                                  }
-                                 const isValidType = value.every(file =>
+                                 const isValidType = fileList.every(file =>
                                     ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'].includes(file.type)
                                  );
                                  if (!isValidType) {
@@ -220,7 +231,9 @@ const OrganizationRegisterPage = () => {
                      <AntUpload
                         listType="picture-card"
                         multiple
+                        fileList={fileList}
                         beforeUpload={(file) => {
+                           console.log('Debug - Before upload file:', file);
                            const isLt5M = file.size / 1024 / 1024 < 5;
                            if (!isLt5M) {
                               CustomFailedToast('Kích thước file không được vượt quá 5MB!');
@@ -233,8 +246,10 @@ const OrganizationRegisterPage = () => {
                            }
                            return false;
                         }}
-                        onChange={({ fileList }) => {
-                           licenseForm.setFieldsValue({ documents: fileList });
+                        onChange={({ fileList: newFileList }) => {
+                           console.log('Debug - Upload onChange fileList:', newFileList);
+                           setFileList(newFileList);
+                           licenseForm.setFieldsValue({ documents: newFileList });
                         }}
                         className="custom-upload"
                         accept=".pdf,.jpg,.jpeg,.png"

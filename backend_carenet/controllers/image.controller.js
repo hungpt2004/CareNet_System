@@ -1,43 +1,49 @@
 const { cloudinary } = require("../services/uploadCloundinary");
-const {
-  eventImageUpload,
-  organizationDocumentUpload,
-} = require("../middleware/uploadMiddleware");
 const Organization = require("../models/organization.model");
+const Event = require("../models/event.model");
 
 // Upload ảnh sự kiện
 exports.uploadEventImages = async (req, res) => {
+
+  const { eventId } = req.body;
+
   try {
-    // Sử dụng middleware eventImageUpload
-    eventImageUpload(req, res, async (err) => {
-      if (err) {
-        return res.status(400).json({
-          status: "error",
-          message: "Lỗi khi tải lên ảnh sự kiện",
-          error: err.message,
-        });
-      }
-
-      if (!req.files || req.files.length === 0) {
-        return res.status(400).json({
-          status: "error",
-          message: "Vui lòng chọn ít nhất một ảnh",
-        });
-      }
-
-      // Lấy danh sách URL của các ảnh đã upload
-      const images = req.files.map((file) => ({
-        url: file.path,
-        public_id: file.filename,
-        originalname: file.originalname,
-      }));
-
-      return res.status(200).json({
-        status: "success",
-        message: "Tải lên ảnh sự kiện thành công",
-        images,
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({
+        status: "error",
+        message: "Vui lòng chọn ít nhất một ảnh",
       });
+    }
+
+    // Lấy danh sách URL của các ảnh đã upload
+    const images = req.files.map((file) => ({
+      url: file.path,
+      public_id: file.filename,
+      originalname: file.originalname,
+    }));
+
+    const documents = req.files.map((file) => ({
+      url: file.path,
+      public_id: file.filename,
+      originalname: file.originalname,
+      type: file.mimetype,
+    }));
+
+    const eventUrls = documents.map((doc) => doc.url);
+
+    const updatedEvent = await Event.findByIdAndUpdate(eventId, {
+      $set: { images: eventUrls},
+    }, { new: true });
+
+    console.log('Updated event:', updatedEvent);
+
+    return res.status(200).json({
+      status: "success",
+      message: "Tải lên ảnh sự kiện thành công",
+      images,
+      updatedEvent,
     });
+
   } catch (error) {
     console.error("Error in uploadEventImages:", error);
     return res.status(500).json({
@@ -51,19 +57,32 @@ exports.uploadEventImages = async (req, res) => {
 // Upload giấy tờ tổ chức
 exports.uploadOrganizationDocuments = async (req, res) => {
   const currentUser = req.user.user;
+  const { organizationId } = req.body;
+  console.log("Debug - Starting uploadOrganizationDocuments controller");
+  console.log("Debug - Current user:", currentUser);
+  console.log("Debug - Request files:", req.files);
 
   try {
     // Lấy organizationId từ currentUser
-    const organizationId = currentUser.organizationId;
+    // const organizationId = currentUser.organizationId;
+    console.log("Debug - Organization ID:", organizationId);
+
+    if (!organizationId) {
+      console.log("Debug - No organization ID found for user");
+      return res.status(400).json({
+        status: "error",
+        message:
+          "Không tìm thấy thông tin tổ chức. Vui lòng đăng ký tổ chức trước.",
+      });
+    }
 
     if (!req.files || req.files.length === 0) {
+      console.log("Debug - No files found in request");
       return res.status(400).json({
         status: "error",
         message: "Vui lòng chọn ít nhất một giấy tờ",
       });
     }
-
-    console.log(req.files);
 
     // Lấy danh sách URL của các giấy tờ đã upload
     const documents = req.files.map((file) => ({
@@ -74,12 +93,22 @@ exports.uploadOrganizationDocuments = async (req, res) => {
     }));
 
     // Cập nhật licenseDocuments trong Organization
-    const documentUrls = documents.map(doc => doc.url);
-    await Organization.findByIdAndUpdate(
-      organizationId,
+    const documentUrls = documents.map((doc) => doc.url);
+    const updatedOrganization = await Organization.findOneAndUpdate(
+      { _id: organizationId },
       { $set: { licenseDocuments: documentUrls } },
       { new: true }
     );
+
+    if (!updatedOrganization) {
+      console.log("Debug - Organization not found:", organizationId);
+      return res.status(404).json({
+        status: "error",
+        message: "Không tìm thấy thông tin tổ chức",
+      });
+    }
+
+    console.log("Debug - Updated organization:", updatedOrganization);
 
     return res.status(200).json({
       status: "success",

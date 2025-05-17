@@ -46,6 +46,12 @@ const EventSchema = new mongoose.Schema({
     default: "hiring",
   },
 
+  adminStatus: {
+    type: String,
+    enum: ["pending", "approved", "rejected"],
+    default: "pending",
+  },
+
   createdAt: { type: Date, default: Date.now },
 
   acceptDate: { type: Date, default: Date.now },
@@ -64,25 +70,12 @@ const EventSchema = new mongoose.Schema({
     },
   ],
 
-  // Lọc theo nguoi dung phu hop voi skill need
-
   // Certificate fields
-  certificateTitle: {
-    type: String,
-    default: "Chứng nhận tham gia tình nguyện"
-  },
-  certificateDescription: {
-    type: String,
-    default: "Chứng nhận đã tham gia và hoàn thành xuất sắc sự kiện"
-  },
-  certificateTemplate: {
-    type: String,
-    enum: ["classic", "modern", "minimal"],
-    default: "classic"
-  },
-  certificateLogo: {
-    type: String
-  }
+  // certificateId: { type: mongoose.Schema.Types.ObjectId, ref: "Certificate", default: null},
+
+  // certificateLink: { type: String, default: null},
+
+
 }, {
   timestamps: true,
 });

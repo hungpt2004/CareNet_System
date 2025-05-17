@@ -10,7 +10,7 @@ OrganizationRouter.get('/get-owned-event', authenticateToken, OrganizationContro
 OrganizationRouter.get('/get-owned-staff', authenticateToken, OrganizationController.getOwnStaff);
 OrganizationRouter.post('/approve-request/:id', OrganizationController.approveRequest);
 OrganizationRouter.post('/reject-request/:id', OrganizationController.rejectRequest);
-OrganizationRouter.post('/events', authenticateToken, eventImageUpload, OrganizationController.createEvent);
+OrganizationRouter.post('/create-events', authenticateToken, OrganizationController.createEvent);
 OrganizationRouter.post('/events/:eventId/certificates/:userId', authenticateToken, OrganizationController.generateEventCertificate);
 OrganizationRouter.post('/register-organization', authenticateToken, OrganizationController.registerOrganization);
 

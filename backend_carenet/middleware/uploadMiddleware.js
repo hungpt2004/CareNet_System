@@ -66,8 +66,38 @@ const organizationDocumentUpload = createUploadMiddleware({
   allowedFormats: ['jpg', 'jpeg', 'png', 'pdf'],
   transformation: [{ quality: 'auto:best' }],
   maxFileSize: 5 * 1024 * 1024 // 5MB
-}).array('documents', 5);
+}).array('documents', 10);
 
+// Middleware upload certifcateQR
+// Được phép upload 1 file (ảnh hoặc PDF)
+const certificateQRupload = createUploadMiddleware({
+  folder: 'certificate',
+  allowedFormats: ['jpg', 'jpeg', 'png', 'pdf'],
+  transformation: [{ quality: 'auto:best' }],
+  maxFileSize: 5 * 1024 * 1024 // 5MB
+});
+
+
+// Add debug logs
+const debugOrganizationDocumentUpload = (req, res, next) => {
+  console.log('Debug - Starting organization document upload middleware');
+  console.log('Debug - Request headers:', req.headers);
+  console.log('Debug - Request body:', req.body);
+  
+  organizationDocumentUpload(req, res, (err) => {
+    if (err) {
+      console.error('Debug - Upload error:', err);
+      return res.status(400).json({
+        status: 'error',
+        message: 'Upload failed',
+        error: err.message
+      });
+    }
+    console.log('Debug - Upload successful');
+    console.log('Debug - Files:', req.files);
+    next();
+  });
+};
 
 // Dữ liệu trả về từ cloudinary ví dụ
 /*
@@ -88,6 +118,6 @@ const organizationDocumentUpload = createUploadMiddleware({
 module.exports = {
   avatarUpload,
   eventImageUpload,
-  organizationDocumentUpload,
+  organizationDocumentUpload: debugOrganizationDocumentUpload,
   createUploadMiddleware
 };

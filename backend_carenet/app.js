@@ -16,13 +16,18 @@ app.use(cors());
 app.use(express.json());
 app.use(sessionMiddleware);
 
+app.use((err, req, res, next) => {
+   console.error(err.stack);
+   res.status(500).json({ message: 'Có lỗi xảy ra!', error: err.message });
+});
+
 app.use('/auth', authRouter)
 app.use('/volunteer', userRouter)
 app.use('/search', searchRouter);
 app.use('/event', eventRouter);
 app.use('/feedback', feedbackRouter);
 app.use('/organization', organizationRouter);
-app.use('/api/certificates', certificateRoutes);
+app.use('/certificates', certificateRoutes);
 app.use('/attendance', attendanceRouter);
 app.use('/images', imageRouter);
 

@@ -8,8 +8,7 @@ const asyncHandler = require("../middleware/asyncHandler");
 const { sendApproveRequest, sendRejectRequest } = require("./email.controller");
 const { getIO } = require("../socket");
 const { generateCertificate } = require("../services/certificate.service");
-const cloudinary = require("cloudinary");
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 exports.getOwnEvent = asyncHandler(async (req, res) => {
   const currentUser = req.user.user;
@@ -188,12 +187,11 @@ exports.approveCancelledRequest = asyncHandler(async (req, res) => {
   const { organizationId } = req.body;
 
   try {
-    
   } catch (error) {
     return res.status(500).json({
-      status: 'fail',
-      message: 'Lỗi khi duyệt yêu cầu: ' + error.message
-    })
+      status: "fail",
+      message: "Lỗi khi duyệt yêu cầu: " + error.message,
+    });
   }
 });
 
@@ -416,28 +414,30 @@ exports.generateEventCertificate = asyncHandler(async (req, res) => {
     // Lấy thông tin sự kiện và người dùng
     const event = await Event.findById(eventId);
     const user = await User.findById(userId);
-    
+
     const registration = await EventRegistration.findOne({
       event: eventId,
       user: userId,
-      status: 'approved'
+      status: "approved",
     });
 
     if (!event || !user || !registration) {
       return res.status(404).json({
-        status: 'fail',
-        message: 'Không tìm thấy thông tin sự kiện hoặc người dùng'
+        status: "fail",
+        message: "Không tìm thấy thông tin sự kiện hoặc người dùng",
       });
     }
 
     // Tạo dữ liệu cho chứng chỉ
     const certificateData = {
-      title: event.certificateTitle || 'Chứng nhận tham gia tình nguyện',
-      description: event.certificateDescription || `Chứng nhận ${user.fullname} đã tham gia và hoàn thành xuất sắc sự kiện ${event.title}`,
+      title: event.certificateTitle || "Chứng nhận tham gia tình nguyện",
+      description:
+        event.certificateDescription ||
+        `Chứng nhận ${user.fullname} đã tham gia và hoàn thành xuất sắc sự kiện ${event.title}`,
       recipientName: user.fullname,
-      issueDate: new Date().toLocaleDateString('vi-VN'),
-      template: event.certificateTemplate || 'classic',
-      logo: event.certificateLogo
+      issueDate: new Date().toLocaleDateString("vi-VN"),
+      template: event.certificateTemplate || "classic",
+      logo: event.certificateLogo,
     };
 
     // Tạo chứng chỉ
@@ -445,28 +445,27 @@ exports.generateEventCertificate = asyncHandler(async (req, res) => {
 
     if (!result.success) {
       return res.status(500).json({
-        status: 'fail',
-        message: 'Không thể tạo chứng chỉ: ' + result.error
+        status: "fail",
+        message: "Không thể tạo chứng chỉ: " + result.error,
       });
     }
 
     // Cập nhật thông tin chứng chỉ vào registration
     await EventRegistration.findByIdAndUpdate(registration._id, {
       certificateUrl: result.certificateUrl,
-      certificateGeneratedAt: new Date()
+      certificateGeneratedAt: new Date(),
     });
 
     return res.status(200).json({
-      status: 'success',
-      message: 'Tạo chứng chỉ thành công',
-      certificateUrl: result.certificateUrl
+      status: "success",
+      message: "Tạo chứng chỉ thành công",
+      certificateUrl: result.certificateUrl,
     });
-
   } catch (error) {
-    console.error('Error generating certificate:', error);
+    console.error("Error generating certificate:", error);
     return res.status(500).json({
-      status: 'fail',
-      message: 'Lỗi khi tạo chứng chỉ: ' + error.message
+      status: "fail",
+      message: "Lỗi khi tạo chứng chỉ: " + error.message,
     });
   }
 });
@@ -482,64 +481,85 @@ exports.createEvent = asyncHandler(async (req, res) => {
       timeRange,
       location,
       maxParticipants,
-      donationTarget,
-      contact,
       formData,
-      certificateTitle,
-      certificateDescription,
-      certificateTemplate
     } = req.body;
 
-    console.log('Request body:', req.body);
-    console.log('Request files:', req.files);
+    console.log("Request body:", req.body);
 
     // Validate required fields
     if (!title || !description || !staffId || !timeRange || !location) {
       return res.status(400).json({
-        status: 'fail',
-        message: 'Thiếu thông tin bắt buộc'
+        status: "fail",
+        message: "Thiếu thông tin bắt buộc",
       });
     }
 
     // Validate staffId format
     if (!mongoose.Types.ObjectId.isValid(staffId)) {
       return res.status(400).json({
-        status: 'fail',
-        message: 'ID nhân viên không hợp lệ'
+        status: "fail",
+        message: "ID nhân viên không hợp lệ",
       });
     }
 
     // Lấy thông tin organization từ user hiện tại
     const currentUser = req.user.user;
-    const organization = await Organization.findOne({ _id: currentUser.organizationId });
+    const organization = await Organization.findOne({
+      _id: currentUser.organizationId,
+    });
 
     if (!organization) {
       return res.status(404).json({
-        status: 'fail',
-        message: 'Không tìm thấy thông tin tổ chức'
+        status: "fail",
+        message: "Không tìm thấy thông tin tổ chức",
       });
     }
 
+    // Xử lý location data
+    const locationData = {
+      street: location.street || null,
+      ward: location.ward || null,
+      district: location.district || null,
+      province: location.province || "Đà Nẵng",
+      country: "Việt Nam",
+      fullAddress: [
+        location.street,
+        location.ward,
+        location.district,
+        location.province,
+      ]
+        .filter(Boolean)
+        .join(", "),
+    };
+
+    // Xử lý formData
+    const processedFormData = {
+      questions: Array.isArray(formData?.questions)
+        ? formData.questions.map((q) => ({
+            question: q.question || "",
+            type: q.type || "text",
+            options: Array.isArray(q.options) ? q.options : [],
+          }))
+        : [],
+    };
+
     // Check if the staffId is valid
     const staff = await User.findOneAndUpdate(
-      {_id: new mongoose.Types.ObjectId(staffId)},
+      { _id: new mongoose.Types.ObjectId(staffId) },
       {
         $set: {
           status: "busy",
-        }
+        },
       },
       { new: true }
     );
 
     if (!staff) {
       return res.status(404).json({
-        status: 'fail',
-        message: 'Không tìm thấy nhân viên phụ trách'
+        status: "fail",
+        message: "Không tìm thấy nhân viên phụ trách",
       });
     }
-
-    // Lấy URLs của ảnh đã upload
-    const imageUrls = req.files ? req.files.map(file => file.path) : [];
 
     // Tạo event mới
     const newEvent = await Event.create({
@@ -551,45 +571,39 @@ exports.createEvent = asyncHandler(async (req, res) => {
       startAt: timeRange[0],
       endAt: timeRange[1],
       organizationId: organization._id,
-      location,
-      images: imageUrls,
+      location: locationData,
       maxParticipants: maxParticipants || 0,
-      donationTarget: donationTarget || 0,
-      formData,
-      status: 'hiring',
-      certificateTitle: certificateTitle || '',
-      certificateDescription: certificateDescription || '',
-      certificateTemplate: certificateTemplate || 'classic'
+      formData: processedFormData,
+      status: "hiring",
+      adminStatus: "pending",
     });
+
+    console.log("New event:", newEvent);
 
     return res.status(201).json({
-      status: 'success',
-      message: 'Tạo sự kiện thành công',
-      event: newEvent
+      status: "success",
+      message: "Tạo sự kiện thành công",
+      event: newEvent,
     });
-
   } catch (error) {
-    console.error('Error creating event:', error);
+    console.error("Error creating event:", error);
     return res.status(500).json({
-      status: 'fail',
-      message: 'Lỗi khi tạo sự kiện: ' + error.message
+      status: "fail",
+      message: "Lỗi khi tạo sự kiện: " + error.message,
     });
   }
 });
 
 exports.registerOrganization = asyncHandler(async (req, res) => {
- 
   const currentUser = req.user.user;
 
   console.log(JSON.stringify(req.body, null, 2));
 
   try {
+    const { name, description, phone } = req.body;
 
-    const {name, description, phone} = req.body;
-
-    
     // Get organization level
-    const basicLevel = await OrganizationLevel.findOne({name: 'basic'});
+    const basicLevel = await OrganizationLevel.findOne({ name: "basic" });
 
     // Create organization
     const newOrganization = new Organization({
@@ -598,30 +612,32 @@ exports.registerOrganization = asyncHandler(async (req, res) => {
       name: name,
       description: description,
       phone: phone,
-      status: 'pending',
-    })
+      status: "pending",
+    });
+
+    // Update user with new organizationId
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: currentUser._id },
+      {
+        $set: {
+          organizationId: newOrganization._id,
+        },
+      },
+      { new: true } // Return the updated document
+    );
 
     await newOrganization.save();
 
-    await User.findOneAndUpdate(
-      {_id: currentUser._id},
-      {
-        $set: {
-          organizationId: newOrganization._id
-        }
-      }
-    )
-
     return res.status(201).json({
-      status: 'success',
-      message: 'Yêu cầu tạo thành công! Đợi duyệt',
-      organization: newOrganization
-    })
-
+      status: "success",
+      message: "Yêu cầu tạo thành công! Đợi duyệt",
+      organization: newOrganization,
+      user: updatedUser, // Return the updated user data
+    });
   } catch (error) {
     return res.status(500).json({
-      status: 'fail',
-      message: 'Lỗi khi đăng ký tổ chức: ' + error.message
+      status: "fail",
+      message: "Lỗi khi đăng ký tổ chức: " + error.message,
     });
   }
 });
