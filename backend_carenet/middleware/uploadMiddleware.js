@@ -80,7 +80,19 @@ const eventImageUpload = createUploadMiddleware({
 // Middleware đã giúp upload nên không cần xử lý trong controller
 // Chỉ cần lấy địa chỉ file lưu vào database => req.file.path (url)
 
+// Middleware upload CCCD images
+const cccdUpload = createUploadMiddleware({
+  folder: 'cccd',
+  allowedFormats: ['jpg', 'jpeg', 'png'],
+  transformation: [
+    { width: 800, height: 500, crop: 'fit' },
+    { quality: 'auto:best' }
+  ],
+  maxFileSize: 3 * 1024 * 1024 // 3MB
+});
+
 module.exports = {
   avatarUpload,
   eventImageUpload,
+  cccdUpload,
 };

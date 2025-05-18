@@ -22,10 +22,9 @@ import {
 import defaultAvatar from "../../assets/defaultAvatar.png";
 
 const ProfileInfo = () => {
-
   // Get current user
   const currentUser = useAuthStore((state) => state.currentUser);
-  const {updateUser} = useAuthStore();
+  const { updateUser } = useAuthStore();
 
   // CSS styles defined directly in the component
   const styles = {
@@ -219,8 +218,97 @@ const ProfileInfo = () => {
       document.head.removeChild(style);
     };
   }, []);
+  // Modal state for CCCD image preview
+  const [cccdModalOpen, setCccdModalOpen] = useState(false);
+  const [cccdModalImg, setCccdModalImg] = useState("");
 
-  
+  // Open modal with selected image
+  const handleOpenCccdModal = (imgUrl) => {
+    setCccdModalImg(imgUrl);
+    setCccdModalOpen(true);
+  };
+
+  // Close modal
+  const handleCloseCccdModal = () => {
+    setCccdModalOpen(false);
+    setCccdModalImg("");
+  };
+  // CCCD image upload state
+  const [cccdFiles, setCccdFiles] = useState([]);
+  const [cccdPreviews, setCccdPreviews] = useState([]);
+  const [cccdUploading, setCccdUploading] = useState(false);
+  const [uploadedCccdImages, setUploadedCccdImages] = useState(
+    (currentUser.cccdImages && currentUser.cccdImages.slice(0, 2)) || []
+  );
+
+  // Handle CCCD file selection
+  const handleCccdFileChange = (e) => {
+    let files = Array.from(e.target.files);
+    // Only allow up to 2 images in total (uploaded + new)
+    const maxSelectable = 2 - uploadedCccdImages.length;
+    if (maxSelectable <= 0) {
+      CustomFailedToast("Chỉ được phép tải lên tối đa 2 ảnh CCCD.");
+      return;
+    }
+    files = files.slice(0, maxSelectable);
+    setCccdFiles(files);
+    setCccdPreviews(files.map((file) => URL.createObjectURL(file)));
+  };
+
+  // Upload CCCD images
+  const handleCccdUpload = async () => {
+    if (cccdFiles.length === 0) {
+      CustomFailedToast("Vui lòng chọn ảnh CCCD để tải lên.");
+      return;
+    }
+    if (uploadedCccdImages.length >= 2) {
+      CustomFailedToast("Chỉ được phép tải lên tối đa 2 ảnh CCCD.");
+      return;
+    }
+    if (uploadedCccdImages.length + cccdFiles.length > 2) {
+      CustomFailedToast("Tổng số ảnh CCCD không được vượt quá 2.");
+      return;
+    }
+    setCccdUploading(true);
+    const formData = new FormData();
+    cccdFiles.forEach((file) => formData.append("cccdImages", file));
+    try {
+      const res = await axiosInstance.put("/profile/upload-cccd", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      if (res.data && res.data.cccdImages) {
+        setUploadedCccdImages(res.data.cccdImages.slice(0, 2));
+        setCccdFiles([]);
+        setCccdPreviews([]);
+        CustomSuccessToast(res.data.message || "Tải ảnh CCCD thành công.");
+        updateUser(res.data.user);
+      }
+    } catch (err) {
+      CustomFailedToast("Tải ảnh CCCD thất bại.");
+    } finally {
+      setCccdUploading(false);
+    }
+  };
+
+  // Remove a CCCD image from both UI and backend
+  const handleRemoveCccdImage = async (index) => {
+    const imageToRemove = uploadedCccdImages[index];
+    try {
+      // Call backend to remove the image by URL
+      const res = await axiosInstance.put("/profile/remove-cccd", {
+        imageUrl: imageToRemove,
+      });
+      if (res.data && res.data.cccdImages) {
+        setUploadedCccdImages(res.data.cccdImages.slice(0, 2));
+        CustomSuccessToast(res.data.message || "Đã xóa ảnh CCCD thành công.");
+        updateUser(res.data.user);
+      } else {
+        throw new Error();
+      }
+    } catch (err) {
+      CustomFailedToast("Xóa ảnh CCCD thất bại. Vui lòng thử lại.");
+    }
+  };
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
@@ -334,7 +422,10 @@ const ProfileInfo = () => {
                 <Card.Body className="p-0">
                   <div style={styles.userProfile}>
                     <img
-                      src={JSON.parse(localStorage.getItem("user")).avatarUrl||defaultAvatar}
+                      src={
+                        JSON.parse(localStorage.getItem("user")).avatarUrl ||
+                        defaultAvatar
+                      }
                       alt="User Avatar"
                       className="avatar-img"
                       style={styles.avatar}
@@ -488,6 +579,115 @@ const ProfileInfo = () => {
                             style={styles.formControl}
                             readOnly
                           />
+                          {/* CCCD image upload and preview */}
+                          <div style={{ marginTop: 12 }}>
+                            <Form.Label style={styles.formLabel}>
+                              Ảnh CCCD (tối đa 2 ảnh: mặt trước & sau)
+                            </Form.Label>
+                            <Form.Control
+                              type="file"
+                              accept="image/jpeg, image/png"
+                              multiple
+                              onChange={handleCccdFileChange}
+                              style={{ marginBottom: 8 }}
+                            />
+                            {/* Preview selected images */}
+                            <div
+                              style={{
+                                display: "flex",
+                                gap: 8,
+                                marginBottom: 8,
+                              }}
+                            >
+                              {cccdPreviews.map((url, idx) => (
+                                <img
+                                  key={idx}
+                                  src={url}
+                                  alt={`CCCD preview ${idx + 1}`}
+                                  style={{
+                                    width: 80,
+                                    height: 50,
+                                    objectFit: "cover",
+                                    border: "1px solid #ccc",
+                                    borderRadius: 4,
+                                  }}
+                                />
+                              ))}
+                            </div>
+                            <Button
+                              variant="primary"
+                              size="sm"
+                              onClick={handleCccdUpload}
+                              disabled={cccdUploading || cccdFiles.length === 0}
+                              style={{ marginBottom: 8 }}
+                            >
+                              {cccdUploading ? (
+                                <Spinner animation="border" size="sm" />
+                              ) : (
+                                "Tải lên CCCD"
+                              )}
+                            </Button>
+                            {/* Show already uploaded CCCD images */}
+                            {uploadedCccdImages.length > 0 && (
+                              <div style={{ marginTop: 8 }}>
+                                <div
+                                  style={{
+                                    fontSize: 13,
+                                    color: "#555",
+                                    marginBottom: 4,
+                                  }}
+                                >
+                                  Ảnh CCCD đã tải lên:
+                                </div>
+                                <div style={{ display: "flex", gap: 8 }}>
+                                  {uploadedCccdImages.map((url, idx) => (
+                                    <div
+                                      key={idx}
+                                      style={{
+                                        position: "relative",
+                                        display: "inline-block",
+                                      }}
+                                    >
+                                      <img
+                                        src={url}
+                                        alt={`CCCD uploaded ${idx + 1}`}
+                                        style={{
+                                          width: 80,
+                                          height: 50,
+                                          objectFit: "cover",
+                                          border: "1px solid #4dabbc",
+                                          borderRadius: 4,
+                                          cursor: "pointer",
+                                        }}
+                                        onClick={() => handleOpenCccdModal(url)}
+                                        title="Nhấn để xem lớn"
+                                      />
+                                      <Button
+                                        variant="danger"
+                                        size="sm"
+                                        style={{
+                                          position: "absolute",
+                                          top: -8,
+                                          right: -8,
+                                          borderRadius: "50%",
+                                          padding: "0 6px",
+                                          fontSize: 12,
+                                          lineHeight: 1,
+                                          minWidth: 0,
+                                        }}
+                                        onClick={() =>
+                                          handleRemoveCccdImage(idx)
+                                        }
+                                        title="Xóa ảnh này"
+                                      >
+                                        ×
+                                      </Button>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
                         </Form.Group>
                       </Col>
                     </Row>
@@ -557,6 +757,74 @@ const ProfileInfo = () => {
           </Col>
         </Row>
       </Container>
+      {/* CCCD Image Preview Modal */}
+      {cccdModalOpen && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            background: "rgba(0,0,0,0.6)",
+            zIndex: 9999,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            animation: "fadeIn 0.2s",
+          }}
+          onClick={handleCloseCccdModal}
+        >
+          <div
+            style={{
+              background: "white",
+              borderRadius: 8,
+              padding: 16,
+              boxShadow: "0 4px 24px rgba(0,0,0,0.2)",
+              maxWidth: "90vw",
+              maxHeight: "90vh",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              position: "relative",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={cccdModalImg}
+              alt="CCCD preview"
+              style={{
+                maxWidth: "80vw",
+                maxHeight: "70vh",
+                borderRadius: 8,
+                marginBottom: 12,
+                boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+              }}
+            />
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handleCloseCccdModal}
+              style={{
+                position: "absolute",
+                top: 8,
+                right: 8,
+                borderRadius: "50%",
+                fontSize: 18,
+                width: 32,
+                height: 32,
+                padding: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              title="Đóng"
+            >
+              ×
+            </Button>
+          </div>
+        </div>
+      )}
     </>
   );
 };

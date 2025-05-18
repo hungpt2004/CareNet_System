@@ -9,13 +9,14 @@ import {
   Button,
   Pagination,
   Form,
+  Toast,
 } from "react-bootstrap";
 import { motion, AnimatePresence } from "framer-motion";
 import { Modal, Rate } from "antd";
 import "antd/dist/reset.css";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../utils/AxiosInstance";
-import useAuthStore from "../../hooks/authStore";
+// import useAuthStore from "../../hooks/authStore";
 import {
   CustomFailedToast,
   CustomSuccessToast,
@@ -502,17 +503,38 @@ const ProfileHistory = () => {
 
   // Handle feedback submission
   const handleSubmitFeedback = async () => {
+    console.log("Submitting feedback:", feedbackText); // Debug: check value
     const feedbackData = {
-      eventId: selectedEffort.event._id,
       rating,
       content: feedbackText,
     };
 
     try {
-      const res = await axiosInstance.post(`/profile/send-feedback-history-events/${selectedEffort.event._id}`,feedbackData);
+      // Call the backend createFeedback endpoint
+      const res = await axiosInstance.post(
+        `/feedback/create-feedback/${selectedEffort.event._id}`,
+        feedbackData
+      );
       if (res.data && res.data.message) {
         CustomSuccessToast(res.data.message);
-        setIsModalVisible(false); 
+        setIsModalVisible(false);
+        // Update the status of the effort in the UI immediately if needed
+        setEffortData((prevEfforts) =>
+          prevEfforts.map((effort) => {
+            if (
+              effort._id === selectedEffort._id &&
+              (effort.status === "completed" || effort.status === "finished")
+            ) {
+              // If status was "finished", backend sets it to "completed" after feedback
+              // So we update it here for immediate UI feedback
+              return {
+                ...effort,
+                status: "completed",
+              };
+            }
+            return effort;
+          })
+        );
       }
     } catch (err) {
       console.error("Error submitting feedback:", err);
@@ -556,307 +578,317 @@ const ProfileHistory = () => {
   };
 
   return (
-    <Container
-      className="d-flex justify-content-center align-items-center"
-      style={{ ...styles.accountContainer, maxWidth: "1100px" }}
-    >
-      <Row className="w-100">
-        <Col md={4}>
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <Card style={styles.sidebarCard}>
-              <Card.Body className="p-0">
-                <div style={styles.userProfile}>
-                  <img
-                    src={
-                      JSON.parse(localStorage.getItem("user")).avatarUrl ||
-                      defaultAvatar
-                    }
-                    alt="User Avatar"
-                    className="avatar-img"
-                    style={styles.avatar}
-                  />
-                  <div style={styles.userInfo}>
-                    <h5 style={styles.userName}>Hung Pham Trong</h5>
-                    <p style={styles.accountType}>Tài Khoản Cá Nhân</p>
-                  </div>
-                </div>
-                <div style={styles.menuItems}>
-                  <div
-                    className="menu-item"
-                    style={styles.menuItem}
-                    onClick={() => navigate("/profile-information")}
-                  >
-                    <span>Thông Tin </span>
-                  </div>
-                  <div
-                    className="menu-item"
-                    style={styles.menuItem}
-                    onClick={() => navigate("/profile-avatar")}
-                  >
-                    <span>Cập Nhật Avatar</span>
-                  </div>
-                  <div
-                    className="menu-item active"
-                    style={{ ...styles.menuItem, ...styles.menuItemActive }}
-                    onClick={() => navigate("/profile-history")}
-                  >
-                    <span>Lịch Sử Nỗ lực</span>
-                  </div>
-                  <div
-                    className="menu-item"
-                    style={styles.menuItem}
-                    onClick={() => navigate("/profile-favourite")}
-                  >
-                    <span>Yêu Thích</span>
-                  </div>
-                  <div
-                    className="menu-item"
-                    style={styles.menuItem}
-                    onClick={() => navigate("/profile-score")}
-                  >
-                    <span>Số Điểm</span>
-                  </div>
-                  <div
-                    className="menu-item"
-                    style={styles.menuItem}
-                    onClick={() => navigate("/profile-certificate")}
-                  >
-                    <span>Chứng Chỉ </span>
-                  </div>
-                  <div className="menu-item" style={styles.menuItem}>
-                    <span>Đăng Xuất</span>
-                  </div>
-                </div>
-              </Card.Body>
-            </Card>
-          </motion.div>
-        </Col>
-        <Col md={8} style={{ marginTop: "80px" }}>
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            <Card style={styles.infoCard}>
-              <Card.Header style={styles.infoHeader}>
-                <h4 className="mb-0">LỊCH SỬ NỖ LỰC</h4>
-              </Card.Header>
-              <Card.Body style={styles.infoCardBody}>
-                <div style={styles.filterContainer}>
-                  {statusFilters.map((filter) => (
-                    <Button
-                      key={filter}
-                      variant="dark"
-                      className={`filter-btn ${
-                        activeFilter === filter ? "active" : ""
-                      }`}
-                      style={{
-                        ...styles.filterButton,
-                        ...(activeFilter === filter
-                          ? styles.filterButtonActive
-                          : {}),
-                      }}
-                      onClick={() => handleFilterChange(filter)}
-                    >
-                      {filter === "ALL" ? "Tất cả" : translateStatus(filter)}{" "}
-                      {/* Hiển thị tiếng Việt */}
-                    </Button>
-                  ))}
-                </div>
-
-                {currentItems.length > 0 ? (
-                  <div style={styles.effortGrid}>
-                    <AnimatePresence>
-                      {currentItems.map((effort, index) => (
-                        <motion.div
-                          key={effort._id}
-                          style={styles.effortCard}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -20 }}
-                          transition={{ duration: 0.3, delay: index * 0.1 }}
-                          layout
-                        >
-                          <h5 style={styles.effortHeader}>
-                            {effort.event.title}
-                          </h5>
-
-                          <div style={styles.effortField}>
-                            <div style={styles.effortLabel}>Bắt Đầu: </div>
-                            <div style={styles.effortValue}>
-                              {new Date(
-                                effort.event.startAt
-                              ).toLocaleDateString("en-GB")}
-                            </div>
-                          </div>
-
-                          <div style={styles.effortField}>
-                            <div style={styles.effortLabel}>Kết Thúc: </div>
-                            <div style={styles.effortValue}>
-                              {new Date(effort.event.endAt).toLocaleDateString(
-                                "en-GB"
-                              )}
-                            </div>
-                          </div>
-
-                          <div style={styles.effortField}>
-                            <div style={styles.effortLabel}>Tình Trạng:</div>
-                            <div style={styles.effortValue}>
-                              <span
-                                style={{
-                                  ...styles.statusBadge,
-                                  ...getStatusStyle(effort.status),
-                                }}
-                              >
-                                {translateStatus(effort.status)}
-                              </span>
-                            </div>
-                          </div>
-
-                          <Button
-                            className="feedback-btn"
-                            style={styles.feedbackButton}
-                            onClick={() => handleFeedbackClick(effort)}
-                          >
-                            Đánh Giá
-                          </Button>
-                        </motion.div>
-                      ))}
-                    </AnimatePresence>
-                  </div>
-                ) : (
-                  <div style={styles.noResults}>
-                    <h5>
-                      Không tìm thấy nỗ lực với trạng thái:{" "}
-                      {translateStatus(activeFilter)}
-                    </h5>
-                    <p>Hãy thử chọn bộ lọc khác hoặc quay lại sau.</p>
-                  </div>
-                )}
-
-                {totalPages > 0 && (
-                  <div style={styles.paginationContainer}>
-                    <Pagination
-                      style={{
-                        "--bs-pagination-color": "#0E606E",
-                        "--bs-pagination-active-bg": "#0E606E",
-                        "--bs-pagination-active-border-color": "#0E606E",
-                        "--bs-pagination-hover-color": "#0E606E",
-                        "--bs-pagination-focus-color": "#0E606E",
-                      }}
-                    >
-                      <Pagination.Prev
-                        onClick={() =>
-                          setCurrentPage((prev) => Math.max(prev - 1, 1))
-                        }
-                        disabled={currentPage === 1}
-                      />
-                      {paginationItems}
-                      <Pagination.Next
-                        onClick={() =>
-                          setCurrentPage((prev) =>
-                            Math.min(prev + 1, totalPages)
-                          )
-                        }
-                        disabled={currentPage === totalPages}
-                      />
-                    </Pagination>
-                  </div>
-                )}
-              </Card.Body>
-            </Card>
-          </motion.div>
-        </Col>
-      </Row>
-
-      {/* Feedback Modal */}
-      <Modal
-        title={`Đánh Giá Cho Sự Kiện: ${
-          selectedEffort?.event.title || "Event"
-        }`}
-        open={isModalVisible}
-        onCancel={handleModalClose}
-        footer={null}
-        width={600}
-        centered
+    <>
+    <CustomToast />
+      <Container
+        className="d-flex justify-content-center align-items-center"
+        style={{ ...styles.accountContainer, maxWidth: "1100px" }}
       >
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.3 }}
+        <Row className="w-100">
+          <Col md={4}>
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Card style={styles.sidebarCard}>
+                <Card.Body className="p-0">
+                  <div style={styles.userProfile}>
+                    <img
+                      src={
+                        JSON.parse(localStorage.getItem("user")).avatarUrl ||
+                        defaultAvatar
+                      }
+                      alt="User Avatar"
+                      className="avatar-img"
+                      style={styles.avatar}
+                    />
+                    <div style={styles.userInfo}>
+                      <h5 style={styles.userName}>Hung Pham Trong</h5>
+                      <p style={styles.accountType}>Tài Khoản Cá Nhân</p>
+                    </div>
+                  </div>
+                  <div style={styles.menuItems}>
+                    <div
+                      className="menu-item"
+                      style={styles.menuItem}
+                      onClick={() => navigate("/profile-information")}
+                    >
+                      <span>Thông Tin </span>
+                    </div>
+                    <div
+                      className="menu-item"
+                      style={styles.menuItem}
+                      onClick={() => navigate("/profile-avatar")}
+                    >
+                      <span>Cập Nhật Avatar</span>
+                    </div>
+                    <div
+                      className="menu-item active"
+                      style={{ ...styles.menuItem, ...styles.menuItemActive }}
+                      onClick={() => navigate("/profile-history")}
+                    >
+                      <span>Lịch Sử Nỗ lực</span>
+                    </div>
+                    <div
+                      className="menu-item"
+                      style={styles.menuItem}
+                      onClick={() => navigate("/profile-favourite")}
+                    >
+                      <span>Yêu Thích</span>
+                    </div>
+                    <div
+                      className="menu-item"
+                      style={styles.menuItem}
+                      onClick={() => navigate("/profile-score")}
+                    >
+                      <span>Số Điểm</span>
+                    </div>
+                    <div
+                      className="menu-item"
+                      style={styles.menuItem}
+                      onClick={() => navigate("/profile-certificate")}
+                    >
+                      <span>Chứng Chỉ </span>
+                    </div>
+                    <div className="menu-item" style={styles.menuItem}>
+                      <span>Đăng Xuất</span>
+                    </div>
+                  </div>
+                </Card.Body>
+              </Card>
+            </motion.div>
+          </Col>
+          <Col md={8} style={{ marginTop: "80px" }}>
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <Card style={styles.infoCard}>
+                <Card.Header style={styles.infoHeader}>
+                  <h4 className="mb-0">LỊCH SỬ NỖ LỰC</h4>
+                </Card.Header>
+                <Card.Body style={styles.infoCardBody}>
+                  <div style={styles.filterContainer}>
+                    {statusFilters.map((filter) => (
+                      <Button
+                        key={filter}
+                        variant="dark"
+                        className={`filter-btn ${
+                          activeFilter === filter ? "active" : ""
+                        }`}
+                        style={{
+                          ...styles.filterButton,
+                          ...(activeFilter === filter
+                            ? styles.filterButtonActive
+                            : {}),
+                        }}
+                        onClick={() => handleFilterChange(filter)}
+                      >
+                        {filter === "ALL" ? "Tất cả" : translateStatus(filter)}{" "}
+                        {/* Hiển thị tiếng Việt */}
+                      </Button>
+                    ))}
+                  </div>
+
+                  {currentItems.length > 0 ? (
+                    <div style={styles.effortGrid}>
+                      <AnimatePresence>
+                        {currentItems.map((effort, index) => (
+                          <motion.div
+                            key={effort._id}
+                            style={styles.effortCard}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            transition={{ duration: 0.3, delay: index * 0.1 }}
+                            layout
+                          >
+                            <h5 style={styles.effortHeader}>
+                              {effort.event.title}
+                            </h5>
+
+                            <div style={styles.effortField}>
+                              <div style={styles.effortLabel}>Bắt Đầu: </div>
+                              <div style={styles.effortValue}>
+                                {new Date(
+                                  effort.event.startAt
+                                ).toLocaleDateString("en-GB")}
+                              </div>
+                            </div>
+
+                            <div style={styles.effortField}>
+                              <div style={styles.effortLabel}>Kết Thúc: </div>
+                              <div style={styles.effortValue}>
+                                {new Date(
+                                  effort.event.endAt
+                                ).toLocaleDateString("en-GB")}
+                              </div>
+                            </div>
+
+                            <div style={styles.effortField}>
+                              <div style={styles.effortLabel}>Tình Trạng:</div>
+                              <div style={styles.effortValue}>
+                                <span
+                                  style={{
+                                    ...styles.statusBadge,
+                                    ...getStatusStyle(effort.status),
+                                  }}
+                                >
+                                  {translateStatus(effort.status)}
+                                </span>
+                              </div>
+                            </div>
+
+                            <Button
+                              className="feedback-btn"
+                              style={styles.feedbackButton}
+                              onClick={() => handleFeedbackClick(effort)}
+                            >
+                              Đánh Giá
+                            </Button>
+                          </motion.div>
+                        ))}
+                      </AnimatePresence>
+                    </div>
+                  ) : (
+                    <div style={styles.noResults}>
+                      <h5>
+                        Không tìm thấy nỗ lực với trạng thái:{" "}
+                        {translateStatus(activeFilter)}
+                      </h5>
+                      <p>Hãy thử chọn bộ lọc khác hoặc quay lại sau.</p>
+                    </div>
+                  )}
+
+                  {totalPages > 0 && (
+                    <div style={styles.paginationContainer}>
+                      <Pagination
+                        style={{
+                          "--bs-pagination-color": "#0E606E",
+                          "--bs-pagination-active-bg": "#0E606E",
+                          "--bs-pagination-active-border-color": "#0E606E",
+                          "--bs-pagination-hover-color": "#0E606E",
+                          "--bs-pagination-focus-color": "#0E606E",
+                        }}
+                      >
+                        <Pagination.Prev
+                          onClick={() =>
+                            setCurrentPage((prev) => Math.max(prev - 1, 1))
+                          }
+                          disabled={currentPage === 1}
+                        />
+                        {paginationItems}
+                        <Pagination.Next
+                          onClick={() =>
+                            setCurrentPage((prev) =>
+                              Math.min(prev + 1, totalPages)
+                            )
+                          }
+                          disabled={currentPage === totalPages}
+                        />
+                      </Pagination>
+                    </div>
+                  )}
+                </Card.Body>
+              </Card>
+            </motion.div>
+          </Col>
+        </Row>
+
+        {/* Feedback Modal */}
+        <Modal
+          title={`Đánh Giá Cho Sự Kiện: ${
+            selectedEffort?.event.title || "Event"
+          }`}
+          open={isModalVisible}
+          onCancel={handleModalClose}
+          footer={null}
+          width={600}
+          centered
         >
-          <div style={styles.modalBody}>
-            <h5>Gửi Đánh Giá Cho Chúng Tôi </h5>
-            <p>
-              Chúng tôi trân trọng ý kiến phản hồi của bạn về sự kiện:{" "}
-              {selectedEffort?.event.title}. Xin vui lòng chia sẻ suy nghĩ của
-              bạn và đánh giá trải nghiệm của mình.
-            </p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div style={styles.modalBody}>
+              <h5>Gửi Đánh Giá Cho Chúng Tôi </h5>
+              <p>
+                Chúng tôi trân trọng ý kiến phản hồi của bạn về sự kiện:{" "}
+                {selectedEffort?.event.title}. Xin vui lòng chia sẻ suy nghĩ của
+                bạn và đánh giá trải nghiệm của mình.
+              </p>
 
-            <Form style={styles.feedbackForm}>
-              <Form.Group className="mb-4" controlId="feedbackText">
-                <Form.Label style={styles.formLabel}>
-                  Đánh Giá Của Bạn
-                </Form.Label>
-                <Form.Control
-                  as="textarea"
-                  rows={4}
-                  placeholder="Xin vui lòng chia sẻ trải nghiệm, gợi ý hoặc những lo ngại của bạn..."
-                  value={feedbackText}
-                  onChange={(e) => setFeedbackText(e.target.value)}
-                />
-              </Form.Group>
-
-              <div style={styles.ratingContainer}>
-                <Form.Label style={styles.formLabel}>
-                  Đánh giá trải nghiệm của bạn
-                </Form.Label>
-                <div>
-                  <Rate
-                    allowHalf
-                    value={rating}
-                    onChange={setRating}
-                    style={{ color: "#0E606E" }}
-                    className="mb-3"
+              <Form style={styles.feedbackForm}>
+                <Form.Group className="mb-4" controlId="feedbackText">
+                  <Form.Label style={styles.formLabel}>
+                    Đánh Giá Của Bạn
+                  </Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={4}
+                    placeholder="Xin vui lòng chia sẻ trải nghiệm, gợi ý hoặc những lo ngại của bạn..."
+                    value={feedbackText}
+                    onChange={(e) => {
+                      // Debug: log value
+                      console.log("Input value:", e.target.value);
+                      setFeedbackText(e.target.value);
+                    }}
                   />
-                  <span className="ms-2">
-                    {rating ? (
-                      <strong>{rating} trong số 5 sao</strong>
-                    ) : (
-                      "Nhấn để đánh giá"
-                    )}
-                  </span>
-                </div>
-              </div>
+                </Form.Group>
 
-              <div className="d-flex justify-content-end mt-4">
-                <Button
-                  variant="light"
-                  onClick={handleModalClose}
-                  className="me-2"
-                >
-                  Hủy
-                </Button>
-                <Button
-                  variant="primary"
-                  className="submit-btn"
-                  style={{ backgroundColor: "#0E606E", borderColor: "#0E606E" }}
-                  onClick={handleSubmitFeedback}
-                  disabled={!feedbackText.trim() || rating === 0}
-                >
-                  Gửi Đánh Giá
-                </Button>
-              </div>
-            </Form>
-          </div>
-        </motion.div>
-      </Modal>
-    </Container>
+                <div style={styles.ratingContainer}>
+                  <Form.Label style={styles.formLabel}>
+                    Đánh giá trải nghiệm của bạn
+                  </Form.Label>
+                  <div>
+                    <Rate
+                      allowHalf
+                      value={rating}
+                      onChange={setRating}
+                      style={{ color: "#0E606E" }}
+                      className="mb-3"
+                    />
+                    <span className="ms-2">
+                      {rating ? (
+                        <strong>{rating} trong số 5 sao</strong>
+                      ) : (
+                        "Nhấn để đánh giá"
+                      )}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="d-flex justify-content-end mt-4">
+                  <Button
+                    variant="light"
+                    onClick={handleModalClose}
+                    className="me-2"
+                  >
+                    Hủy
+                  </Button>
+                  <Button
+                    variant="primary"
+                    className="submit-btn"
+                    style={{
+                      backgroundColor: "#0E606E",
+                      borderColor: "#0E606E",
+                    }}
+                    onClick={handleSubmitFeedback}
+                    disabled={!feedbackText.trim() || rating === 0}
+                  >
+                    Gửi Đánh Giá
+                  </Button>
+                </div>
+              </Form>
+            </div>
+          </motion.div>
+        </Modal>
+      </Container>
+    </>
   );
 };
 
