@@ -23,7 +23,7 @@ exports.createFeedback = asyncHandler(async (req, res) => {
     if (historyEvent.status !== "completed" && historyEvent.status !== "finished") {
       return res.status(400).json({
         status: "fail",
-        message: "Trạng thái của bạn không được chấp thuận để đánh giá",
+        message: "Trạng thái của bạn không được chấp thuận để đánh giá sự kiện này",
       });
     }
 
@@ -63,4 +63,6 @@ exports.createFeedback = asyncHandler(async (req, res) => {
     });
   }
 });
+
+
 

@@ -4,6 +4,7 @@ const HistoryEvent = require("../models/historyEvent.model");
 const Feedback = require("../models/feedback.model");
 const asyncHandler = require("../middleware/asyncHandler");
 const checkWordByGemini = require("../services/geminiCheckInstance");
+const { cccdUpload } = require("../middleware/uploadMiddleware");
 
 // backend for profile-information
 exports.editProfile = asyncHandler(async (req, res) => {
@@ -194,8 +195,7 @@ exports.sendFeedbackHistoryEvents = asyncHandler(async (req, res) => {
     message: "Feedback submitted successfully.",
   });
 });
-// CCCD image upload
-const { cccdUpload } = require("../middleware/uploadMiddleware");
+
 // Upload CCCD image(s)
 exports.uploadCCCD = [
   cccdUpload.array("cccdImages", 2), // Accept up to 2 images (front/back)
@@ -204,7 +204,7 @@ exports.uploadCCCD = [
     const userId = user._id;
 
     if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ error: true, message: "No CCCD images uploaded" });
+      return res.status(400).json({ error: true, message: "Không có ảnh CCCD để tải lên" });
     }
 
     // Extract URLs from uploaded files
@@ -219,30 +219,32 @@ exports.uploadCCCD = [
       );
 
       if (!updatedUser) {
-        return res.status(404).json({ error: true, message: "User not found" });
+        return res.status(404).json({ error: true, message: "Người dùng không tìm thấy" });
       }
 
       return res.status(200).json({
         error: false,
         user: updatedUser,
         cccdImages: updatedUser.cccdImages,
-        message: "CCCD images uploaded successfully."
+        message: "Ảnh CCCD đã được tải lên thành công.",
       });
     } catch (err) {
       console.error("Error uploading CCCD images:", err);
-      return res.status(500).json({ error: true, message: "Failed to upload CCCD images." });
+      return res.status(500).json({ error: true, message: "Ảnh CCCD tải lên thất bại." });
     }
   }
 ];
 // Remove a CCCD image by URL
-exports.removeCCCD = require("../middleware/asyncHandler")(async (req, res) => {
+exports.removeCCCD = asyncHandler(async (req, res) => {
   const user = req.user.user;
   const userId = user._id;
   const { imageUrl } = req.body;
   if (!imageUrl) {
-    return res.status(400).json({ error: true, message: "Thiếu đường dẫn ảnh cần xóa." });
+    return res
+      .status(400)
+      .json({ error: true, message: "Thiếu đường dẫn ảnh cần xóa." });
   }
-  try {
+  
     // Remove the image URL from the user's cccdImages array
     const updatedUser = await User.findOneAndUpdate(
       { _id: userId },
@@ -250,15 +252,15 @@ exports.removeCCCD = require("../middleware/asyncHandler")(async (req, res) => {
       { new: true }
     );
     if (!updatedUser) {
-      return res.status(404).json({ error: true, message: "Không tìm thấy người dùng." });
+      return res
+        .status(404)
+        .json({ error: true, message: "Không tìm thấy người dùng." });
     }
     return res.status(200).json({
       error: false,
       user: updatedUser,
       cccdImages: updatedUser.cccdImages,
-      message: "Đã xóa ảnh CCCD thành công."
+      message: "Đã xóa ảnh CCCD thành công.",
     });
-  } catch (err) {
-    return res.status(500).json({ error: true, message: "Xóa ảnh CCCD thất bại." });
-  }
+  
 });
