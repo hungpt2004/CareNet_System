@@ -17,11 +17,9 @@ import FeedbackManagement from "./pages/feedbackmanagerment_page/FeedbackManagem
 import SupportRequestPage from './pages/support_page/SupportRequestPage';
 import AdminLayout from './layout/AdminLayout';
 import AdminCourses from './pages/admin_course_page/AdminCoursesPage';
-import AdminStudents from './pages/admin_students_page/AdminStudentsPage';
 import AdminDashboard from './pages/admin_dashboard_page/AdminDashboardPage';
 import AdminOrganizations from './pages/admin_organization_page/admin_organization';
 import AdminVolunteerPosts from './pages/admin_posts_page/AdminPostPage';
-import AdminEventAttendance from './pages/admin_students_page/AdminAttendancePage';
 import AdminEventParticipants from './pages/admin_students_page/AdminEventParticipant';
 import { ToastProvider } from './components/toast/ToastNotification';
 import OwnerLayout from './layout/OwnerLayout';
@@ -45,6 +43,8 @@ import StaffAttendancePage from './pages/staff_attendance_page/StaffAttendancePa
 import OrganizationStaffManagement from './pages/organization_user_page/OrganizationStaffManagement';
 import StaffLayout from './layout/StaffLayout';
 import OrganizationRegisterPage from './pages/organization_register_page/OrganizationRegisterPage';
+import AdminOrganizationsPending from './pages/admin_students_page/AdminOrganizationsPage';
+import AdminEventsPending from './pages/admin_students_page/AdminEventsPage';
 
 const guestRoutes = [
   { path: '/', element: <LandingPage /> },
@@ -56,8 +56,8 @@ const guestRoutes = [
 const publicRoutes = [
   { path: '/login', element: <AuthenGatePage /> },
   { path: '/forgot-password', element: <ForgotPasswordPage /> },
-  { path: '/payment-success', element: <PaymentSuccessPage/> },
-  { path: '/payment-cancel', element: <PaymentCancelPage/> },
+  { path: '/payment-success/:certificateId', element: <PaymentSuccessPage/> },
+  { path: '/payment-cancel/:certificateId', element: <PaymentCancelPage/> },
 ]
 
 const privateCustomerRoutes = [
@@ -80,11 +80,11 @@ const privateCustomerRoutes = [
 const privateAdminRoutes = [
   { path: '/dashboard', element: <AdminDashboard /> },
   { path: '/course', element: <AdminCourses /> },
-  { path: '/student', element: <AdminStudents /> },
+  { path: '/request-organization', element: <AdminOrganizationsPending /> },
   { path: '/admin-support', element: <AdminSupportRequests /> },
   { path: '/admin-organization', element: <AdminOrganizations /> },
   { path: '/admin-post', element: <AdminVolunteerPosts /> },
-  { path: '/admin-attendance', element: <AdminEventAttendance /> },
+  { path: '/request-event', element: <AdminEventsPending /> },
 ];
 
 const privateOwnerRoutes = [

@@ -10,6 +10,9 @@ const organizationRouter = require("./routes/organization.routes");
 const certificateRoutes = require('./routes/certificate.routes');
 const attendanceRouter = require("./routes/attendance.routes");
 const imageRouter = require('./routes/image.routes');
+const paymentRouter = require('./routes/payment.routes');
+const AdminRouter = require("./routes/admin.routes");
+const StaffRouter = require("./routes/staff.routes");
 
 const app = express();
 app.use(cors());
@@ -30,5 +33,8 @@ app.use('/organization', organizationRouter);
 app.use('/certificates', certificateRoutes);
 app.use('/attendance', attendanceRouter);
 app.use('/images', imageRouter);
+app.use('/payment', paymentRouter);
+app.use('/admin', AdminRouter);
+app.use('/staff', StaffRouter);
 
 module.exports = app;

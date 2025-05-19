@@ -230,3 +230,8 @@ exports.getPendingVolunteers = asyncHandler(async (req, res) => {
   }
 });
 
+exports.updateEventInformation = asyncHandler(async (req, res) => {
+
+  
+
+});

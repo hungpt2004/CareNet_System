@@ -56,6 +56,8 @@ const EventSchema = new mongoose.Schema({
 
   acceptDate: { type: Date, default: Date.now },
 
+  rejectReason: { type: String, default: null },
+
   // Những user đã điểm danh
   attendedUsers: [
     {

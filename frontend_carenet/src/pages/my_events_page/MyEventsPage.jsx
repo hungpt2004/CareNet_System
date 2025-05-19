@@ -9,6 +9,7 @@ import { CustomFailedToast, CustomSuccessToast, CustomToast } from "../../compon
 import CustomSpinner from "../../components/spinner/CustomSpinner";
 import io from 'socket.io-client';
 import { formatDateVN } from "../../utils/FormatDateVN";
+import { formatTimeVN } from "../../utils/FormatTimeVN";
 
 // Custom styles
 const customStyles = {
@@ -43,12 +44,8 @@ function MyEventsPage() {
    const [selectedEvent, setSelectedEvent] = useState(null);
    const [showModal, setShowModal] = useState(false);
    const [isLoading, setIsLoading] = useState(false);
-   const [certificateLink, setCertificateLink] = useState(null);
    const [showCertificateModal, setShowCertificateModal] = useState(false);
    const [selectedCertificate, setSelectedCertificate] = useState(null);
-   const [isGeneratingCertificate, setIsGeneratingCertificate] = useState(false);
-   const socketRef = useRef(null);
-   const currentUser = useAuthStore((state) => state.currentUser);
    const [showCancelModal, setShowCancelModal] = useState(false);
    const [selectedEventForCancel, setSelectedEventForCancel] = useState(null);
    const [cancelReason, setCancelReason] = useState('');
@@ -72,107 +69,63 @@ function MyEventsPage() {
 
    const handleGenerateCertificate = async (eventId) => {
       console.log("Generating certificate for event:", eventId);
-      setIsGeneratingCertificate(true);
       try {
-         const response = await axiosInstance.post('/certificates/create-certificate', {
-            eventId: eventId
-         });
+         // First check if certificate exists
+         const checkResponse = await axiosInstance.get(`/certificates/get-certificate/${eventId}`);
+         console.log('Check certificate response:', checkResponse.data);
+         
+         if(checkResponse.data.status === 'success' && checkResponse.data.certificate) {
+            // Certificate exists, show it
+            setSelectedCertificate({
+               ...checkResponse.data.certificate,
+               isPaid: !!checkResponse.data.certifcatePurchase
+            });
+            setShowCertificateModal(true);
+            setShowModal(false);
+         } else if(checkResponse.data.status === 'fail') {
+            // Certificate doesn't exist, create new one
+            const response = await axiosInstance.post('/certificates/create-certificate', {
+               eventId: eventId
+            });
 
-         if(response.data.status === 'success' && response.data.certificate){
-            setCertificateLink(response.data.certificate.certificateUrl);
-            setSelectedCertificate(response.data.certificate);
-            CustomSuccessToast('Tạo chứng chỉ thành công');
-            fetchUserEvents();
+            if(response.data.status === 'success' && response.data.certificate){
+               setSelectedCertificate({
+                  ...response.data.certificate,
+                  isPaid: false
+               });
+               setShowCertificateModal(true);
+               setShowModal(false);
+               CustomSuccessToast('Tạo chứng chỉ thành công');
+               fetchUserEvents();
+            }
          }
       } catch (error) {
-         console.error('Error generating certificate:', error);
-         CustomFailedToast('Không thể tạo chứng chỉ');
-      } finally {
-         setIsGeneratingCertificate(false);
+         console.error('Error with certificate:', error);
+         CustomFailedToast('Không thể xử lý chứng chỉ');
       }
    };
 
-   const handleViewCertificate = (certificate) => {
-      setSelectedCertificate(certificate);
-      setShowCertificateModal(true);
-   };
-
-   const handlePurchaseCertificate = async (certificateId) => {
+   const handlePayment = async (certificateId) => {
       try {
-         const response = await axiosInstance.post('/certificates/purchase', {
+         const response = await axiosInstance.post('/payment/create-payment-link', {
             certificateId: certificateId
          });
-         if (response.data.status === 'success') {
-            CustomSuccessToast('Thanh toán thành công');
-            // Refresh certificate data
-            fetchUserEvents();
+
+         if(response.data.status === 'success' && response.data.checkoutUrl){
+            window.location.href = response.data.checkoutUrl;
+         } else {
+            CustomFailedToast('Không thể tạo liên kết thanh toán');
          }
       } catch (error) {
-         console.error('Error purchasing certificate:', error);
-         CustomFailedToast('Không thể thanh toán chứng chỉ');
+         console.error('Error creating payment link:', error);
+         CustomFailedToast('Không thể tạo liên kết thanh toán');
       }
    };
-
-   // Socket.IO setup
-   useEffect(() => {
-      // Kết nối Socket.IO
-      socketRef.current = io('http://localhost:5000', {
-         withCredentials: true
-      });
-
-      // Debug log khi kết nối thành công
-      socketRef.current.on('connect', () => {
-         console.log('Socket.IO connected successfully in MyEventsPage');
-      });
-
-      // Debug log khi có lỗi kết nối
-      socketRef.current.on('connect_error', (error) => {
-         console.error('Socket.IO connection error in MyEventsPage:', error);
-      });
-
-      // Join vào room của user
-      if (currentUser?._id) {
-         console.log('Joining user room in MyEventsPage:', currentUser._id);
-         socketRef.current.emit('joinUserRoom', currentUser._id);
-      }
-
-      // Lắng nghe sự kiện requestApproved
-      socketRef.current.on('requestApproved', (data) => {
-         console.log('Received requestApproved event in MyEventsPage:', data);
-         fetchUserEvents();
-      });
-
-      // Lắng nghe sự kiện requestRejected
-      socketRef.current.on('requestRejected', (data) => {
-         console.log('Received requestRejected event in MyEventsPage:', data);
-         console.log('Calling fetchUserEvents after rejection...');
-         fetchUserEvents();
-      });
-
-      return () => {
-         if (currentUser?._id) {
-            console.log('Leaving user room in MyEventsPage:', currentUser._id);
-            socketRef.current.emit('leaveUserRoom', currentUser._id);
-         }
-         socketRef.current.disconnect();
-      };
-   }, [currentUser?._id]);
 
    useEffect(() => {
       fetchUserEvents();
    }, []);
 
-   // Format date for display
-   const formatDate = (dateString) => {
-      const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
-      return new Date(dateString).toLocaleDateString("vi-VN", options);
-   };
-
-   // Format time for display
-   const formatTime = (dateString) => {
-      const options = { hour: "numeric", minute: "numeric", hour12: true };
-      return new Date(dateString).toLocaleTimeString("vi-VN", options);
-   };
 
    // Get status tag color based on historyEvent status
    const getStatusTag = (status) => {
@@ -239,17 +192,20 @@ function MyEventsPage() {
          });
 
          if (response.data.status === 'success') {
-            CustomToast.success('Yêu cầu hủy tham gia đã được gửi');
+            CustomSuccessToast('Yêu cầu hủy tham gia đã được gửi');
             fetchUserEvents();
          }
       } catch (error) {
-         CustomToast.error('Không thể gửi yêu cầu hủy tham gia');
+         console.error('Error canceling event:', error);
+         CustomFailedToast('Không thể gửi yêu cầu hủy tham gia');
       }
 
       setShowCancelModal(false);
       setCancelReason('');
       setSelectedEventForCancel(null);
    };
+
+
 
    // Table columns configuration
    const columns = [
@@ -282,7 +238,7 @@ function MyEventsPage() {
             <Space direction="vertical" size="small">
                <div>{formatDateVN(startAt)}</div>
                <div style={{ color: "#666" }}>
-                  {formatTime(startAt)} - {formatTime(record.event.endAt)}
+                  {formatTimeVN(startAt)} - {formatTimeVN(record.event.endAt)}
                </div>
             </Space>
          ),
@@ -333,28 +289,21 @@ function MyEventsPage() {
                )}
                {record.status === "approved" && (
                   <>
-                     <Button
-                        variant="outline-success"
-                        size="sm"
-                        onClick={() => handleGenerateCertificate(record.event._id)}
-                        disabled={isGeneratingCertificate}
-                     >
-                        {isGeneratingCertificate ? (
-                           <>
-                              <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                              Đang tạo...
-                           </>
-                        ) : (
-                           'Tạo chứng chỉ'
-                        )}
-                     </Button>
-                     {certificateLink && (
+                     {showCertificateModal.isPaid ? (
                         <Button
                            variant="outline-info"
                            size="sm"
-                           onClick={() => handleViewCertificate(record)}
+                           onClick={() => handleGenerateCertificate(record.event._id)}
                         >
-                            Xem chứng chỉ
+                           Xem chứng chỉ
+                        </Button>
+                     ) : (
+                        <Button
+                           variant="outline-primary"
+                           size="sm"
+                           onClick={() => handleGenerateCertificate(record.event._id)}
+                        >
+                           Mua chứng chỉ tham gia
                         </Button>
                      )}
                   </>
@@ -438,9 +387,9 @@ function MyEventsPage() {
                                           <div className="d-flex align-items-center mb-2">
                                              <Calendar size={18} className="me-2" style={{ color: customStyles.primaryColor }} />
                                              <div>
-                                                <div className="fw-bold">{formatDate(selectedEvent.startAt)}</div>
+                                                <div className="fw-bold">{formatDateVN(selectedEvent.startAt)}</div>
                                                 <div className="text-muted">
-                                                   {formatTime(selectedEvent.startAt)} - {formatTime(selectedEvent.endAt)}
+                                                   {formatTimeVN(selectedEvent.startAt)} - {formatTimeVN(selectedEvent.endAt)}
                                                 </div>
                                              </div>
                                           </div>
@@ -480,10 +429,10 @@ function MyEventsPage() {
                                                 <Button
                                                    variant="outline-primary"
                                                    className="w-100"
-                                                   onClick={() => handlePurchaseCertificate(selectedEvent._id)}
+                                                   onClick={() => handleGenerateCertificate(selectedEvent._id)}
                                                 >
                                                    <Award size={18} className="me-2" />
-                                                   Mua chứng chỉ tham gia
+                                                   {selectedEvent.certificate ? 'Xem chứng chỉ' : 'Mua chứng chỉ tham gia'}
                                                 </Button>
                                              </motion.div>
                                           )}
@@ -589,66 +538,68 @@ function MyEventsPage() {
                            <div className="text-center">
                               <div className="position-relative mb-4">
                                  <Image
-                                    src={certificateLink}
+                                    src={selectedCertificate.certificateUrl}
                                     alt="Certificate Preview"
                                     style={{
                                        width: '100%',
                                        height: 'auto',
-                                       filter: 'blur(4px)',
+                                       filter: selectedCertificate.isPaid ? 'none' : 'blur(4px)',
                                        transition: 'filter 0.3s ease'
                                     }}
-                                    preview={false}
+                                    preview={selectedCertificate.isPaid}
                                  />
-                                 <div 
-                                    className="position-absolute top-50 start-50 translate-middle text-center w-100"
-                                    style={{
-                                       background: 'rgba(255, 255, 255, 0.95)',
-                                       padding: '2rem',
-                                       borderRadius: '1rem',
-                                       boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
-                                    }}
-                                 >
-                                    <h4 className="mb-3" style={{ color: '#5DB996' }}>Chứng chỉ đã sẵn sàng</h4>
-                                    <p className="text-muted mb-4">
-                                       Để tải xuống và in chứng chỉ với chất lượng cao, vui lòng thanh toán phí 30.000đ
-                                    </p>
-                                    <div className="d-flex justify-content-center gap-3">
-                                       <Button
-                                          variant="primary"
-                                          size="lg"
-                                          onClick={() => handlePurchaseCertificate(selectedCertificate._id)}
-                                          style={{
-                                             backgroundColor: '#5DB996',
-                                             borderColor: '#5DB996',
-                                             padding: '0.5rem 2rem'
-                                          }}
-                                       >
-                                          Thanh toán ngay
-                                       </Button>
-                                       <Button
-                                          variant="outline-secondary"
-                                          size="lg"
-                                          disabled
-                                          style={{
-                                             padding: '0.5rem 2rem'
-                                          }}
-                                       >
-                                          <i className="fas fa-download me-2"></i>
-                                          Tải xuống
-                                       </Button>
-                                       <Button
-                                          variant="outline-secondary"
-                                          size="lg"
-                                          disabled
-                                          style={{
-                                             padding: '0.5rem 2rem'
-                                          }}
-                                       >
-                                          <i className="fas fa-print me-2"></i>
-                                          In chứng chỉ
-                                       </Button>
+                                 {!selectedCertificate.isPaid && (
+                                    <div 
+                                       className="position-absolute top-50 start-50 translate-middle text-center w-100"
+                                       style={{
+                                          background: 'rgba(255, 255, 255, 0.95)',
+                                          padding: '2rem',
+                                          borderRadius: '1rem',
+                                          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                                       }}
+                                    >
+                                       <h4 className="mb-3" style={{ color: '#5DB996' }}>Chứng chỉ đã sẵn sàng</h4>
+                                       <p className="text-muted mb-4">
+                                          Để tải xuống và in chứng chỉ với chất lượng cao, vui lòng thanh toán phí 30.000đ
+                                       </p>
+                                       <div className="d-flex justify-content-center gap-3">
+                                          <Button
+                                             variant="primary"
+                                             size="lg"
+                                             onClick={() => handlePayment(selectedCertificate._id)}
+                                             style={{
+                                                backgroundColor: '#5DB996',
+                                                borderColor: '#5DB996',
+                                                padding: '0.5rem 2rem'
+                                             }}
+                                          >
+                                             Thanh toán ngay
+                                          </Button>
+                                          <Button
+                                             variant="outline-secondary"
+                                             size="lg"
+                                             disabled
+                                             style={{
+                                                padding: '0.5rem 2rem'
+                                             }}
+                                          >
+                                             <i className="fas fa-download me-2"></i>
+                                             Tải xuống
+                                          </Button>
+                                          <Button
+                                             variant="outline-secondary"
+                                             size="lg"
+                                             disabled
+                                             style={{
+                                                padding: '0.5rem 2rem'
+                                             }}
+                                          >
+                                             <i className="fas fa-print me-2"></i>
+                                             In chứng chỉ
+                                          </Button>
+                                       </div>
                                     </div>
-                                 </div>
+                                 )}
                               </div>
                            </div>
                         )}
