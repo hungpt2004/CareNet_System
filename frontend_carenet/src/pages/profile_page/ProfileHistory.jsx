@@ -24,6 +24,8 @@ import {
 } from "../../components/toast/CustomToast";
 import defaultAvatar from "../../assets/defaultAvatar.png";
 const ProfileHistory = () => {
+  // Spinner state for feedback submit
+  const [submittingFeedback, setSubmittingFeedback] = useState(false);
   // CSS styles defined directly in the component
   const styles = {
     root: {
@@ -503,6 +505,7 @@ const ProfileHistory = () => {
 
   // Handle feedback submission
   const handleSubmitFeedback = async () => {
+    setSubmittingFeedback(true);
     console.log("Submitting feedback:", feedbackText); // Debug: check value
     const feedbackData = {
       rating,
@@ -541,6 +544,8 @@ const ProfileHistory = () => {
       if (err.response && err.response.data && err.response.data.message) {
         CustomFailedToast(err.response.data.message);
       }
+    } finally {
+      setSubmittingFeedback(false);
     }
   };
 
@@ -876,11 +881,16 @@ const ProfileHistory = () => {
                     style={{
                       backgroundColor: "#0E606E",
                       borderColor: "#0E606E",
+                      minWidth: 120,
                     }}
                     onClick={handleSubmitFeedback}
-                    disabled={!feedbackText.trim() || rating === 0}
+                    disabled={!feedbackText.trim() || rating === 0 || submittingFeedback}
                   >
-                    Gửi Đánh Giá
+                    {submittingFeedback ? (
+                      <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    ) : (
+                      "Gửi Đánh Giá"
+                    )}
                   </Button>
                 </div>
               </Form>

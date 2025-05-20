@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState } from "react";
@@ -21,13 +22,20 @@ import {
 } from "@ant-design/icons";
 import { motion } from "framer-motion";
 import moment from "moment";
-import "antd/dist/reset.css";
-
+// import "antd/dist/reset.css";
+import axiosInstance from "../../utils/AxiosInstance";
+import {
+  CustomFailedToast,
+  CustomSuccessToast,
+  CustomToast,
+} from "../../components/toast/CustomToast";
+import Swal from "sweetalert2";
 const { Title } = Typography;
 const { TextArea } = Input;
 const { confirm } = Modal;
 
 const FeedbackPage = () => {
+  const [isSaving, setIsSaving] = useState(false);
   // CSS styles defined directly in the component
   const styles = {
     pageContainer: {
@@ -106,65 +114,31 @@ const FeedbackPage = () => {
     };
   }, []);
 
-  // Sample feedback data
-  const [feedbackData, setFeedbackData] = useState([
-    {
-      key: "1",
-      eventName: "Tree Planting Drive",
-      content:
-        "Great experience! Well organized and very fulfilling to help the environment.",
-      feedbackDate: "2023-04-20",
-      rating: 5,
-    },
-    {
-      key: "2",
-      eventName: "Blood Donation Camp",
-      content:
-        "The staff was very professional and made the donation process comfortable.",
-      feedbackDate: "2023-04-24",
-      rating: 4,
-    },
-    {
-      key: "3",
-      eventName: "Animal Shelter Volunteering",
-      content:
-        "Loved working with the animals! The shelter staff was very helpful and supportive.",
-      feedbackDate: "2023-05-06",
-      rating: 5,
-    },
-    {
-      key: "4",
-      eventName: "Community Park Cleanup",
-      content:
-        "Good initiative but could use better organization and more supplies.",
-      feedbackDate: "2023-05-13",
-      rating: 3,
-    },
-    {
-      key: "5",
-      eventName: "Food Drive for Homeless",
-      content:
-        "Meaningful event that directly helped those in need. Would participate again.",
-      feedbackDate: "2023-05-20",
-      rating: 5,
-    },
-    {
-      key: "6",
-      eventName: "Beach Cleanup",
-      content:
-        "Great community event. Shocking to see how much plastic waste we collected.",
-      feedbackDate: "2023-06-05",
-      rating: 4,
-    },
-    {
-      key: "7",
-      eventName: "Elderly Home Visit",
-      content:
-        "Heartwarming experience connecting with seniors. They had amazing stories to share.",
-      feedbackDate: "2023-06-12",
-      rating: 5,
-    },
-  ]);
+  // Feedback data from API
+  const [feedbackData, setFeedbackData] = useState([]);
+
+  React.useEffect(() => {
+    const fetchFeedbacks = async () => {
+      try {
+        const res = await axiosInstance.get("/feedback/get-all-feedback-for-current-user");
+        if (res.data && res.data.status === "success" && Array.isArray(res.data.feedbacks)) {
+          // Map API data to table format, include feedbackId for update/delete
+          const mapped = res.data.feedbacks.map((fb, idx) => ({
+            key: idx + 1,
+            feedbackId: fb._id, // store feedbackId for API calls
+            eventName: fb.eventTitle || "",
+            content: fb.content,
+            feedbackDate: fb.createdAt,
+            rating: fb.rating,
+          }));
+          setFeedbackData(mapped);
+        }
+      } catch (err) {
+        CustomFailedToast("Không thể tải danh sách đánh giá.");
+      }
+    };
+    fetchFeedbacks();
+  }, []);
 
   // Modal state
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -198,7 +172,7 @@ const FeedbackPage = () => {
       dataIndex: "rating",
       key: "rating",
       sorter: (a, b) => a.rating - b.rating,
-      render: (rating) => <Rate disabled defaultValue={rating} />,
+      render: (rating) => <Rate disabled value={rating} />,
     },
     {
       title: "Action",
@@ -223,7 +197,7 @@ const FeedbackPage = () => {
           <Button
             danger
             icon={<DeleteOutlined />}
-            onClick={() => showDeleteConfirm(record.key)}
+            onClick={() => showDeleteConfirm(record.feedbackId)}
             size="small" // Adjust size for better fit
             style={{
               color: "#ff4d4f",
@@ -244,59 +218,90 @@ const FeedbackPage = () => {
     form.setFieldsValue({
       eventName: record.eventName,
       content: record.content,
-      feedbackDate: moment(record.feedbackDate),
+      feedbackDate: moment(record.feedbackDate).format("YYYY-MM-DD"),
       rating: record.rating,
     });
     setIsModalVisible(true);
   };
 
   // Handle delete feedback
-  const showDeleteConfirm = (key) => {
-    confirm({
-      title: "Are you sure you want to delete this feedback?",
-      icon: <ExclamationCircleOutlined />,
-      content: "This action cannot be undone.",
-      okText: "Yes",
-      okType: "danger",
-      cancelText: "No",
-      onOk() {
-        handleDelete(key);
-      },
+  const showDeleteConfirm = (feedbackId) => {
+    Swal.fire({
+      title: "Bạn đã chắc chắn chưa?",
+      text: "Bạn muốn xóa bài đánh giá này? Hành động này không thể hoàn tác.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Vâng, hãy xóa nó!",
+      cancelButtonText: "Hủy",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        handleDelete(feedbackId);
+      }
     });
   };
 
-  const handleDelete = (key) => {
-    setFeedbackData(feedbackData.filter((item) => item.key !== key));
-    notification.success({
-      message: "Feedback Deleted",
-      description: "The feedback has been successfully deleted.",
-    });
+  const handleDelete = async (feedbackId) => {
+    console.log('handleDelete called with feedbackId:', feedbackId);
+    // Find the feedback by feedbackId
+    const feedback = feedbackData.find((item) => item.feedbackId === feedbackId);
+    if (!feedback) {
+      CustomFailedToast("Không tìm thấy đánh giá để xóa.");
+      return;
+    }
+    try {
+      const res = await axiosInstance.delete(`/feedback/delete-feedback/${feedbackId}`);
+      if (res.data && res.data.message) {
+        setFeedbackData(feedbackData.filter((item) => item.feedbackId !== feedbackId));
+        CustomSuccessToast(res.data.message || "Xóa đánh giá thành công.");
+      } else {
+        CustomFailedToast("Xóa đánh giá thất bại.");
+      }
+    } catch (err) {
+      CustomFailedToast(err?.response?.data?.message || "Xóa đánh giá thất bại.");
+    }
   };
 
   // Handle modal OK
-  const handleOk = () => {
-    form.validateFields().then((values) => {
+  const handleOk = async () => {
+    setIsSaving(true);
+    try {
+      const values = await form.validateFields();
+      // Find the feedbackId by key
+      const feedback = feedbackData.find((item) => item.key === editingFeedback.key);
+      if (!feedback) {
+        CustomFailedToast("Không tìm thấy đánh giá để cập nhật.");
+        setIsSaving(false);
+        return;
+      }
+      // Call API to update feedback
+      await axiosInstance.put(`/feedback/update-feedback/${feedback.feedbackId}`, {
+        content: values.content,
+        rating: values.rating,
+      });
+      // Update local state
       const updatedFeedback = {
         ...editingFeedback,
         ...values,
-        feedbackDate: values.feedbackDate.format("YYYY-MM-DD"),
+        feedbackDate: values.feedbackDate,
       };
-
       setFeedbackData(
         feedbackData.map((item) =>
           item.key === editingFeedback.key ? updatedFeedback : item
         )
       );
-
       setIsModalVisible(false);
       setEditingFeedback(null);
       form.resetFields();
-
-      notification.success({
-        message: "Feedback Updated",
-        description: "Your feedback has been successfully updated.",
-      });
-    });
+      CustomSuccessToast("Cập nhật đánh giá thành công.");
+    } catch (err) {
+      CustomFailedToast(
+        err?.response?.data?.message || "Cập nhật đánh giá thất bại."
+      );
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   // Handle modal cancel
@@ -307,98 +312,115 @@ const FeedbackPage = () => {
   };
 
   return (
-    <div style={styles.pageContainer}>
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        style={styles.header}
-      >
-        <Title level={2} style={styles.title}>
-          {/* Event Feedback Management */}
-        </Title>
-        {/* <p>View and manage your feedback for various volunteering events</p> */}
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-      >
-        <h2 className="text-center mb-4">Quản lý đánh giá</h2>
-        <Card
-          style={styles.card}
+    <>
+      <CustomToast />
+      <div style={styles.pageContainer}>
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          style={styles.header}
         >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3, delay: 0.4 }}
-            style={styles.tableContainer}
-          >
-            <Table
-              columns={columns}
-              dataSource={feedbackData}
-              pagination={{ pageSize: 5 }}
-              rowKey="key"
-              rowClassName={(record, index) =>
-                `table-row-${index % 2 === 0 ? "light" : "dark"}`
-              }
-              bordered
-            />
-          </motion.div>
-        </Card>
-      </motion.div>
+          <Title level={2} style={styles.title}>
+            {/* Event Feedback Management */}
+          </Title>
+          {/* <p>View and manage your feedback for various volunteering events</p> */}
+        </motion.div>
 
-      {/* Edit Feedback Modal */}
-      <Modal
-        title="Edit Feedback"
-        visible={isModalVisible}
-        className="mt-5"
-        onOk={handleOk}
-        onCancel={handleCancel}
-        footer={[
-          <Button key="back" onClick={handleCancel}>
-            Cancel
-          </Button>,
-          <Button key="submit" type="primary" onClick={handleOk}>
-            Save
-          </Button>,
-        ]}
-      >
-        <Form form={form} layout="vertical" name="feedbackForm">
-          <Form.Item
-            name="eventName"
-            label="Event Name"
-            rules={[
-              { required: true, message: "Please input the event name!" },
-            ]}
-          >
-            <Input disabled />
-          </Form.Item>
-          <Form.Item
-            name="content"
-            label="Content"
-            rules={[{ required: true, message: "Please input your feedback!" }]}
-          >
-            <TextArea rows={4} />
-          </Form.Item>
-          <Form.Item
-            name="feedbackDate"
-            label="Feedback Date"
-            rules={[{ required: true, message: "Please select the date!" }]}
-          >
-            <DatePicker style={{ width: "100%" }} />
-          </Form.Item>
-          <Form.Item
-            name="rating"
-            label="Rating"
-            rules={[{ required: true, message: "Please rate the event!" }]}
-          >
-            <Rate />
-          </Form.Item>
-        </Form>
-      </Modal>
-    </div>
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          <h2 className="text-center mb-4">Quản lý đánh giá</h2>
+          <Card style={styles.card}>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3, delay: 0.4 }}
+              style={styles.tableContainer}
+            >
+              <Table
+                columns={columns}
+                dataSource={feedbackData}
+                pagination={{ pageSize: 5 }}
+                rowKey="key"
+                rowClassName={(record, index) =>
+                  `table-row-${index % 2 === 0 ? "light" : "dark"}`
+                }
+                bordered
+              />
+            </motion.div>
+          </Card>
+        </motion.div>
+
+        {/* Edit Feedback Modal */}
+        <Modal
+          title="Sửa Đánh Giá "
+          open={isModalVisible}
+          className="mt-5"
+          onOk={handleOk}
+          onCancel={handleCancel}
+          footer={[
+            <Button key="back" onClick={handleCancel}>
+              Hủy
+            </Button>,
+            <Button key="submit" type="primary" onClick={handleOk} disabled={isSaving} style={{ minWidth: 80 }}>
+              {isSaving ? (
+                <span>
+                  <span className="ant-spin ant-spin-sm ant-spin-spinning" role="img" style={{ marginRight: 8 }}>
+                    <span className="ant-spin-dot ant-spin-dot-spin">
+                      <i className="ant-spin-dot-item" />
+                      <i className="ant-spin-dot-item" />
+                      <i className="ant-spin-dot-item" />
+                      <i className="ant-spin-dot-item" />
+                    </span>
+                  </span>
+                  Đang lưu...
+                </span>
+              ) : (
+                "Lưu"
+              )}
+            </Button>,
+          ]}
+        >
+          <Form form={form} layout="vertical" name="feedbackForm">
+            <Form.Item
+              name="eventName"
+              label="Tên sự kiện"
+              rules={[
+                { required: true, message: "Please input the event name!" },
+              ]}
+            >
+              <Input disabled />
+            </Form.Item>
+            <Form.Item
+              name="content"
+              label="Bài đánh giá"
+              rules={[
+                { required: true, message: "Please input your feedback!" },
+              ]}
+            >
+              <TextArea rows={4} />
+            </Form.Item>
+            <Form.Item
+              name="feedbackDate"
+              label="Ngày đánh giá"
+              rules={[{ required: true, message: "Please select the date!" }]}
+            >
+              <Input disabled />
+            </Form.Item>
+            <Form.Item
+              name="rating"
+              label="Số sao"
+              rules={[{ required: true, message: "Please rate the event!" }]}
+            >
+              <Rate allowHalf />
+            </Form.Item>
+          </Form>
+        </Modal>
+      </div>
+    </>
   );
 };
 
