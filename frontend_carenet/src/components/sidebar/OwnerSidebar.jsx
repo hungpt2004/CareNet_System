@@ -1,7 +1,20 @@
 import React, { useState } from "react";
 import { Nav } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
-import { Home, Users, BookOpen, Calendar, BarChart2, Award, MessageSquare, DollarSign, Layers, Settings, ChevronDown, ChevronRight } from 'lucide-react';
+import {
+  Home,
+  Users,
+  BookOpen,
+  Calendar,
+  BarChart2,
+  Award,
+  MessageSquare,
+  DollarSign,
+  Layers,
+  Settings,
+  ChevronDown,
+  ChevronRight,
+} from "lucide-react";
 
 // Custom CSS variables for the color scheme
 const customStyles = {
@@ -36,6 +49,7 @@ const OwnerSidebar = ({ showSidebar, isMobile }) => {
         { title: "Danh sách TNV", path: "/admin-participant" },
         { title: "Điểm danh TNV", path: "/owner-attendance" },
         { title: "Phê duyệt TNV", path: "/owner-user" },
+        { title: "Đánh giá TNV", path: "/owner-feedback" },
       ],
     },
     {
@@ -80,22 +94,34 @@ const OwnerSidebar = ({ showSidebar, isMobile }) => {
                       <div
                         className="d-flex align-items-center justify-content-between sidebar-link"
                         onClick={() => toggleSubmenu(item.id)}
-                        style={{ cursor: 'pointer', padding: '0.5rem 1rem' }}
+                        style={{ cursor: "pointer", padding: "0.5rem 1rem" }}
                       >
                         <div className="d-flex align-items-center">
-                          <span className="icon-container me-2">{item.icon}</span>
+                          <span className="icon-container me-2">
+                            {item.icon}
+                          </span>
                           <span>{item.title}</span>
                         </div>
-                        {expandedMenus[item.id] ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                        {expandedMenus[item.id] ? (
+                          <ChevronDown size={16} />
+                        ) : (
+                          <ChevronRight size={16} />
+                        )}
                       </div>
 
-                      <div className={`submenu ${expandedMenus[item.id] ? "show" : ""}`}>
+                      <div
+                        className={`submenu ${
+                          expandedMenus[item.id] ? "show" : ""
+                        }`}
+                      >
                         {item.submenu.map((subitem, index) => (
-                          <NavLink 
-                            key={index} 
-                            to={subitem.path} 
-                            className={({ isActive }) => 
-                              `sidebar-sublink d-block ${isActive ? "active" : ""}`
+                          <NavLink
+                            key={index}
+                            to={subitem.path}
+                            className={({ isActive }) =>
+                              `sidebar-sublink d-block ${
+                                isActive ? "active" : ""
+                              }`
                             }
                           >
                             {subitem.title}
@@ -104,10 +130,12 @@ const OwnerSidebar = ({ showSidebar, isMobile }) => {
                       </div>
                     </>
                   ) : (
-                    <NavLink 
-                      to={item.path} 
-                      className={({ isActive }) => 
-                        `d-flex align-items-center sidebar-link ${isActive ? "active" : ""}`
+                    <NavLink
+                      to={item.path}
+                      className={({ isActive }) =>
+                        `d-flex align-items-center sidebar-link ${
+                          isActive ? "active" : ""
+                        }`
                       }
                     >
                       <span className="icon-container me-2">{item.icon}</span>
@@ -122,11 +150,7 @@ const OwnerSidebar = ({ showSidebar, isMobile }) => {
       </div>
 
       {/* Mobile Sidebar Overlay */}
-      {isMobile && showSidebar && (
-        <div 
-          className="sidebar-overlay"
-        ></div>
-      )}
+      {isMobile && showSidebar && <div className="sidebar-overlay"></div>}
 
       <style>{`
         .sidebar {

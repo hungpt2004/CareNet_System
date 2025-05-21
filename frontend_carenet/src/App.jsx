@@ -39,6 +39,7 @@ import OnBoardingPage from './pages/onboarding_page/OnBoardingPage';
 import PaymentSuccessPage from './pages/payment_status_page/PaymentSuccessPage';
 import PaymentCancelPage from './pages/payment_status_page/PaymentCancelPage';
 import MyEventsPage from './pages/my_events_page/MyEventsPage';
+import AdminFeedbackPage from "./pages/admin_students_page/AdminFeedbackPage";
 
 const guestRoutes = [
   { path: '/', element: <LandingPage /> },
@@ -86,6 +87,7 @@ const privateOwnerRoutes = [
   { path: '/owner-user', element: <OrganizationUserRequests /> },
   { path: '/owner-attendance', element: <OrganizationEventAttendance /> },
   { path: '/admin-participant', element: <AdminEventParticipants /> },
+  {path: '/owner-feedback', element: <AdminFeedbackPage />},
 ];
 
 

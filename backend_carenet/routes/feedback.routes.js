@@ -7,4 +7,5 @@ feedbackRouter.post("/create-feedback/:id", authenticateToken, feedbackControlle
 feedbackRouter.get("/get-all-feedback-for-current-user",authenticateToken,feedbackController.getAllFeedback);
 feedbackRouter.put("/update-feedback/:id", authenticateToken, feedbackController.editFeedback);
 feedbackRouter.delete("/delete-feedback/:id", authenticateToken, feedbackController.deleteFeedback);
+feedbackRouter.get("/get-all-feedback-for-current-organization", authenticateToken, feedbackController.getAllFeedbackForCurrentOrganization)
 module.exports = feedbackRouter;

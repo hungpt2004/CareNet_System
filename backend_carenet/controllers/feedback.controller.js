@@ -172,3 +172,48 @@ exports.deleteFeedback = asyncHandler(async (req, res) => {
     });
   }
 });
+
+exports.getAllFeedbackForCurrentOrganization = asyncHandler(async (req, res) => {
+  const user = req.user.user;
+  try {
+    // 1. Get organizationId from current user
+    const organizationId = user.organizationId;
+    if (!organizationId) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Bạn không thuộc tổ chức nào."
+      });
+    }
+
+    // 2. Find all events of this organization
+    const events = await require("../models/event.model").find({ organizationId: organizationId }, "_id title");
+    const eventIds = events.map(e => e._id);
+
+    // 3. Find all feedbacks for these events, populate userId (fullname) and eventId (title)
+    const feedbacks = await Feedback.find({ eventId: { $in: eventIds } })
+      .populate({ path: "eventId", select: "title" })
+      .populate({ path: "userId", select: "fullname" });
+
+    // 4. Map to desired output
+    const feedbackList = feedbacks.map(fb => ({
+      _id: fb._id,
+      eventTitle: fb.eventId?.title || null,
+      content: fb.content,
+      rating: fb.rating,
+      createdAt: fb.createdAt,
+      fullname: fb.userId?.fullname || null
+    }));
+
+    return res.status(200).json({
+      status: "success",
+      message: "Lấy feedback của tổ chức thành công",
+      feedbacks: feedbackList
+    });
+  } catch (error) {
+    console.error("Error getting organization feedback:", error);
+    return res.status(500).json({
+      status: "fail",
+      message: "Lỗi khi lấy feedback của tổ chức"
+    });
+  }
+});
