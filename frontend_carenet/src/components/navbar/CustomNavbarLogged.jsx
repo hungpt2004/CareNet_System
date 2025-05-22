@@ -3,7 +3,7 @@ import { Button, Container, Nav, Navbar, Image, Row, Col } from "react-bootstrap
 import styles from '../../css/AppColors.module.css'
 import useAuthStore from "../../hooks/authStore";
 import { useNavigate } from "react-router-dom";
-
+import defaultAvatar from "../../assets/defaultAvatar.png";
 const CustomNavbarLogged = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -122,7 +122,10 @@ const CustomNavbarLogged = () => {
                 }}
               >
                 <Image
-                  src={currentUser?.avatar}
+                  src={
+                    (localStorage.getItem("user") && JSON.parse(localStorage.getItem("user")).avatarUrl) ||
+                    defaultAvatar
+                  }
                   width="100%"
                   height="100%"
                   style={{ objectFit: 'cover' }}
