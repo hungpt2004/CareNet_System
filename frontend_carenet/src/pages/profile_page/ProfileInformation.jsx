@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   Container,
   Row,
@@ -240,6 +240,8 @@ const ProfileInfo = () => {
   const [uploadedCccdImages, setUploadedCccdImages] = useState(
     (currentUser.cccdImages && currentUser.cccdImages.slice(0, 2)) || []
   );
+  // Ref for file input
+  const cccdFileInputRef = useRef(null);
 
   // Handle CCCD file selection
   const handleCccdFileChange = (e) => {
@@ -290,8 +292,21 @@ const ProfileInfo = () => {
     }
   };
 
-  // Remove a CCCD image from both UI and backend
-  const handleRemoveCccdImage = async (index) => {
+  // State for custom confirmation modal
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteIndex, setDeleteIndex] = useState(null);
+
+  // Show the custom confirmation modal
+  const handleRemoveCccdImage = (index) => {
+    setDeleteIndex(index);
+    setShowDeleteModal(true);
+  };
+
+  // Confirm deletion (called when user clicks 'Vâng hãy xóa đi')
+  const confirmRemoveCccdImage = async () => {
+    const index = deleteIndex;
+    setShowDeleteModal(false);
+    setDeleteIndex(null);
     const imageToRemove = uploadedCccdImages[index];
     try {
       // Call backend to remove the image by URL
@@ -590,6 +605,7 @@ const ProfileInfo = () => {
                               multiple
                               onChange={handleCccdFileChange}
                               style={{ marginBottom: 8 }}
+                              ref={cccdFileInputRef}
                             />
                             {/* Preview selected images */}
                             <div
@@ -614,19 +630,34 @@ const ProfileInfo = () => {
                                 />
                               ))}
                             </div>
-                            <Button
-                              variant="primary"
-                              size="sm"
-                              onClick={handleCccdUpload}
-                              disabled={cccdUploading || cccdFiles.length === 0}
-                              style={{ marginBottom: 8 }}
-                            >
-                              {cccdUploading ? (
-                                <Spinner animation="border" size="sm" />
-                              ) : (
-                                "Tải lên CCCD"
-                              )}
-                            </Button>
+                            <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+                              <Button
+                                variant="primary"
+                                size="sm"
+                                onClick={handleCccdUpload}
+                                disabled={cccdUploading || cccdFiles.length === 0}
+                              >
+                                {cccdUploading ? (
+                                  <Spinner animation="border" size="sm" />
+                                ) : (
+                                  "Tải lên CCCD"
+                                )}
+                              </Button>
+                              <Button
+                                variant="outline-secondary"
+                                size="sm"
+                                disabled={cccdUploading || cccdFiles.length === 0}
+                                onClick={() => {
+                                  setCccdFiles([]);
+                                  setCccdPreviews([]);
+                                  if (cccdFileInputRef.current) {
+                                    cccdFileInputRef.current.value = "";
+                                  }
+                                }}
+                              >
+                                Hủy
+                              </Button>
+                            </div>
                             {/* Show already uploaded CCCD images */}
                             {uploadedCccdImages.length > 0 && (
                               <div style={{ marginTop: 8 }}>
@@ -634,7 +665,8 @@ const ProfileInfo = () => {
                                   style={{
                                     fontSize: 13,
                                     color: "#555",
-                                    marginBottom: 4,
+                                    marginBottom: 12,
+                                    marginTop: 10,
                                   }}
                                 >
                                   Ảnh CCCD đã tải lên:
@@ -822,6 +854,63 @@ const ProfileInfo = () => {
             >
               ×
             </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Modern Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            background: "rgba(0,0,0,0.4)",
+            zIndex: 10000,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <div
+            style={{
+              background: "#fff",
+              borderRadius: 12,
+              padding: 32,
+              minWidth: 320,
+              boxShadow: "0 8px 32px rgba(0,0,0,0.18)",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              animation: "fadeIn 0.2s",
+              position: "relative",
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ fontWeight: 600, fontSize: 18, marginBottom: 12, color: '#0E606E', textAlign: 'center' }}>
+              Bạn chắc chắn muốn xóa chứ?
+            </div>
+            <div style={{ color: '#555', fontSize: 15, marginBottom: 24, textAlign: 'center' }}>
+              Hành động này không thể hoàn tác.
+            </div>
+            <div style={{ display: 'flex', gap: 16 }}>
+              <Button
+                variant="danger"
+                style={{ minWidth: 110, fontWeight: 500 }}
+                onClick={confirmRemoveCccdImage}
+              >
+                Vâng hãy xóa đi
+              </Button>
+              <Button
+                variant="outline-secondary"
+                style={{ minWidth: 80, fontWeight: 500 }}
+                onClick={() => { setShowDeleteModal(false); setDeleteIndex(null); }}
+              >
+                Hủy
+              </Button>
+            </div>
           </div>
         </div>
       )}

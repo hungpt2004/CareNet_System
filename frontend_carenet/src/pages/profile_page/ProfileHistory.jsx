@@ -12,11 +12,10 @@ import {
   Toast,
 } from "react-bootstrap";
 import { motion, AnimatePresence } from "framer-motion";
-import { Modal, Rate } from "antd";
+import { Modal, Rate, Tooltip } from "antd";
 import "antd/dist/reset.css";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../utils/AxiosInstance";
-// import useAuthStore from "../../hooks/authStore";
 import {
   CustomFailedToast,
   CustomSuccessToast,
@@ -746,13 +745,26 @@ const ProfileHistory = () => {
                               </div>
                             </div>
 
-                            <Button
-                              className="feedback-btn"
-                              style={styles.feedbackButton}
-                              onClick={() => handleFeedbackClick(effort)}
+                            <Tooltip
+                              title={
+                                effort.status !== "finished"
+                                  ? "Tình trạng của bạn phải là Kết thúc mới cho phép gửi đánh giá"
+                                  : ""
+                              }
+                              color="#0E606E"
+                              placement="top"
                             >
-                              Đánh Giá
-                            </Button>
+                              <span>
+                                <Button
+                                  className="feedback-btn"
+                                  style={styles.feedbackButton}
+                                  onClick={() => effort.status === "finished" && handleFeedbackClick(effort)}
+                                  disabled={effort.status !== "finished"}
+                                >
+                                  Đánh Giá
+                                </Button>
+                              </span>
+                            </Tooltip>
                           </motion.div>
                         ))}
                       </AnimatePresence>
