@@ -155,7 +155,7 @@ export default function EventDetail() {
                       transition={{ delay: 0.4 }}
                     >
                       <Users size={16} className="me-2" style={{ color: customStyles.primaryColor }} />
-                      <strong>{eventData?.currentParticipants} người tham gia</strong>
+                      <strong>{eventData?.currentParticipants} người ghi danh</strong>
                     </motion.div>
                   </Col>
                   <Col md={4} className="d-flex flex-column justify-content-between">

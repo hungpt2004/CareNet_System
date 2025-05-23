@@ -89,19 +89,6 @@ function AuthenGatePage() {
 
   const handleRegisterModalShow = () => setShowRegisterModal(true)
 
-  // Toggle password visibility
-  const toggleLoginPasswordVisibility = () => {
-    setShowLoginPassword(!showLoginPassword)
-  }
-
-  const toggleRegisterPasswordVisibility = () => {
-    setShowRegisterPassword(!showRegisterPassword)
-  }
-
-  const toggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword(!showConfirmPassword)
-  }
-
 
   // Handle login form submission
   const handleLoginSubmit = async (values) => {
@@ -248,7 +235,7 @@ function AuthenGatePage() {
                 marginBottom: "32px",
               }}
             >
-              Nền tảng kết nối tình nguyện viên với các tổ chức và sự kiện thiện nguyện trên khắp Việt Nam
+              Nền tảng kết nối tình nguyện viên với các tổ chức xã hội trên khắp Việt Nam
             </Typography.Paragraph>
 
             <Space size="middle">
