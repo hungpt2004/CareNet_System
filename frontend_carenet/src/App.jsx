@@ -21,7 +21,6 @@ import AdminDashboard from './pages/admin_dashboard_page/AdminDashboardPage';
 import AdminOrganizations from './pages/admin_organization_page/admin_organization';
 import AdminVolunteerPosts from './pages/admin_posts_page/AdminPostPage';
 import AdminEventParticipants from './pages/admin_students_page/AdminEventParticipant';
-import { ToastProvider } from './components/toast/ToastNotification';
 import OwnerLayout from './layout/OwnerLayout';
 import OrganizationPostPage from './pages/organization_post_page/OrganizationPostPage';
 import ProfileScore from './pages/profile_page/ProfileScore';
@@ -45,12 +44,15 @@ import StaffLayout from './layout/StaffLayout';
 import OrganizationRegisterPage from './pages/organization_register_page/OrganizationRegisterPage';
 import AdminOrganizationsPending from './pages/admin_students_page/AdminOrganizationsPage';
 import AdminEventsPending from './pages/admin_students_page/AdminEventsPage';
+import OrganizationUserPending from './pages/organization_user_page/OrganizationUserPending';
+import ChatPage from './pages/chat/ChatPage';
 
 const guestRoutes = [
   { path: '/', element: <LandingPage /> },
   { path: '/search', element: <VolunteerEventSearch /> },
   { path: '/onboarding', element: <OnBoardingPage /> },
   { path: '/organization-register', element: <OrganizationRegisterPage /> },
+    { path: '/chat', element: <ChatPage/>}
 ];
 
 const publicRoutes = [
@@ -91,6 +93,7 @@ const privateOwnerRoutes = [
   { path: '/owner-dashboard', element: <OrganizationDashboardPage /> },
   { path: '/owner-post', element: <OrganizationPostPage /> },
   { path: '/owner-user', element: <OrganizationUserRequests /> },
+  { path: '/owner-pending', element: <OrganizationUserPending /> },
   { path: '/owner-attendance', element: <OrganizationEventAttendance /> },
   { path: '/admin-participant', element: <AdminEventParticipants /> },
   { path: '/upgrade-pro', element: <UpgradePro /> },
@@ -104,7 +107,6 @@ const privateStaffRoutes = [
 
 function App() {
   return (
-    <ToastProvider>
       <Router>
         <Routes>
           {/* Customer Routes */}
@@ -181,7 +183,6 @@ function App() {
 
         </Routes>
       </Router>
-    </ToastProvider>
   );
 }
 

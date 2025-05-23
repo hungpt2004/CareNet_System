@@ -24,6 +24,16 @@ exports.approveOrganizationRegister = asyncHandler(async (req, res) => {
     },
   });
 
+  await User.findOneAndUpdate(
+    {
+      organizationId: organization._id,
+      role: 'volunteer'
+    },
+    {
+      $set: {role: 'organization'}
+    }
+  )
+
   res.status(200).json({
     status: "success",
     message: "Phê duyệt tổ chức thành công",
@@ -57,6 +67,12 @@ exports.rejectOrganizationRegister = asyncHandler(async (req, res) => {
         rejectReason: rejectReason || null,
       },
     });
+
+
+    await Event.findOneAndUpdate(
+      {organizationId: organizationId},
+      {$set: {status: 'cancelled'}}
+    )
 
     // Gửi mail tới tổ chức
 
@@ -169,6 +185,29 @@ exports.getPendingEvent = asyncHandler(async (req, res) => {
     return res.status(500).json({
       status: "fail",
       message: "Lấy danh sách sự kiện đang chờ duyệt thất bại",
+    });
+  }
+});
+
+exports.getAllAccount = asyncHandler(async (req, res) => {
+  try {
+    
+    const organizationList = await Organization.find();
+
+    const userList = await User.find();
+
+    const eventList = await Event.find();
+
+    res.status(200).json({
+      status: "success",
+      users: userList,
+      organizations: organizationList,
+      events: eventList,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "fail",
+      message: "Lấy danh sách tài khoản thất bại",
     });
   }
 });

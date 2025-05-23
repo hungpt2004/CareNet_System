@@ -5,6 +5,7 @@ import { Footer } from "../components/footer/Footer";
 import CustomNavbarLogged from "../components/navbar/CustomNavbarLogged";
 import CustomNavbar from "../components/navbar/CustomNavbar";
 import useAuthStore from "../hooks/authStore";
+import Breadcrumbs from "./Breadcrumb";
 
 const CustomerLayout = () => {
   // Kiểm tra xem người dùng có đăng nhập không
@@ -18,7 +19,10 @@ const CustomerLayout = () => {
       {/* Main Content with padding for fixed navbar */}
       <main className="flex-grow-1" style={{ paddingTop: '100px' }}>
         <Container fluid>
-          <Outlet />
+          <div className="p-5 mt-5">
+            <Breadcrumbs />
+            <Outlet />
+          </div>
         </Container>
       </main>
 

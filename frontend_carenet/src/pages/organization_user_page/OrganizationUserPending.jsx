@@ -1,6 +1,4 @@
-"use client"
-
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef } from "react";
 import {
   Table,
   Select,
@@ -21,7 +19,7 @@ import {
   Row,
   Col,
   Divider,
-} from "antd"
+} from "antd";
 import {
   SearchOutlined,
   CheckCircleOutlined,
@@ -31,112 +29,82 @@ import {
   UserOutlined,
   ClockCircleOutlined,
   ExclamationCircleOutlined,
-} from "@ant-design/icons"
-import axiosInstance from "../../utils/AxiosInstance"
-import { CustomSuccessToast, CustomToast } from "../../components/toast/CustomToast"
-import CustomSpinner from "../../components/spinner/CustomSpinner"
-import io from "socket.io-client"
-import axios from "axios"
-import useAuthStore from "../../hooks/authStore"
+} from "@ant-design/icons";
+import axiosInstance from "../../utils/axiosInstance";
+import { CustomSuccessToast, CustomToast } from "../../components/toast/CustomToast";
+import CustomSpinner from "../../components/spinner/CustomSpinner";
+import io from 'socket.io-client';
+import axios from "axios";
 
-const { Title, Text, Paragraph } = Typography
-const { TabPane } = Tabs
-const { Search } = Input
+const { Title, Text, Paragraph } = Typography;
+const { TabPane } = Tabs;
+const { Search } = Input;
 
-const OrganizationUserRequests = () => {
-  const [loading, setLoading] = useState(false)
-  const [requests, setRequests] = useState([])
-  const [filteredRequests, setFilteredRequests] = useState([])
-  const [searchText, setSearchText] = useState("")
-  const [sortKey, setSortKey] = useState(null)
-  const [sortOrder, setSortOrder] = useState(null)
-  const [selectedEventId, setSelectedEventId] = useState("all")
-  const [events, setEvents] = useState([])
-  const [detailVisible, setDetailVisible] = useState(false)
-  const [selectedRequest, setSelectedRequest] = useState(null)
-  const [rejectModalVisible, setRejectModalVisible] = useState(false)
-  const [rejectForm] = Form.useForm()
-  const [rejectingRequestId, setRejectingRequestId] = useState(null)
-  const socketRef = useRef(null)
-  const [activeTab, setActiveTab] = useState("all")
-  const currentUser = useAuthStore((state) => state.currentUser)
+const OrganizationUserPending = () => {
+  const [loading, setLoading] = useState(false);
+  const [requests, setRequests] = useState([]);
+  const [filteredRequests, setFilteredRequests] = useState([]);
+  const [searchText, setSearchText] = useState("");
+  const [sortKey, setSortKey] = useState(null);
+  const [sortOrder, setSortOrder] = useState(null);
+  const [selectedEventId, setSelectedEventId] = useState("all");
+  const [events, setEvents] = useState([]);
+  const [detailVisible, setDetailVisible] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState(null);
+  const [rejectModalVisible, setRejectModalVisible] = useState(false);
+  const [rejectForm] = Form.useForm();
+  const [rejectingRequestId, setRejectingRequestId] = useState(null);
+  const socketRef = useRef(null);
+  const [activeTab, setActiveTab] = useState("all");
 
   // Khởi tạo Socket.IO connection
   useEffect(() => {
-    socketRef.current = io("http://localhost:5000", {
-      withCredentials: true,
-    })
-
-    // Debug log khi kết nối thành công
-    socketRef.current.on('connect', () => {
-      console.log('Socket.IO connected successfully in OrganizationUserRequest')
-    })
-
-    // Debug log khi có lỗi kết nối
-    socketRef.current.on('connect_error', (error) => {
-      console.error('Socket.IO connection error in OrganizationUserRequest:', error)
-    })
-
-    // Join vào room của organization
-    if (currentUser?._id) {
-      console.log('Joining organization room:', currentUser._id)
-      socketRef.current.emit('joinOrganizationRoom', currentUser._id)
-    }
-
-    // Lắng nghe sự kiện requestApproved
-    socketRef.current.on('requestApproved', (data) => {
-      console.log('Received requestApproved event in OrganizationUserRequest:', data)
-      // Refresh danh sách yêu cầu khi có thông báo mới
-      if (selectedEventId && selectedEventId !== "all") {
-        fetchEventRegistrations(selectedEventId)
-      }
-    })
+    socketRef.current = io('http://localhost:5000', {
+      withCredentials: true
+    });
 
     return () => {
-      if (currentUser?._id) {
-        console.log('Leaving organization room:', currentUser._id)
-        socketRef.current.emit('leaveOrganizationRoom', currentUser._id)
-      }
       if (socketRef.current) {
-        socketRef.current.disconnect()
+        socketRef.current.disconnect();
       }
-    }
-  }, [currentUser?._id, selectedEventId])
+    };
+  }, []);
 
   // Fetch owned events
   const fetchOwnedEvents = async () => {
     try {
-      setLoading(true)
-      const response = await axiosInstance.get("/organization/get-owned-event")
+      setLoading(true);
+      const response = await axiosInstance.get('/organization/get-owned-event');
       if (response.data.status === "success" && response.data.eventData) {
-        setEvents(response.data.eventData)
+        setEvents(response.data.eventData);
       }
     } catch (error) {
-      console.error("Error fetching events:", error)
-      message.error("Không thể tải danh sách sự kiện")
+      console.error("Error fetching events:", error);
+      message.error("Không thể tải danh sách sự kiện");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // Fetch event registrations
   const fetchEventRegistrations = async (eventId) => {
     try {
-      console.log("Fetching event registrations for event:", eventId)
-      setLoading(true)
-      const response = await axiosInstance.get(`/organization/get-request-event/${eventId}`)
+      console.log('Fetching event registrations for event:', eventId);
+      setLoading(true);
+      const response = await axiosInstance.get(`/organization/get-request-pending/${eventId}`);
       if (response.data.status === "success") {
-        console.log("Fetched registrations:", response.data.eventRegistrationData)
-        setRequests(response.data.eventRegistrationData)
-        setFilteredRequests(response.data.eventRegistrationData)
+        console.log('Fetched registrations:', response.data.eventRegistrationData);
+        setRequests(response.data.eventRegistrationData);
+        setFilteredRequests(response.data.eventRegistrationData);
       }
     } catch (error) {
-      console.error("Error fetching registrations:", error)
-      message.error("Không thể tải danh sách yêu cầu")
+      console.error("Error fetching registrations:", error);
+      message.error("Không thể tải danh sách yêu cầu");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
+
 
   console.log(selectedRequest?.user?.fullname)
   console.log(selectedRequest?.user?.email)
@@ -144,165 +112,149 @@ const OrganizationUserRequests = () => {
   // Approve request
   const handleApprove = async (requestId) => {
     try {
-      setLoading(true)
-      console.log("Approving request:", { requestId, selectedRequest })
+      setLoading(true);
+      console.log('Approving request:', { requestId, selectedRequest });
 
       // Tìm request trong danh sách nếu chưa có trong selectedRequest
-      const requestToApprove = selectedRequest || requests.find((r) => r._id === requestId)
+      const requestToApprove = selectedRequest || requests.find(r => r._id === requestId);
       if (!requestToApprove) {
-        console.error("Request not found:", requestId)
-        message.error("Không tìm thấy yêu cầu")
-        return
+        console.error('Request not found:', requestId);
+        message.error("Không tìm thấy yêu cầu");
+        return;
       }
 
       // Tương tác API duyệt yêu cầu
       const response = await axios.post(`http://localhost:5000/organization/approve-request/${requestId}`, {
         fullname: requestToApprove.user?.fullname,
         email: requestToApprove.user?.email,
-      })
-
+      });
+      
       if (response.data.status === "success") {
-        console.log("Request approved successfully:", response.data)
+        console.log('Request approved successfully:', response.data);
 
         // Gửi thông báo realtime qua Socket.IO
-        const eventTitle = events.find((e) => e._id === selectedEventId)?.title
+        const eventTitle = events.find(e => e._id === selectedEventId)?.title;
         const notificationData = {
           userId: requestToApprove.user._id,
           eventId: selectedEventId,
           eventTitle: eventTitle,
-          message: `Đơn đăng ký tham gia sự kiện "${eventTitle}" đã được duyệt`,
-        }
-        console.log("Emitting Socket.IO notification:", notificationData)
-        socketRef.current.emit("requestApproved", notificationData)
+          message: `Đơn đăng ký tham gia sự kiện "${eventTitle}" đã được duyệt`
+        };
+        console.log('Emitting Socket.IO notification:', notificationData);
+        socketRef.current.emit('requestApproved', notificationData);
 
-        // Đóng modal chi tiết
-        setDetailVisible(false)
-        setSelectedRequest(null)
-
-        // Cập nhật lại danh sách yêu cầu
-        if (selectedEventId === "all") {
-          // Nếu đang xem tất cả sự kiện, cập nhật lại danh sách yêu cầu cho tất cả sự kiện
-          await Promise.all(events.map((event) => fetchEventRegistrations(event._id)))
-        } else {
-          // Nếu đang xem một sự kiện cụ thể, chỉ cập nhật lại danh sách yêu cầu của sự kiện đó
-          await fetchEventRegistrations(selectedEventId)
-        }
-
-        CustomSuccessToast("Duyệt yêu cầu thành công")
+        // Đóng modal chi tiết 
+        setDetailVisible(false);
+        setSelectedRequest(null);
+        
+        
+        await fetchEventRegistrations(selectedEventId);
+        console.log('Event registrations refreshed');
+        
+        CustomSuccessToast("Duyệt yêu cầu thành công");
       }
     } catch (error) {
-      console.error("Error approving request:", error)
-      message.error("Không thể duyệt yêu cầu")
+      console.error("Error approving request:", error);
+      message.error("Không thể duyệt yêu cầu");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // Handle reject request
   const handleReject = async (requestId) => {
     try {
-      setLoading(true)
-      const values = await rejectForm.validateFields()
+      setLoading(true);
+      const values = await rejectForm.validateFields();
       const response = await axios.post(`http://localhost:5000/organization/reject-request/${requestId}`, {
-        cancellationReason: values.reason,
-      })
+        cancellationReason: values.reason
+      });
       if (response.data.status === "success") {
-        fetchEventRegistrations(selectedEventId)
-        setRejectModalVisible(false)
-        rejectForm.resetFields()
+        fetchEventRegistrations(selectedEventId);
+        setRejectModalVisible(false);
+        rejectForm.resetFields();
       }
-      CustomSuccessToast("Từ chối yêu cầu thành công")
+      CustomSuccessToast("Từ chối yêu cầu thành công");
     } catch (error) {
-      console.error("Error rejecting request:", error)
-      message.error("Không thể từ chối yêu cầu")
+      console.error("Error rejecting request:", error);
+      message.error("Không thể từ chối yêu cầu");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // Show reject confirmation modal
   const showRejectModal = (requestId) => {
-    setRejectingRequestId(requestId)
-    setRejectModalVisible(true)
-  }
+    setRejectingRequestId(requestId);
+    setRejectModalVisible(true);
+  };
 
   // View details
   const handleViewDetails = (request) => {
-    console.log("Viewing request details:", request)
-    setSelectedRequest(request)
-    setDetailVisible(true)
-  }
+    console.log("Viewing request details:", request);
+    setSelectedRequest(request);
+    setDetailVisible(true);
+  };
 
   // Load data when event is selected
   useEffect(() => {
     if (selectedEventId && selectedEventId !== "all") {
-      fetchEventRegistrations(selectedEventId)
+      fetchEventRegistrations(selectedEventId);
     } else {
-      setRequests([])
-      setFilteredRequests([])
+      setRequests([]);
+      setFilteredRequests([]);
     }
-  }, [selectedEventId])
+  }, [selectedEventId]);
 
   // Load owned events when component mounts
   useEffect(() => {
-    fetchOwnedEvents()
-  }, [])
+    fetchOwnedEvents();
+  }, []);
 
-  // Filter by tab
+  // Search logic
   useEffect(() => {
-    if (activeTab === "all") {
-      setFilteredRequests(
-        requests.filter((request) =>
-          searchText
-            ? request.user?.fullname?.toLowerCase().includes(searchText.toLowerCase()) ||
-              request.user?.email?.toLowerCase().includes(searchText.toLowerCase()) ||
-              request.user?.phone?.includes(searchText) ||
-              request.user?.cccdNumber?.includes(searchText)
-            : true,
-        ),
-      )
+    if (searchText) {
+      const filtered = requests.filter((request) => {
+        const user = formatUserData(request.user);
+        return (
+          user.fullname.toLowerCase().includes(searchText.toLowerCase()) ||
+          user.email.toLowerCase().includes(searchText.toLowerCase()) ||
+          user.phone.includes(searchText) ||
+          user.cccdNumber.includes(searchText)
+        );
+      });
+      setFilteredRequests(filtered);
     } else {
-      setFilteredRequests(
-        requests.filter(
-          (request) =>
-            request.status === activeTab &&
-            (searchText
-              ? request.user?.fullname?.toLowerCase().includes(searchText.toLowerCase()) ||
-                request.user?.email?.toLowerCase().includes(searchText.toLowerCase()) ||
-                request.user?.phone?.includes(searchText) ||
-                request.user?.cccdNumber?.includes(searchText)
-              : true),
-        ),
-      )
+      setFilteredRequests(requests);
     }
-  }, [activeTab, requests, searchText])
+  }, [searchText, requests]);
 
   // Format user data for display
   const formatUserData = (user) => {
-    if (!user) return {}
+    if (!user) return {};
     return {
-      fullname: user.fullname || "N/A",
-      email: user.email || "N/A",
-      phone: user.phone || "N/A",
-      cccdNumber: user.cccdNumber || "N/A",
-      dob: user.dob ? new Date(user.dob).toLocaleDateString("vi-VN") : "N/A",
+      fullname: user.fullname || 'N/A',
+      email: user.email || 'N/A',
+      phone: user.phone || 'N/A',
+      cccdNumber: user.cccdNumber || 'N/A',
+      dob: user.dob ? new Date(user.dob).toLocaleDateString('vi-VN') : 'N/A',
       isVerified: user.isVerified || false,
-      status: user.status || "ready",
+      status: user.status || 'ready',
       reputationPoints: user.reputationPoints || 0,
       totalHours: user.totalHours || 0,
       activityPoints: user.activityPoints || 0,
-    }
-  }
+    };
+  };
 
   // Format date
   const formatDate = (dateString) => {
-    if (!dateString) return "N/A"
+    if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("vi-VN", {
       year: "numeric",
       month: "numeric",
       day: "numeric",
-    })
-  }
+    });
+  };
 
   // Get status tag
   const getStatusTag = (status) => {
@@ -312,84 +264,71 @@ const OrganizationUserRequests = () => {
           <Tag color="success" icon={<CheckCircleOutlined />}>
             Đã duyệt
           </Tag>
-        )
+        );
       case "pending":
         return (
           <Tag color="processing" icon={<ClockCircleOutlined />}>
             Chờ duyệt
           </Tag>
-        )
+        );
       case "rejected":
         return (
           <Tag color="error" icon={<CloseCircleOutlined />}>
             Từ chối
           </Tag>
-        )
+        );
       case "cancelled":
         return (
           <Tag color="default" icon={<CloseCircleOutlined />}>
             Đã hủy
           </Tag>
-        )
+        );
       default:
-        return <Tag>Không xác định</Tag>
+        return <Tag>Không xác định</Tag>;
     }
-  }
+  };
 
   // Sort logic
   const handleSort = (key) => {
-    let order = "ascend"
+    let order = "ascend";
     if (sortKey === key && sortOrder === "ascend") {
-      order = "descend"
+      order = "descend";
     }
-    setSortKey(key)
-    setSortOrder(order)
+    setSortKey(key);
+    setSortOrder(order);
 
     const sorted = [...filteredRequests].sort((a, b) => {
-      let valueA, valueB
+      let valueA, valueB;
       if (key === "registeredAt") {
-        valueA = new Date(a[key] || 0).getTime()
-        valueB = new Date(b[key] || 0).getTime()
+        valueA = new Date(a[key] || 0).getTime();
+        valueB = new Date(b[key] || 0).getTime();
       } else if (key === "status") {
-        valueA = a[key] || ""
-        valueB = b[key] || ""
+        valueA = a[key] || "";
+        valueB = b[key] || "";
       } else if (["fullname", "email", "phone", "cccdNumber", "dob"].includes(key)) {
-        valueA = formatUserData(a.user)[key] || ""
-        valueB = formatUserData(b.user)[key] || ""
+        valueA = formatUserData(a.user)[key] || "";
+        valueB = formatUserData(b.user)[key] || "";
       } else {
-        valueA = formatUserData(a.user)[key] || 0
-        valueB = formatUserData(b.user)[key] || 0
+        valueA = formatUserData(a.user)[key] || 0;
+        valueB = formatUserData(b.user)[key] || 0;
       }
 
       if (order === "ascend") {
-        return valueA > valueB ? 1 : -1
+        return valueA > valueB ? 1 : -1;
       } else {
-        return valueA < valueB ? 1 : -1
+        return valueA < valueB ? 1 : -1;
       }
-    })
+    });
 
-    setFilteredRequests(sorted)
-  }
-
-  // Get counts for tabs
-  const getPendingCount = () => {
-    return requests.filter((r) => r.status === "pending").length
-  }
-
-  const getApprovedCount = () => {
-    return requests.filter((r) => r.status === "approved").length
-  }
-
-  const getRejectedCount = () => {
-    return requests.filter((r) => r.status === "rejected").length
-  }
+    setFilteredRequests(sorted);
+  };
 
   // Render modal content
   const renderModalContent = () => {
-    if (!selectedRequest) return null
-
-    const userData = formatUserData(selectedRequest.user)
-
+    if (!selectedRequest) return null;
+    
+    const userData = formatUserData(selectedRequest.user);
+    
     return (
       <div style={{ padding: "16px 8px" }}>
         <div style={{ textAlign: "center", marginBottom: "24px" }}>
@@ -536,8 +475,8 @@ const OrganizationUserRequests = () => {
           </div>
         )}
       </div>
-    )
-  }
+    );
+  };
 
   // Table columns
   const columns = [
@@ -646,7 +585,7 @@ const OrganizationUserRequests = () => {
         </Space>
       ),
     },
-  ]
+  ];
 
   return (
     <>
@@ -674,9 +613,9 @@ const OrganizationUserRequests = () => {
         <Card bordered={false} style={{ marginBottom: "24px", boxShadow: "0 1px 2px rgba(0,0,0,0.03)" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
             <Title level={2} style={{ margin: 0 }}>
-              Quản lý yêu cầu tham gia
+              Quản lý yêu cầu hủy tham gia
             </Title>
-            <Badge count={getPendingCount()} showZero={false} style={{ backgroundColor: "#1890ff" }}>
+            <Badge count={requests.filter(r => r.status === "pending").length} showZero={false} style={{ backgroundColor: "#1890ff" }}>
               <Text type="secondary">Chờ duyệt</Text>
             </Badge>
           </div>
@@ -732,9 +671,9 @@ const OrganizationUserRequests = () => {
           style={{ boxShadow: "0 1px 2px rgba(0,0,0,0.03)" }}
           tabList={[
             { key: "all", tab: `Tất cả (${requests.length})` },
-            { key: "pending", tab: `Chờ duyệt (${getPendingCount()})` },
-            { key: "approved", tab: `Đã duyệt (${getApprovedCount()})` },
-            { key: "rejected", tab: `Từ chối (${getRejectedCount()})` },
+            { key: "pending", tab: `Chờ duyệt (${requests.filter(r => r.status === "pending").length})` },
+            { key: "approved", tab: `Đã duyệt (${requests.filter(r => r.status === "approved").length})` },
+            { key: "rejected", tab: `Từ chối (${requests.filter(r => r.status === "rejected").length})` },
           ]}
           activeTabKey={activeTab}
           onTabChange={(key) => setActiveTab(key)}
@@ -762,8 +701,8 @@ const OrganizationUserRequests = () => {
               ),
             }}
             rowClassName={(record) => {
-              if (record.status === "pending") return "ant-table-row-pending"
-              return ""
+              if (record.status === "pending") return "ant-table-row-pending";
+              return "";
             }}
           />
         </Card>
@@ -787,8 +726,8 @@ const OrganizationUserRequests = () => {
           title={null}
           open={rejectModalVisible}
           onCancel={() => {
-            setRejectModalVisible(false)
-            rejectForm.resetFields()
+            setRejectModalVisible(false);
+            rejectForm.resetFields();
           }}
           footer={null}
           width={520}
@@ -827,8 +766,8 @@ const OrganizationUserRequests = () => {
               <div style={{ display: "flex", justifyContent: "center", gap: "16px", marginTop: "24px" }}>
                 <Button
                   onClick={() => {
-                    setRejectModalVisible(false)
-                    rejectForm.resetFields()
+                    setRejectModalVisible(false);
+                    rejectForm.resetFields();
                   }}
                   size="large"
                   style={{ minWidth: "120px" }}
@@ -861,7 +800,7 @@ const OrganizationUserRequests = () => {
         }
       `}</style>
     </>
-  )
-}
+  );
+};
 
-export default OrganizationUserRequests
+export default OrganizationUserPending;

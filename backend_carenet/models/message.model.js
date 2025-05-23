@@ -1,14 +1,32 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const MessageSchema = new Schema({
-   conversationId: { type: Schema.Types.ObjectId, ref: "Conversation", required: true },
-   senderId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-   content: { type: String },
-   attachments: [String], // nếu sau này có ảnh, file...
-   createdAt: { type: Date, default: Date.now },
-   readBy: [{ type: Schema.Types.ObjectId, ref: "User" }] // để đánh dấu đã đọc
- });
- 
- module.exports = mongoose.model("Message", MessageSchema);
- 
+    chat: {
+        type: Schema.ObjectId,
+        ref: 'Chat',
+        required: true
+    },
+    sender: {
+        type: Schema.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    receiver: {
+        type: Schema.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    message: {
+        type: String,
+        required: true
+    },
+    read: {
+        type: Boolean,
+        default: false
+    }
+}, {
+    timestamps: true
+});
+
+module.exports = mongoose.model('Message', MessageSchema);

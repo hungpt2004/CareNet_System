@@ -208,30 +208,32 @@ exports.getFinishedEvents = asyncHandler(async (req, res) => {
   }
 });
 
-exports.getPendingVolunteers = asyncHandler(async (req, res) => {
-  const currentUser = req.user.user;
-  console.log(currentUser.organizationId);
-  
-  try {
-    const pendingVolunteers = await EventRegistration.find({
-      organizationId: currentUser.organizationId,
-      status: "pending",
-    }).populate("user");
-    return res.status(200).json({
-      status: "success",
-      message: "Lấy tình nguyện viên đang chờ phê duyệt",
-      volunteers: pendingVolunteers,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      status: "fail",
-      message: "Lấy tình nguyện viên đang chờ phê duyệt thất bại",
-    });
-  }
-});
-
 exports.updateEventInformation = asyncHandler(async (req, res) => {
 
+  const {eventId} = req.params;
+
+  const {
+    title,
+    description,
+    startAt,
+    endAt,
+    status,
+  } = req.body;
+
+  const currentEvent = await Event.findOne({_id: eventId});
+  if(!currentEvent) return res.status(500).json({status:'fail',message:'Không tìm thấy event hiện tại'})
+
   
+    
+});
+
+exports.getAllProcessingEvent = asyncHandler(async (req, res) => {
+
+  const events = await Event.find({status: 'processing'});
+
+  return res.status(200).json({
+    status: 'success',
+    eventData: events
+  })
 
 });

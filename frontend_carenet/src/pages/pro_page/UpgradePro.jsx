@@ -166,28 +166,28 @@ const UpgradePro = () => {
 
   // Feature lists for each plan
   const freeFeatures = [
-    "Amazing feature one",
-    "Wonderful feature two",
-    "Priceless feature three",
-    "Splended feature four",
+    "Đăng tuyển cơ bản 1 bài",
+    "Quản lý nhân sự của tổ chức", 
+    "Xem hồ sơ ứng viên giới hạn",
+    "Thống kê cơ bản"
   ];
 
   const proFeatures = [
-    "Everything in the Free plan, plus",
-    "Post event limited in month",
-    "Wonderful feature two",
-    "Priceless feature three",
-    "Splended feature four",
-    "Delightful feature five",
+    "Tất cả tính năng của gói Free",
+    "Đăng tuyển không giới hạn",
+    "Tìm kiếm ứng viên nâng cao",
+    "Gửi email hàng loạt cho ứng viên",
+    "Ưu tiên duyệt sự kiện",
+    "Báo cáo và thống kê chi tiết"
   ];
 
   const enterpriseFeatures = [
-    "Everything in the Pro plan, plus",
-    "Amazing feature one",
-    "Wonderful feature two",
-    "Priceless feature three",
-    "Splended feature four",
-    "Delightful feature five",
+    "Tất cả tính năng của gói Pro",
+    "Tùy chỉnh thương hiệu",
+    "Quản lý đa chi nhánh",
+    "API tích hợp hệ thống",
+    "Hỗ trợ 24/7",
+    "Giải pháp tùy chỉnh theo yêu cầu"
   ];
 
   return (
@@ -248,15 +248,12 @@ const UpgradePro = () => {
         `}
       </style>
       {/* <CustomNavbar /> */}
-      <Container
-        style={styles.mainContainer}
-        className="d-flex align-items-center justify-content-center min-vh-100"
-      >
+      <Container style={styles.mainContainer}>
         <div className="w-100">
-          <h1 style={styles.heading}>Our Pricing</h1>
+          <h1 style={styles.heading}>Bảng Giá Dịch Vụ</h1>
 
           <div style={styles.toggleContainer}>
-            <p style={styles.toggleLabel}>Billed Monthly</p>
+            <p style={styles.toggleLabel}>Thanh toán hàng tháng</p>
             <div
               style={styles.toggle}
               onClick={() => setIsYearly(!isYearly)}
@@ -271,7 +268,7 @@ const UpgradePro = () => {
               <span style={styles.toggleSlider}></span>
             </div>
             <p style={styles.toggleLabel}>
-              Billed Yearly <span style={styles.saveText}>(save 15%)</span>
+              Thanh toán hàng năm <span style={styles.saveText}>(tiết kiệm 15%)</span>
             </p>
           </div>
 
@@ -284,11 +281,10 @@ const UpgradePro = () => {
               >
                 <Card.Body className="d-flex flex-column">
                   <div style={styles.pricingHeader}>
-                    <h2 style={styles.pricingTitle}>Free</h2>
-                    <div style={styles.price}>$0</div>
+                    <h2 style={styles.pricingTitle}>Miễn phí</h2>
+                    <div style={styles.price}>0đ</div>
                     <p style={styles.description}>
-                      Description of the tier list will go here, copy should be
-                      concise and impactful.
+                      Trải nghiệm các tính năng cơ bản để bắt đầu tuyển dụng
                     </p>
                   </div>
 
@@ -314,7 +310,7 @@ const UpgradePro = () => {
                       style={styles.buttonFree}
                       className="btn-hover"
                     >
-                      Try for Free
+                      Dùng thử miễn phí
                     </Button>
                   </div>
                 </Card.Body>
@@ -331,12 +327,11 @@ const UpgradePro = () => {
                   <div style={styles.pricingHeader}>
                     <h2 style={styles.pricingTitle}>Pro</h2>
                     <div style={styles.price}>
-                      ${isYearly ? "10" : "12"}
-                      <span style={styles.pricePeriod}>/month</span>
+                      {isYearly ? "200.000" : "250.000"}
+                      <span style={styles.pricePeriod}>/tháng</span>
                     </div>
                     <p style={styles.description}>
-                      Description of the tier list will go here, copy should be
-                      concise and impactful.
+                      Giải pháp toàn diện cho doanh nghiệp chuyên nghiệp
                     </p>
                   </div>
 
@@ -362,7 +357,7 @@ const UpgradePro = () => {
                       style={styles.buttonPro}
                       className="btn-hover"
                     >
-                      Upgrade Now
+                      Nâng cấp ngay
                     </Button>
                   </div>
                 </Card.Body>
@@ -374,18 +369,17 @@ const UpgradePro = () => {
               <Card style={styles.pricingCard()} className="border-0 shadow-sm">
                 <Card.Body className="d-flex flex-column">
                   <div style={styles.pricingHeader}>
-                    <h2 style={styles.pricingTitle}>Enterprise</h2>
+                    <h2 style={styles.pricingTitle}>Doanh nghiệp</h2>
                     <div style={styles.price}>
-                      Custom
+                      Liên hệ
                       <span style={styles.pricePeriod}>
                         <span style={styles.customText}>
-                          yearly billing only
+                          thanh toán theo năm
                         </span>
                       </span>
                     </div>
                     <p style={styles.description}>
-                      Description of the tier list will go here, copy should be
-                      concise and impactful.
+                      Giải pháp tùy chỉnh cho doanh nghiệp lớn
                     </p>
                   </div>
 
@@ -411,7 +405,7 @@ const UpgradePro = () => {
                       style={styles.buttonEnterprise}
                       className="btn-hover"
                     >
-                      Contact Sales
+                      Liên hệ bộ phận kinh doanh
                     </Button>
                   </div>
                 </Card.Body>

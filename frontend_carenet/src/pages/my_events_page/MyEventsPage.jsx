@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Container, Button, Modal, Badge } from "react-bootstrap";
 import { Calendar, MapPin, Users, Clock, Award, Eye, ChevronRight, X, ListCollapse } from "lucide-react";
-import { Table, Tag, Space, Image } from "antd";
+import { Table, Tag, Space, Image, Breadcrumb } from "antd";
 import { motion, AnimatePresence } from "framer-motion";
 import axiosInstance from "../../utils/AxiosInstance";
 import useAuthStore from "../../hooks/authStore";
@@ -10,6 +10,7 @@ import CustomSpinner from "../../components/spinner/CustomSpinner";
 import io from 'socket.io-client';
 import { formatDateVN } from "../../utils/FormatDateVN";
 import { formatTimeVN } from "../../utils/FormatTimeVN";
+import { HomeOutlined, CalendarOutlined } from "@ant-design/icons";
 
 // Custom styles
 const customStyles = {
@@ -49,6 +50,50 @@ function MyEventsPage() {
    const [showCancelModal, setShowCancelModal] = useState(false);
    const [selectedEventForCancel, setSelectedEventForCancel] = useState(null);
    const [cancelReason, setCancelReason] = useState('');
+   const socketRef = useRef(null);
+   const currentUser = useAuthStore((state) => state.currentUser);
+
+   useEffect(() => {
+      // Kết nối Socket.IO
+      socketRef.current = io('http://localhost:5000', {
+         withCredentials: true
+      });
+
+      // Debug log khi kết nối thành công
+      socketRef.current.on('connect', () => {
+         console.log('Socket.IO connected successfully in MyEventsPage');
+      });
+
+      // Debug log khi có lỗi kết nối
+      socketRef.current.on('connect_error', (error) => {
+         console.error('Socket.IO connection error in MyEventsPage:', error);
+      });
+
+      // Join vào room của user
+      if (currentUser?._id) {
+         console.log('Joining user room in MyEventsPage:', currentUser._id);
+         socketRef.current.emit('joinUserRoom', currentUser._id);
+      }
+
+      // Lắng nghe sự kiện requestApproved
+      socketRef.current.on('requestApproved', (data) => {
+         console.log('Received requestApproved event in MyEventsPage:', data);
+         // Refresh danh sách sự kiện khi có thông báo mới
+         fetchUserEvents();
+      });
+
+      return () => {
+         if (currentUser?._id) {
+            console.log('Leaving user room in MyEventsPage:', currentUser._id);
+            socketRef.current.emit('leaveUserRoom', currentUser._id);
+         }
+         socketRef.current.disconnect();
+      };
+   }, [currentUser?._id]);
+
+   useEffect(() => {
+      fetchUserEvents();
+   }, []);
 
    // Fetch user's registered events
    const fetchUserEvents = async () => {
@@ -73,8 +118,8 @@ function MyEventsPage() {
          // First check if certificate exists
          const checkResponse = await axiosInstance.get(`/certificates/get-certificate/${eventId}`);
          console.log('Check certificate response:', checkResponse.data);
-         
-         if(checkResponse.data.status === 'success' && checkResponse.data.certificate) {
+
+         if (checkResponse.data.status === 'success' && checkResponse.data.certificate) {
             // Certificate exists, show it
             setSelectedCertificate({
                ...checkResponse.data.certificate,
@@ -82,13 +127,13 @@ function MyEventsPage() {
             });
             setShowCertificateModal(true);
             setShowModal(false);
-         } else if(checkResponse.data.status === 'fail') {
+         } else if (checkResponse.data.status === 'fail') {
             // Certificate doesn't exist, create new one
             const response = await axiosInstance.post('/certificates/create-certificate', {
                eventId: eventId
             });
 
-            if(response.data.status === 'success' && response.data.certificate){
+            if (response.data.status === 'success' && response.data.certificate) {
                setSelectedCertificate({
                   ...response.data.certificate,
                   isPaid: false
@@ -111,7 +156,7 @@ function MyEventsPage() {
             certificateId: certificateId
          });
 
-         if(response.data.status === 'success' && response.data.checkoutUrl){
+         if (response.data.status === 'success' && response.data.checkoutUrl) {
             window.location.href = response.data.checkoutUrl;
          } else {
             CustomFailedToast('Không thể tạo liên kết thanh toán');
@@ -284,7 +329,7 @@ function MyEventsPage() {
                      size="sm"
                      onClick={() => handleCancelClick(record)}
                   >
-                      Hủy
+                     Hủy
                   </Button>
                )}
                {record.status === "approved" && (
@@ -326,6 +371,24 @@ function MyEventsPage() {
                style={{ backgroundColor: 'white', minHeight: "100vh" }}
             >
                <Container className="py-4">
+                  <Breadcrumb
+                     items={[
+                        {
+                           href: '/home',
+                           title: <HomeOutlined />,
+                        },
+                        {
+                           href: '/profile',
+                           title: <span><CalendarOutlined /> Cá nhân</span>,
+                        },
+                        {
+                           href: '/my-events',
+                           title: 'Quản lý ghi danh',
+                        },
+                     ]}
+                     style={{ marginBottom: "16px" }}
+                  />
+                  
                   <h2 className="text-center mb-4 mt-3">Quản Lý Ghi Danh</h2>
                   <motion.div variants={itemVariants}>
                      <Table
@@ -333,6 +396,8 @@ function MyEventsPage() {
                         dataSource={events}
                         rowKey="_id"
                         pagination={{
+                           defaultPageSize: 4,
+                           defaultCurrent: 4,
                            pageSize: 10,
                            showSizeChanger: true,
                            showTotal: (total) => `Tổng số ${total} sự kiện`,
@@ -549,7 +614,7 @@ function MyEventsPage() {
                                     preview={selectedCertificate.isPaid}
                                  />
                                  {!selectedCertificate.isPaid && (
-                                    <div 
+                                    <div
                                        className="position-absolute top-50 start-50 translate-middle text-center w-100"
                                        style={{
                                           background: 'rgba(255, 255, 255, 0.95)',

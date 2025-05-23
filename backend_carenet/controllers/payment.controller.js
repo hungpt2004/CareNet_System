@@ -146,3 +146,10 @@ exports.cancelPayment = asyncHandler(async (req, res) => {
     message: "Hủy thanh toán thành công",
   });
 });
+
+exports.createPaymentLinkForOrganization = asyncHandler(async (req, res) => {
+  const currentUser = req.user.user;
+
+  
+
+});

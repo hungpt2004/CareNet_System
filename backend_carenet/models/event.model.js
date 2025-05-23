@@ -8,7 +8,6 @@ const EventSchema = new mongoose.Schema({
   rating: { type: Number },
   maxParticipants: {type: Number, default: 0},
   currentParticipants: { type: Number, default: 0 },
-  // pointReward: { type: Number, default: 0 }, // điểm cộng khi hoàn thành
   assignChecker: { type: mongoose.Schema.ObjectId, ref: "User" },
   startAt: { type: Date, required: true, default: Date.now },
   endAt: { type: Date, required: true, default: null },

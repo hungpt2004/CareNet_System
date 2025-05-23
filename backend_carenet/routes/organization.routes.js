@@ -4,8 +4,10 @@ const OrganizationRouter = express.Router();
 const { authenticateToken } = require('../middleware/isAuthenticate');
 const { eventImageUpload } = require('../middleware/uploadMiddleware');
 
+OrganizationRouter.get('/get-all-owned-event', authenticateToken, OrganizationController.getAllOwnerEvent)
 OrganizationRouter.get('/get-filtered-request/:id', OrganizationController.filterRequestsBySkills);
 OrganizationRouter.get('/get-request-event/:id', OrganizationController.getRequestEventById);
+OrganizationRouter.get('/get-request-pending/:id', OrganizationController.getRequestPendingById)
 OrganizationRouter.get('/get-owned-event', authenticateToken, OrganizationController.getOwnEvent);
 OrganizationRouter.get('/get-owned-staff', authenticateToken, OrganizationController.getOwnStaff);
 OrganizationRouter.post('/approve-request/:id', OrganizationController.approveRequest);

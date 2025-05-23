@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Nav } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
-import { Home, Users, BookOpen, Calendar, BarChart2, Award, MessageSquare, DollarSign, Layers, Settings, ChevronDown, ChevronRight, Crown } from 'lucide-react';
+import { Calendar, LogOut, ChevronDown, ChevronRight } from 'lucide-react';
 import useAuthStore from "../../hooks/authStore";
 
 // Custom CSS variables for the color scheme
@@ -10,10 +10,12 @@ const customStyles = {
   darkColor: "#2A3F54",
 };
 
-const OwnerSidebar = ({ showSidebar, isMobile }) => {
+const StaffSidebar = ({ showSidebar, isMobile }) => {
   const [expandedMenus, setExpandedMenus] = useState({});
 
   const currentUser = useAuthStore((state) => state.currentUser);
+
+  console.log(currentUser);
 
   // Toggle submenu
   const toggleSubmenu = (menuId) => {
@@ -26,36 +28,16 @@ const OwnerSidebar = ({ showSidebar, isMobile }) => {
   // Sidebar menu items
   const menuItems = [
     {
-      id: "dashboard",
-      title: "Dashboard",
-      icon: <Home size={20} />,
-      path: "/owner-dashboard",
+      id: "attendance",
+      title: "Điểm Danh",
+      icon: <Calendar size={20} />,
+      path: "/staff-attendance",
     },
     {
-      id: "users",
-      title: "Tình Nguyện Viên",
-      icon: <Users size={20} />,
-      submenu: [
-        { title: "Phê duyệt tham gia", path: "/owner-user" },
-        { title: "Phê duyệt hủy tham gia", path: "/owner-pending" },
-      ],
-    },
-    {
-      id: "organizations",
-      title: "Quản Lý Nội Bộ ",
-      icon: <Award size={20} />,
-      submenu: [
-        { title: "Quản Lý Sự Kiện", path: "/owner-finished-events" },
-        { title: "Tạo bài viết", path: "/owner-post" },
-        { title: "Quản Lý Thành Viên", path: "/owner-staff" },
-      ],
-    },
-    {
-      id: "upgrade",
-      title: "Nâng Cấp Gói",
-      icon: <Crown size={20} />,
-      path: "/upgrade-pro",
-      className: "upgrade-button"
+      id: "logout",
+      title: "Đăng Xuất",
+      icon: <LogOut size={20} />,
+      path: "/login",
     },
   ];
 
@@ -67,16 +49,15 @@ const OwnerSidebar = ({ showSidebar, isMobile }) => {
             <div className="d-flex align-items-center">
               <div className="avatar-container me-3">
                 <img
-                  src={currentUser?.avatar || "https://i.pinimg.com/736x/8a/a9/c5/8aa9c5d8429f561000f1de8e7f6d5a32.jpg"}
-                  alt="Admin User"
+                  src={`${currentUser.avatar}`}
                   className="rounded-circle"
                   width="50"
                   height="50"
                 />
               </div>
               <div>
-                <h6 className="mb-0 text-white">{currentUser?.fullname}</h6>
-                <small className="text-light">{currentUser?.email}</small>
+                <h6 className="mb-0 text-white">CareNet Staff</h6>
+                <small className="text-light">Staff Member</small>
               </div>
             </div>
           </div>
@@ -223,19 +204,6 @@ const OwnerSidebar = ({ showSidebar, isMobile }) => {
           z-index: 1010;
         }
         
-        .upgrade-button {
-          background-color: ${customStyles.primaryColor} !important;
-          color: white !important;
-          margin-top: 1rem;
-          border-radius: 5px;
-          transition: all 0.3s ease;
-        }
-
-        .upgrade-button:hover {
-          background-color: #4ca887 !important;
-          transform: translateY(-2px);
-        }
-        
         @media (max-width: 991.98px) {
           .sidebar.expanded {
             width: 260px;
@@ -246,4 +214,4 @@ const OwnerSidebar = ({ showSidebar, isMobile }) => {
   );
 };
 
-export default OwnerSidebar;
+export default StaffSidebar; 

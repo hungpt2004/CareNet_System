@@ -71,6 +71,7 @@ exports.getVolunteerByEventId = asyncHandler(async (req, res) => {
 
   console.log(listVolunteers.map((volunteer) => volunteer.user));
 
+
   return res.status(200).json({
     status: "success",
     message: "Lấy danh sách đăng ký thành công",
@@ -126,6 +127,17 @@ exports.takeAttendance = asyncHandler(async (req, res) => {
     userId: userId,
   });
 
+  const checkAttendance = await Attendance.findOne(
+    {eventId: currentEvent._id, userId: userId, status: "attended"}
+  )
+
+  if (checkAttendance) {
+    return res.status(400).json({
+      status: "fail",
+      message: "Bạn đã điểm danh cho sự kiện này",
+    });
+  }
+
   if (!attendance) {
     return res.status(400).json({
       status: "fail",
@@ -149,10 +161,34 @@ exports.takeAttendance = asyncHandler(async (req, res) => {
     }
   );
 
+  const eventDurationInMs = currentEvent.endAt - currentEvent.startAt;
+  const eventDurationInHours = eventDurationInMs / (1000 * 60 * 60);
+
+  await User.findOneAndUpdate(
+    {_id: userId},
+    {
+      $set:{
+        status: 'ready',
+      },
+      $inc: {
+        totalHours: eventDurationInHours,
+      }
+    }
+  )
+
+
+
   return res.status(200).json({
     status: "success",
     message: "Điểm danh thành công",
   });
 });
 
-exports.takeAbsent = asyncHandler(async (req, res) => {});
+exports.takeAbsent = asyncHandler(async (req, res) => {
+
+  // Check attendance
+  // set status -> absent, level rating, message
+  
+  // - 15 diem
+
+});

@@ -3,7 +3,8 @@ import {
   Info, MapPin, Upload, Users, Target, 
   ArrowRight, ArrowLeft, Check, Calendar,
   Clock, DollarSign, Gift, Phone, Mail,
-  Plus, Trash2, HelpCircle
+  Plus, Trash2, HelpCircle,
+  FileText
 } from 'lucide-react';
 import { 
   Form, Input, Button, Card, Steps, Select, 
@@ -19,6 +20,7 @@ import { IoMdPerson } from 'react-icons/io';
 import { PlusOutlined } from '@ant-design/icons';
 import useAuthStore from "../../hooks/authStore";
 import styles from '../../css/AppColors.module.css';
+import Title from 'antd/es/skeleton/Title';
 
 const { TextArea } = Input;
 const { RangePicker } = DatePicker;
@@ -264,6 +266,8 @@ const OrganizationPostPage = () => {
 
       const response = await axiosInstance.post('/organization/create-events', formValues);
 
+      console.log(JSON.stringify(response.data,null,2))
+
       if (response.data.status === 'success' && response.data.event) {
         CustomSuccessToast("Tạo sự kiện thành công!")
         setEventId(response.data.event._id);
@@ -271,7 +275,7 @@ const OrganizationPostPage = () => {
       }
     } catch (error) {
       console.error('Error creating event:', error);
-      CustomFailedToast("Tạo sự kiện thất bại!")
+      CustomFailedToast(error)
     } finally {
       setLoading(false);
     }
@@ -482,7 +486,7 @@ const OrganizationPostPage = () => {
             initialValue={currentUser?.phone}
             rules={[
               { required: true, message: 'Vui lòng nhập số điện thoại!' },
-              { pattern: /^[0-9]{10}$/, message: 'Số điện thoại không hợp lệ!' }
+              // { pattern: /^[0-9]{10}$/, message: 'Số điện thoại không hợp lệ!' }
             ]}
           >
             <Input prefix={<Phone size={16} />} disabled />

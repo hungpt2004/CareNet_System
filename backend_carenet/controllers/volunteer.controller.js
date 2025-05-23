@@ -1,6 +1,7 @@
 const User = require("../models/user.model");
 const HistoryEvent = require("../models/historyEvent.model");
 const EventRegistration = require("../models/eventRegistration.model");
+const Feedback = require('../models/feedback.model');
 const asyncHandler = require("../middleware/asyncHandler");
 
 exports.createHobbies = asyncHandler(async (req, res) => {
@@ -94,7 +95,7 @@ exports.requestCancelEvent = asyncHandler(async (req, res) => {
     // Thêm cancel reason vào event registration
     await EventRegistration.findOneAndUpdate(
       { _id: eventRegistration._id },
-      { $set: { cancelReason: cancelReason, status: "pending" } },
+      { $set: { cancelReason: cancelReason, status: "pendingCancel" } },
       { new: true }
     );
 
@@ -110,3 +111,30 @@ exports.requestCancelEvent = asyncHandler(async (req, res) => {
   }
 });
 
+exports.getMyFeedback = asyncHandler(async (req, res) => {
+
+  const currentUser = req.user.user;
+
+  const feedbacks = await Feedback.find({userId: currentUser._id})
+
+  if(!feedbacks) {
+    return res.status(200).json({
+      status: 'true',
+      message: 'Đang không có feedback nào',
+      feedbacks: []
+    })
+  }
+
+  return res.status(200).json({
+    status: 'success',
+    message: 'Lấy feedback thành công',
+    feedback: feedbacks
+  })
+
+});
+
+exports.getUserFollowRole = asyncHandler(async (req, res) => {
+
+  const {role} = req.params
+
+});

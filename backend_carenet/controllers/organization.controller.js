@@ -31,6 +31,20 @@ exports.getOwnEvent = asyncHandler(async (req, res) => {
   }
 });
 
+exports.getAllOwnerEvent = asyncHandler(async (req, res) => {
+
+  const currentUser = req.user.user;
+
+  const events = await Event.find({organizationId: currentUser.organizationId});
+
+  return res.status(200).json({
+    status: 'success',
+    message: 'lấy thành công',
+    eventData: events
+  })
+
+});
+
 exports.getRequestEventById = asyncHandler(async (req, res) => {
   const { id } = req.params;
   try {
@@ -42,9 +56,51 @@ exports.getRequestEventById = asyncHandler(async (req, res) => {
       });
     }
 
-    const currentEventRegistration = await EventRegistration.find({
-      event: currentEvent._id,
-    }).populate(
+    const currentEventRegistration = await EventRegistration.find(
+      {
+        event: currentEvent._id, status: "pending",
+      }
+    ).populate(
+      "user",
+      "fullname email phone hobbies dob status reputationPoints totalHours activityPoints"
+    );
+
+    if (!currentEventRegistration.length) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Không tìm thấy yêu cầu",
+      });
+    }
+    return res.status(200).json({
+      status: "success",
+      eventData: currentEvent,
+      eventRegistrationData: currentEventRegistration,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "fail",
+      message: "Lỗi khi lấy yêu cầu",
+    });
+  }
+});
+
+exports.getRequestPendingById = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  try {
+    const currentEvent = await Event.findById(id);
+    if (!currentEvent) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Không tìm thấy sự kiện",
+      });
+    }
+
+    // Get volunteer request cancel
+    const currentEventRegistration = await EventRegistration.find(
+      {
+        event: currentEvent._id, status: 'pendingCancel'
+      },
+    ).populate(
       "user",
       "fullname email phone hobbies dob status reputationPoints totalHours activityPoints"
     );
@@ -383,25 +439,58 @@ exports.filterRequestsBySkills = asyncHandler(async (req, res) => {
 
 exports.getOwnStaff = asyncHandler(async (req, res) => {
   const currentUser = req.user.user;
+  console.log("Current user:", currentUser);
 
   try {
+    // Kiểm tra user có organizationId không
+    if (!currentUser.organizationId) {
+      console.log("User has no organizationId");
+      return res.status(400).json({
+        status: "fail",
+        message: "Người dùng chưa thuộc tổ chức nào",
+      });
+    }
+
     const organizer = await User.findOne({ _id: currentUser._id });
+    console.log("Organizer:", organizer);
+
+    if (!organizer) {
+      console.log("Organizer not found");
+      return res.status(404).json({
+        status: "fail",
+        message: "Không tìm thấy thông tin người dùng",
+      });
+    }
+
     const organization = await Organization.findOne({
       _id: organizer.organizationId,
     });
+    console.log("Organization:", organization);
+
+    if (!organization) {
+      console.log("Organization not found");
+      return res.status(404).json({
+        status: "fail",
+        message: "Không tìm thấy thông tin tổ chức",
+      });
+    }
+
+    // Tìm tất cả nhân viên của tổ chức
     const staff = await User.find({
       organizationId: organization._id,
       role: "staff",
-      status: "ready",
     });
+    console.log("Found staff:", staff);
+
     return res.status(200).json({
       status: "success",
       staff: staff,
     });
   } catch (error) {
+    console.error("Error in getOwnStaff:", error);
     return res.status(500).json({
       status: "fail",
-      message: "Lỗi khi lấy nhân viên",
+      message: "Lỗi khi lấy nhân viên: " + error.message,
     });
   }
 });
@@ -494,6 +583,31 @@ exports.createEvent = asyncHandler(async (req, res) => {
       });
     }
 
+    // Validate time range
+    if (!Array.isArray(timeRange) || timeRange.length !== 2) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Thời gian không hợp lệ",
+      });
+    }
+
+    const startTime = new Date(timeRange[0]);
+    const endTime = new Date(timeRange[1]);
+
+    if (isNaN(startTime.getTime()) || isNaN(endTime.getTime())) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Định dạng thời gian không hợp lệ",
+      });
+    }
+
+    if (startTime >= endTime) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Thời gian kết thúc phải sau thời gian bắt đầu",
+      });
+    }
+
     // Validate staffId format
     if (!mongoose.Types.ObjectId.isValid(staffId)) {
       return res.status(400).json({
@@ -504,6 +618,8 @@ exports.createEvent = asyncHandler(async (req, res) => {
 
     // Lấy thông tin organization từ user hiện tại
     const currentUser = req.user.user;
+    console.log("Current user:", currentUser);
+
     const organization = await Organization.findOne({
       _id: currentUser.organizationId,
     });
@@ -512,6 +628,62 @@ exports.createEvent = asyncHandler(async (req, res) => {
       return res.status(404).json({
         status: "fail",
         message: "Không tìm thấy thông tin tổ chức",
+      });
+    }
+
+    console.log("Organization found:", organization);
+
+    // Check organization service package
+    const checkServicePackageOrganization = await Organization.findOne({
+      _id: organization._id,
+    }).populate("levelId");
+
+    console.log("Organization with level:", checkServicePackageOrganization);
+
+    if (
+      !checkServicePackageOrganization ||
+      !checkServicePackageOrganization.levelId
+    ) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Không tìm thấy thông tin gói dịch vụ của tổ chức",
+      });
+    }
+
+    const numberOfEvent = await Event.find({
+      organizationId: organization._id,
+    });
+    const numberOfEventConvert = numberOfEvent.length;
+
+    console.log("Current number of events:", numberOfEventConvert);
+
+    if (
+      checkServicePackageOrganization.levelId.name === "basic" &&
+      numberOfEventConvert > 1
+    ) {
+      return res.status(400).json({
+        status: "fail",
+        message: `Tổ chức đã đạt giới hạn số lượng sự kiện (${checkServicePackageOrganization.levelId.maxPost}). Vui lòng nâng cấp gói dịch vụ để tạo thêm sự kiện.`,
+      });
+    }
+
+    // Check if staff is available during the time range
+    const existingEvent = await Event.findOne({
+      assignChecker: staffId,
+      status: "hiring",
+      $or: [
+        {
+          startAt: { $lte: endTime },
+          endAt: { $gte: startTime },
+        },
+      ],
+    });
+
+    if (existingEvent) {
+      return res.status(400).json({
+        status: "fail",
+        message:
+          "Nhân viên đã được phân công cho sự kiện khác trong khoảng thời gian này",
       });
     }
 
@@ -543,7 +715,7 @@ exports.createEvent = asyncHandler(async (req, res) => {
         : [],
     };
 
-    // Check if the staffId is valid
+    // Check if the staffId is valid and update status
     const staff = await User.findOneAndUpdate(
       { _id: new mongoose.Types.ObjectId(staffId) },
       {
@@ -561,6 +733,8 @@ exports.createEvent = asyncHandler(async (req, res) => {
       });
     }
 
+    console.log("Staff found and updated:", staff);
+
     // Tạo event mới
     const newEvent = await Event.create({
       title,
@@ -568,8 +742,8 @@ exports.createEvent = asyncHandler(async (req, res) => {
       category,
       skillNeeds: skills,
       assignChecker: new mongoose.Types.ObjectId(staffId),
-      startAt: timeRange[0],
-      endAt: timeRange[1],
+      startAt: startTime,
+      endAt: endTime,
       organizationId: organization._id,
       location: locationData,
       maxParticipants: maxParticipants || 0,
@@ -578,7 +752,7 @@ exports.createEvent = asyncHandler(async (req, res) => {
       adminStatus: "pending",
     });
 
-    console.log("New event:", newEvent);
+    console.log("New event created successfully:", newEvent);
 
     return res.status(201).json({
       status: "success",
@@ -642,3 +816,10 @@ exports.registerOrganization = asyncHandler(async (req, res) => {
   }
 });
 
+// Import file excel hoặc là file 
+// Đọc file
+// Lấy tên 
+// Tạo mail
+exports.createStaffList = asyncHandler(async (req, res) => {
+
+})

@@ -20,8 +20,6 @@ const createVerifyToken = async (payload) =>
 exports.signUpWithUsernamePassword = asyncHandler(async (req, res, next) => {
   const { fullname, email, password, phone, dob } = req.body;
 
-  console.log(req.body)
-
   if (!fullname || !email || !password || !phone || !dob) {
     return res.status(500).json({
       status: "fail",

@@ -208,7 +208,6 @@ const AdminEventsPending = () => {
             size="sm"
             onClick={() => handleViewDetails(record)}
           >
-            <Eye size={16} className="me-2" />
             Chi tiết
           </Button>
           {record.adminStatus === "pending" && (
@@ -218,7 +217,6 @@ const AdminEventsPending = () => {
                 size="sm"
                 onClick={() => handleConfirmAction('reject', record._id)}
               >
-                <XCircle size={16} className="me-2" />
                 Từ chối
               </Button>
               <Button
@@ -226,7 +224,6 @@ const AdminEventsPending = () => {
                 size="sm"
                 onClick={() => handleConfirmAction('approve', record._id)}
               >
-                <CheckCircle2 size={16} className="me-2" />
                 Duyệt
               </Button>
             </>

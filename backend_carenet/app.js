@@ -13,6 +13,8 @@ const imageRouter = require('./routes/image.routes');
 const paymentRouter = require('./routes/payment.routes');
 const AdminRouter = require("./routes/admin.routes");
 const StaffRouter = require("./routes/staff.routes");
+const LevelRouter = require("./routes/level.routes");
+const monthlyPaymentRouter = require('./routes/monthlyPayment.routes');
 
 const app = express();
 app.use(cors());
@@ -36,5 +38,7 @@ app.use('/images', imageRouter);
 app.use('/payment', paymentRouter);
 app.use('/admin', AdminRouter);
 app.use('/staff', StaffRouter);
+app.use('/level', LevelRouter);
+app.use('/api/monthly-payment', monthlyPaymentRouter);
 
 module.exports = app;

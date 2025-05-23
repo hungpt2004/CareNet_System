@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Table,
   Button,
@@ -22,6 +22,7 @@ import {
 import { motion } from "framer-motion";
 import moment from "moment";
 import "antd/dist/reset.css";
+import axiosInstance from "../../utils/AxiosInstance";
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -57,7 +58,7 @@ const FeedbackPage = () => {
   };
 
   // Add CSS to document
-  React.useEffect(() => {
+  useEffect(() => {
     const style = document.createElement("style");
     style.textContent = `
       body {
@@ -106,70 +107,32 @@ const FeedbackPage = () => {
     };
   }, []);
 
-  // Sample feedback data
-  const [feedbackData, setFeedbackData] = useState([
-    {
-      key: "1",
-      eventName: "Tree Planting Drive",
-      content:
-        "Great experience! Well organized and very fulfilling to help the environment.",
-      feedbackDate: "2023-04-20",
-      rating: 5,
-    },
-    {
-      key: "2",
-      eventName: "Blood Donation Camp",
-      content:
-        "The staff was very professional and made the donation process comfortable.",
-      feedbackDate: "2023-04-24",
-      rating: 4,
-    },
-    {
-      key: "3",
-      eventName: "Animal Shelter Volunteering",
-      content:
-        "Loved working with the animals! The shelter staff was very helpful and supportive.",
-      feedbackDate: "2023-05-06",
-      rating: 5,
-    },
-    {
-      key: "4",
-      eventName: "Community Park Cleanup",
-      content:
-        "Good initiative but could use better organization and more supplies.",
-      feedbackDate: "2023-05-13",
-      rating: 3,
-    },
-    {
-      key: "5",
-      eventName: "Food Drive for Homeless",
-      content:
-        "Meaningful event that directly helped those in need. Would participate again.",
-      feedbackDate: "2023-05-20",
-      rating: 5,
-    },
-    {
-      key: "6",
-      eventName: "Beach Cleanup",
-      content:
-        "Great community event. Shocking to see how much plastic waste we collected.",
-      feedbackDate: "2023-06-05",
-      rating: 4,
-    },
-    {
-      key: "7",
-      eventName: "Elderly Home Visit",
-      content:
-        "Heartwarming experience connecting with seniors. They had amazing stories to share.",
-      feedbackDate: "2023-06-12",
-      rating: 5,
-    },
-  ]);
-
   // Modal state
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingFeedback, setEditingFeedback] = useState(null);
+  const [feedbackData, setFeedbackData] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
+
+  const fetchMyFeedback = async () => {
+    setLoading(true)
+    try {
+      const response = await axiosInstance.get('/volunteer/feedbacks');
+      if (response.data.status === 'success' && response.data.feedbacks) {
+        setFeedbackData(response.data.feedbacks);
+      }
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000)
+    }
+  }
+
+  useEffect(() => {
+    fetchMyFeedback();
+  }, [])
 
   // Table columns
   const columns = [

@@ -1,0 +1,112 @@
+/* OrganizationRegister.module.css */
+@import './AppColors.module.css';
+
+:local {
+  .container {
+    min-height: 100vh;
+    background: linear-gradient(180deg, #f9fafb, #e5e7eb);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    width: 100%;
+    max-width: 800px;
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .title {
+    color: var(--text-primary, #1f2937);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .buttonPrimary {
+    background: linear-gradient(90deg, var(--primary-color, #3b82f6), var(--secondary-color, #4f46e5)) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease !important;
+    font-weight: 500;
+  }
+
+  .buttonPrimary:hover {
+    background: linear-gradient(90deg, #2563eb, #4338ca) !important;
+    transform: translateY(-1px);
+  }
+
+  .buttonOutline {
+    border: 1px solid var(--text-secondary, #6b7280) !important;
+    color: var(--text-secondary, #6b7280) !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease !important;
+    font-weight: 500;
+  }
+
+  .buttonOutline:hover {
+    background: #f3f4f6 !important;
+    transform: translateY(-1px);
+  }
+
+  .uploadButton {
+    transition: all 0.3s ease;
+  }
+
+  .uploadButton:hover {
+    transform: scale(1.05);
+  }
+
+  .steps {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+  }
+
+  .input {
+    border-radius: 8px !important;
+    transition: all 0.3s ease;
+  }
+
+  .input:focus {
+    border-color: var(--primary-color, #3b82f6) !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+  }
+
+  .textSecondary {
+    color: var(--text-secondary, #6b7280);
+  }
+
+  .listItem {
+    transition: all 0.3s ease;
+  }
+
+  .listItem:hover {
+    background: #f9fafb;
+    border-radius: 4px;
+  }
+
+  .termsLink {
+    color: var(--primary-color, #3b82f6);
+    transition: all 0.3s ease;
+  }
+
+  .termsLink:hover {
+    color: #2563eb;
+    text-decoration: underline;
+  }
+}

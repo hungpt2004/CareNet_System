@@ -5,6 +5,7 @@ import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import { motion } from "framer-motion";
 // import CustomNavbar from "../../components/navbar/CustomNavbar";
 import { useNavigate } from "react-router-dom";
+import useAuthStore from "../../hooks/authStore";
 const ProfileAvatar = () => {
   // CSS styles defined directly in the component
   const styles = {
@@ -126,6 +127,8 @@ const ProfileAvatar = () => {
     },
   };
 
+  const currentUser = useAuthStore((state) => state.curretnUser);
+
   // Add CSS to document
   React.useEffect(() => {
     const style = document.createElement("style");
@@ -223,7 +226,8 @@ const ProfileAvatar = () => {
                 <Card.Body className="p-0">
                   <div style={styles.userProfile}>
                     <img
-                      src="https://img.freepik.com/premium-vector/avatar-profile-icon-flat-style-female-user-profile-vector-illustration-isolated-background-women-profile-sign-business-concept_157943-38866.jpg?semt=ais_hybrid"
+                      src={`${currentUser.avatar}`}
+                      // src="https://img.freepik.com/premium-vector/avatar-profile-icon-flat-style-female-user-profile-vector-illustration-isolated-background-women-profile-sign-business-concept_157943-38866.jpg?semt=ais_hybrid"
                       alt="User Avatar"
                       className="avatar-img"
                       style={styles.avatar}

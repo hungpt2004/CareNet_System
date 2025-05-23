@@ -85,6 +85,7 @@ exports.searchEvents = asyncHandler(async (req, res) => {
 
     const query = {
       status: "hiring",
+      adminStatus: "approved",
     };
 
     console.log(province);

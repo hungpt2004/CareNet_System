@@ -100,12 +100,12 @@ const StaffAttendancePage = () => {
         CustomSuccessToast(`Điểm danh thành công user: ${selectedUser.fullname}`)
         fetchEventRegistrations(selectedEvent);
       } else if (response.data.status === 'fail') {
-        CustomFailedToast(`Điểm danh thất bại user ${response.data.message}`)
+        CustomFailedToast(`${response.data.message}`)
       }
     } catch (error) {
       message.error('Điểm danh thất bại');
       console.log(error);
-      CustomFailedToast(`Điểm danh thất bại user ${error.response.data.message}`)
+      CustomFailedToast(`${error.response.data.message}`)
     }
 
     setIsModalVisible(false);
@@ -128,7 +128,7 @@ const StaffAttendancePage = () => {
     },
     {
       title: 'Số điện thoại',
-      dataIndex: ['user', 'phone'],
+      dataIndex:  ['user', 'phone'],
       key: 'phone',
     },
     {
