@@ -218,3 +218,31 @@ exports.getPendingVolunteers = asyncHandler(async (req, res) => {
   }
 });
 
+exports.getEventsByOrganizationId = asyncHandler(async (req, res) => {
+  try {
+    const { organizationId } = req.query;
+
+    if (!organizationId) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Vui lòng cung cấp organizationId",
+      });
+    }
+
+    const events = await Event.find({ organizationId: organizationId })
+      .populate("assignChecker", "fullname email")
+      .lean();
+
+    console.log(`Fetched ${events.length} events for organization ${organizationId}`, events);
+    return res.status(200).json({
+      status: "success",
+      data: events,
+    });
+  } catch (error) {
+    console.error("Error fetching events:", error.message, error.stack);
+    return res.status(500).json({
+      status: "fail",
+      message: "Lỗi khi lấy danh sách sự kiện: " + error.message,
+    });
+  }
+});

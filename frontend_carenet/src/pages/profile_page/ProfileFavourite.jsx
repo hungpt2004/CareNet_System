@@ -289,7 +289,7 @@ const ProfileFavourite = () => {
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-certificate-purchases")}
                   >
-                    <span>Certificate</span>
+                    <span>CertificatePurchases</span>
                   </div>
                   <div className="menu-item" style={styles.menuItem}>
                     <span>Log Out</span>

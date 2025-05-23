@@ -178,7 +178,14 @@ function App() {
               <Route key={path} path={path} element={element} />
             ))}
           </Route>
-
+            <Route
+  path="/admin-organization"
+  element={
+    <ProtectedRoute allowedRoles={['admin']}>
+      <AdminOrganizations />
+    </ProtectedRoute>
+  }
+/>
         </Routes>
       </Router>
     </ToastProvider>

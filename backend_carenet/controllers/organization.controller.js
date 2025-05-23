@@ -1,4 +1,5 @@
 const Organization = require("../models/organization.model");
+const OrganizationLevel = require("../models/organizationLevel.model");
 const User = require("../models/user.model");
 const Event = require("../models/event.model");
 const EventRegistration = require("../models/eventRegistration.model");
@@ -324,4 +325,204 @@ exports.getOwnStaff = asyncHandler(async (req, res) => {
     });
   }
 });
+exports.getAllOrganizations = asyncHandler(async (req, res) => {
+  try {
+    const organizations = await Organization.find()
+   .populate('userId', 'avatar')
+      .populate("levelId", "name")
+      .lean();
 
+    if (!organizations.length) {
+      console.log("No organizations found in database");
+    }
+
+    for (const org of organizations) {
+      org.staffCount = await User.countDocuments({
+        organizationId: org._id,
+        role: "staff",
+      });
+      org.eventCount = await Event.countDocuments({
+        organizationId: org._id,
+      });
+      console.log(`Org ${org.name}: staffCount=${org.staffCount}, eventCount=${org.eventCount}, userId.dob=${org.userId?.dob}`);
+    }
+
+    console.log("Organizations found:", organizations.length, organizations);
+    return res.status(200).json({
+      status: "success",
+      data: organizations,
+    });
+  } catch (error) {
+    console.error("Error fetching organizations:", error.message, error.stack);
+    return res.status(500).json({
+      status: "fail",
+      message: "Lỗi khi lấy danh sách tổ chức: " + error.message,
+    });
+  }
+});
+
+exports.updateOrganizationStatus = asyncHandler(async (req, res) => {
+  try {
+    const { organizationId, status } = req.body;
+
+    if (!organizationId || !status) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Vui lòng cung cấp organizationId và status",
+      });
+    }
+
+    const validStatuses = ["active", "inactive"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Status phải là 'active' hoặc 'inactive'",
+      });
+    }
+
+    const organization = await Organization.findById(organizationId);
+    if (!organization) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Không tìm thấy tổ chức",
+      });
+    }
+
+    organization.organizationStatus = status;
+    await organization.save();
+
+    console.log(`Updated status of organization ${organization.name} to ${status}`);
+    return res.status(200).json({
+      status: "success",
+      message: "Cập nhật trạng thái tổ chức thành công",
+      data: organization,
+    });
+  } catch (error) {
+    console.error("Error updating organization status:", error.message, error.stack);
+    return res.status(500).json({
+      status: "fail",
+      message: "Lỗi khi cập nhật trạng thái tổ chức: " + error.message,
+    });
+  }
+});
+exports.updateOrganizationLevel = asyncHandler(async (req, res) => {
+  try {
+    const { organizationId, levelId } = req.body;
+
+    if (!organizationId || !levelId) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Vui lòng cung cấp organizationId và levelId",
+      });
+    }
+
+    const organization = await Organization.findById(organizationId);
+    if (!organization) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Không tìm thấy tổ chức",
+      });
+    }
+
+    const organizationLevel = await OrganizationLevel.findById(levelId);
+    if (!organizationLevel) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Không tìm thấy loại tổ chức",
+      });
+    }
+
+    organization.levelId = levelId;
+    await organization.save();
+
+    console.log(`Updated level of organization ${organization.name} to ${organizationLevel.name}`);
+    return res.status(200).json({
+      status: "success",
+      message: "Cập nhật loại tổ chức thành công",
+      data: organization,
+    });
+  } catch (error) {
+    console.error("Error updating organization level:", error.message, error.stack);
+    return res.status(500).json({
+      status: "fail",
+      message: "Lỗi khi cập nhật loại tổ chức: " + error.message,
+    });
+  }
+});
+
+exports.getAllOrganizationLevels = asyncHandler(async (req, res) => {
+  try {
+    const levels = await OrganizationLevel.find().lean();
+    console.log("Fetched organization levels:", levels);
+    return res.status(200).json({
+      status: "success",
+      data: levels,
+    });
+  } catch (error) {
+    console.error("Error fetching organization levels:", error.message, error.stack);
+    return res.status(500).json({
+      status: "fail",
+      message: "Lỗi khi lấy danh sách loại tổ chức: " + error.message,
+    });
+  }
+});
+
+exports.getOrganizationMembers = asyncHandler(async (req, res) => {
+  try {
+    const { organizationId } = req.query;
+
+    if (!organizationId) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Vui lòng cung cấp organizationId",
+      });
+    }
+
+    const members = await User.find({
+      organizationId: organizationId,
+      role: "staff",
+    })
+      .select("_id fullname email avatar role") // Explicitly include _id as userId
+      .lean();
+
+    console.log(`Fetched ${members.length} members for organization ${organizationId}`, members);
+    return res.status(200).json({
+      status: "success",
+      data: members,
+    });
+  } catch (error) {
+    console.error("Error fetching organization members:", error.message, error.stack);
+    return res.status(500).json({
+      status: "fail",
+      message: "Lỗi khi lấy danh sách thành viên: " + error.message,
+    });
+  }
+});
+exports.getEventsByOrganizationId = asyncHandler(async (req, res) => {
+  try {
+    const { organizationId } = req.query;
+
+    if (!organizationId) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Vui lòng cung cấp organizationId",
+      });
+    }
+
+    const events = await Event.find({ organizationId: organizationId })
+      .populate("assignChecker", "fullname email") // Optional: Populate assignChecker details
+      .lean();
+
+    console.log(`Fetched ${events.length} events for organization ${organizationId}`, events);
+    return res.status(200).json({
+      status: "success",
+      data: events,
+    });
+  } catch (error) {
+    console.error("Error fetching events:", error.message, error.stack);
+    return res.status(500).json({
+      status: "fail",
+      message: "Lỗi khi lấy danh sách sự kiện: " + error.message,
+    });
+  }
+});
