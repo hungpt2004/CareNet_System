@@ -21,7 +21,7 @@ import {
 } from "../../components/toast/CustomToast";
 
 import defaultAvatar from "../../assets/defaultAvatar.png";
-import { AiOutlineUser, AiOutlinePicture, AiOutlineHistory, AiOutlineHeart, AiOutlineStar, AiOutlineIdcard, AiOutlineLogout } from "react-icons/ai";
+import { AiOutlineUser, AiOutlinePicture, AiOutlineHistory, AiOutlineHeart, AiOutlineStar, AiOutlineIdcard, AiOutlineLogout, AiOutlineUpload } from "react-icons/ai";
 
 const ProfileInfo = () => {
   // Get current user
@@ -665,11 +665,12 @@ const ProfileInfo = () => {
                                 size="sm"
                                 onClick={handleCccdUpload}
                                 disabled={cccdUploading || cccdFiles.length === 0}
+                                aria-label="Tải lên CCCD"
                               >
                                 {cccdUploading ? (
                                   <Spinner animation="border" size="sm" />
                                 ) : (
-                                  "Tải lên CCCD"
+                                  <AiOutlineUpload style={{ fontSize: 20 }} />
                                 )}
                               </Button>
                               <Button
