@@ -19,6 +19,10 @@ import {
   EditOutlined,
   DeleteOutlined,
   ExclamationCircleOutlined,
+  CalendarOutlined,
+  StarFilled,
+  FileTextOutlined,
+  AppstoreOutlined,
 } from "@ant-design/icons";
 import { motion } from "framer-motion";
 import moment from "moment";
@@ -145,22 +149,37 @@ const FeedbackPage = () => {
   const [editingFeedback, setEditingFeedback] = useState(null);
   const [form] = Form.useForm();
 
-  // Table columns
+  // Table columns with icons
   const columns = [
     {
-      title: "Event Name",
+      title: (
+        <span>
+          <AppstoreOutlined style={{ color: '#0E606E', marginRight: 6 }} />
+          Event Name
+        </span>
+      ),
       dataIndex: "eventName",
       key: "eventName",
       sorter: (a, b) => a.eventName.localeCompare(b.eventName),
     },
     {
-      title: "Content",
+      title: (
+        <span>
+          <FileTextOutlined style={{ color: '#0E606E', marginRight: 6 }} />
+          Content
+        </span>
+      ),
       dataIndex: "content",
       key: "content",
       ellipsis: true,
     },
     {
-      title: "Feedback Date",
+      title: (
+        <span>
+          <CalendarOutlined style={{ color: '#0E606E', marginRight: 6 }} />
+          Feedback Date
+        </span>
+      ),
       dataIndex: "feedbackDate",
       key: "feedbackDate",
       sorter: (a, b) =>
@@ -168,14 +187,24 @@ const FeedbackPage = () => {
       render: (text) => moment(text).format("MMMM D, YYYY"),
     },
     {
-      title: "Rating",
+      title: (
+        <span>
+          <StarFilled style={{ color: '#FFD700', marginRight: 6 }} />
+          Rating
+        </span>
+      ),
       dataIndex: "rating",
       key: "rating",
       sorter: (a, b) => a.rating - b.rating,
       render: (rating) => <Rate disabled value={rating} />,
     },
     {
-      title: "Action",
+      title: (
+        <span>
+          <EditOutlined style={{ color: '#0E606E', marginRight: 6 }} />
+          Action
+        </span>
+      ),
       key: "action",
       align: "center", // Ensures buttons are centered inside the column
       render: (_, record) => (
@@ -332,7 +361,7 @@ const FeedbackPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <h2 className="text-center mb-4">Quản lý đánh giá</h2>
+          <h2 className="text-center mb-4">QUẢN LÍ ĐÁNH GIÁ</h2>
           <Card style={styles.card}>
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
@@ -384,10 +413,10 @@ const FeedbackPage = () => {
             </Button>,
           ]}
         >
-          <Form form={form} layout="vertical" name="feedbackForm">
+          <Form form={form} layout="vertical" name="feedbackForm" requiredMark={false}>
             <Form.Item
               name="eventName"
-              label="Tên sự kiện"
+              label={<span><AppstoreOutlined style={{ color: '#0E606E', marginRight: 6 }} />Tên sự kiện</span>}
               rules={[
                 { required: true, message: "Please input the event name!" },
               ]}
@@ -396,7 +425,7 @@ const FeedbackPage = () => {
             </Form.Item>
             <Form.Item
               name="content"
-              label="Bài đánh giá"
+              label={<span><FileTextOutlined style={{ color: '#0E606E', marginRight: 6 }} />Bài đánh giá</span>}
               rules={[
                 { required: true, message: "Please input your feedback!" },
               ]}
@@ -405,14 +434,14 @@ const FeedbackPage = () => {
             </Form.Item>
             <Form.Item
               name="feedbackDate"
-              label="Ngày đánh giá"
+              label={<span><CalendarOutlined style={{ color: '#0E606E', marginRight: 6 }} />Ngày đánh giá</span>}
               rules={[{ required: true, message: "Please select the date!" }]}
             >
               <Input disabled />
             </Form.Item>
             <Form.Item
               name="rating"
-              label="Số sao"
+              label={<span><StarFilled style={{ color: '#FFD700', marginRight: 6 }} />Số sao</span>}
               rules={[{ required: true, message: "Please rate the event!" }]}
             >
               <Rate allowHalf />

@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Container, Row, Col, Card, Pagination } from "react-bootstrap";
 import { motion } from "framer-motion";
 import { HeartFill } from "react-bootstrap-icons";
+import { AiOutlineUser, AiOutlinePicture, AiOutlineHistory, AiOutlineHeart, AiOutlineStar, AiOutlineIdcard, AiOutlineLogout } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 import defaultAvatar from "../../assets/defaultAvatar.png";
 const ProfileFavourite = () => {
@@ -248,6 +249,7 @@ const ProfileFavourite = () => {
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-information")}
                   >
+                    <AiOutlineUser style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
                     <span>Thông Tin</span>
                   </div>
                   <div
@@ -255,6 +257,7 @@ const ProfileFavourite = () => {
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-avatar")}
                   >
+                    <AiOutlinePicture style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
                     <span>Cập Nhật Avatar</span>
                   </div>
                   <div
@@ -262,6 +265,7 @@ const ProfileFavourite = () => {
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-history")}
                   >
+                    <AiOutlineHistory style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
                     <span>Lịch Sử Nỗ Lực</span>
                   </div>
                   <div
@@ -269,6 +273,7 @@ const ProfileFavourite = () => {
                     style={{ ...styles.menuItem, ...styles.menuItemActive }}
                     onClick={() => navigate("/profile-favourite")}
                   >
+                    <AiOutlineHeart style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
                     <span>Yêu Thích</span>
                   </div>
                   <div
@@ -276,6 +281,7 @@ const ProfileFavourite = () => {
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-score")}
                   >
+                    <AiOutlineStar style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
                     <span>Số Điểm</span>
                   </div>
                   <div
@@ -283,9 +289,11 @@ const ProfileFavourite = () => {
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-certificate")}
                   >
+                    <AiOutlineIdcard style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
                     <span>Chứng Chỉ</span>
                   </div>
                   <div className="menu-item" style={styles.menuItem}>
+                    <AiOutlineLogout style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
                     <span>Đăng Xuất</span>
                   </div>
                 </div>
@@ -301,7 +309,10 @@ const ProfileFavourite = () => {
           >
             <Card style={styles.infoCard}>
               <Card.Header style={styles.infoHeader}>
-                <h4 className="mb-0">YÊU THÍCH</h4>
+                <h4 className="mb-0">
+                  <AiOutlineHeart style={{ marginRight: 10, fontSize: 24, verticalAlign: 'middle' }} />
+                  YÊU THÍCH
+                </h4>
               </Card.Header>
               <Card.Body style={styles.infoCardBody}>
                 <div style={styles.favouriteList}>

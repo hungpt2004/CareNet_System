@@ -12,6 +12,7 @@ import {
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import derivative from "antd/es/theme/themes/default";
+import { AiOutlineUser, AiOutlinePicture, AiOutlineHistory, AiOutlineHeart, AiOutlineStar, AiOutlineIdcard, AiOutlineLogout } from "react-icons/ai";
 const ProfileScore = () => {
   // CSS styles defined directly in the component
   const styles = {
@@ -348,6 +349,7 @@ const ProfileScore = () => {
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-information")}
                   >
+                    <AiOutlineUser style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
                     <span>Thông Tin</span>
                   </div>
                   <div
@@ -355,6 +357,7 @@ const ProfileScore = () => {
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-avatar")}
                   >
+                    <AiOutlinePicture style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
                     <span>Cập Nhật Avatar</span>
                   </div>
                   <div
@@ -362,6 +365,7 @@ const ProfileScore = () => {
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-history")}
                   >
+                    <AiOutlineHistory style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
                     <span>Lịch Sử Nỗ Lực</span>
                   </div>
                   <div
@@ -369,6 +373,7 @@ const ProfileScore = () => {
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-favourite")}
                   >
+                    <AiOutlineHeart style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
                     <span>Yêu Thích</span>
                   </div>
                   <div
@@ -376,6 +381,7 @@ const ProfileScore = () => {
                     style={{ ...styles.menuItem, ...styles.menuItemActive }}
                     onClick={() => navigate("/profile-score")}
                   >
+                    <AiOutlineStar style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
                     <span>Số Điểm</span>
                   </div>
                   <div
@@ -383,9 +389,11 @@ const ProfileScore = () => {
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-certificate")}
                   >
+                    <AiOutlineIdcard style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
                     <span>Chứng Chỉ</span>
                   </div>
                   <div className="menu-item" style={styles.menuItem}>
+                    <AiOutlineLogout style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
                     <span>Đăng Xuất</span>
                   </div>
                 </div>
@@ -401,7 +409,10 @@ const ProfileScore = () => {
           >
             <Card style={styles.infoCard}>
               <Card.Header style={styles.infoHeader}>
-                <h4 className="mb-0">SỐ ĐIỂM</h4>
+                <h4 className="mb-0">
+                  <AiOutlineStar style={{ marginRight: 10, fontSize: 24, verticalAlign: 'middle' }} />
+                  SỐ ĐIỂM
+                </h4>
               </Card.Header>
               <Card.Body style={styles.infoCardBody}>
                 <motion.div

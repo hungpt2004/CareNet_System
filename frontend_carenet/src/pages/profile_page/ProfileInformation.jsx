@@ -19,7 +19,9 @@ import {
   CustomSuccessToast,
   CustomToast,
 } from "../../components/toast/CustomToast";
+
 import defaultAvatar from "../../assets/defaultAvatar.png";
+import { AiOutlineUser, AiOutlinePicture, AiOutlineHistory, AiOutlineHeart, AiOutlineStar, AiOutlineIdcard, AiOutlineLogout } from "react-icons/ai";
 
 const ProfileInfo = () => {
   // Get current user
@@ -351,6 +353,7 @@ const ProfileInfo = () => {
 
   // Xử lí nộp form và cập nhật form
   const handleSubmit = async (e) => {
+
     e.preventDefault();
     setLoading(true);
     // Convert the date to "yyyy-mm-dd" format if it's in "dd/mm/yyyy" format
@@ -360,6 +363,10 @@ const ProfileInfo = () => {
     // Validate phone number using regex (example for a 10-digit phone number)
     const phoneRegex = /^[0-9]{10}$/; // Modify based on the expected phone number format
     if (!phoneRegex.test(formData.phone)) {
+      setFormData((prev) => ({
+        ...prev,
+        phone: currentUser.phone,
+      }));
       setLoading(false);
       CustomFailedToast(
         "Số điện thoại không hợp lệ. Vui lòng nhập số điện thoại hợp lệ gồm 10 chữ số."
@@ -376,6 +383,12 @@ const ProfileInfo = () => {
     }
 
     if (age < 18) {
+      setFormData((prev) => ({
+        ...prev,
+        dob: currentUser.dob
+          ? new Date(currentUser.dob).toLocaleDateString("en-GB")
+          : "",
+      }));
       setLoading(false);
       CustomFailedToast("Bạn phải ít nhất 18 tuổi.");
       return;
@@ -456,6 +469,7 @@ const ProfileInfo = () => {
                       style={{ ...styles.menuItem, ...styles.menuItemActive }}
                       onClick={() => navigate("/profile-information")}
                     >
+                      <AiOutlineUser style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
                       <span>Thông tin </span>
                     </div>
                     <div
@@ -463,6 +477,7 @@ const ProfileInfo = () => {
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-avatar")}
                     >
+                      <AiOutlinePicture style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
                       <span>Cập Nhật Avatar </span>
                     </div>
                     <div
@@ -470,6 +485,7 @@ const ProfileInfo = () => {
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-history")}
                     >
+                      <AiOutlineHistory style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
                       <span>Lịch sử nỗ lực</span>
                     </div>
                     <div
@@ -477,6 +493,7 @@ const ProfileInfo = () => {
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-favourite")}
                     >
+                      <AiOutlineHeart style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
                       <span>Yêu Thích</span>
                     </div>
                     <div
@@ -484,6 +501,7 @@ const ProfileInfo = () => {
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-score")}
                     >
+                      <AiOutlineStar style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
                       <span>Số Điểm</span>
                     </div>
                     <div
@@ -491,9 +509,11 @@ const ProfileInfo = () => {
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-certificate")}
                     >
+                      <AiOutlineIdcard style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
                       <span>Chứng Chỉ </span>
                     </div>
                     <div className="menu-item" style={styles.menuItem}>
+                      <AiOutlineLogout style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
                       <span>Đăng Xuất</span>
                     </div>
                   </div>
@@ -509,7 +529,10 @@ const ProfileInfo = () => {
             >
               <Card style={styles.infoCard}>
                 <Card.Header style={styles.infoHeader}>
-                  <h4 className="mb-0">THÔNG TIN</h4>
+                  <h4 className="mb-0">
+                    <AiOutlineUser style={{ marginRight: 10, fontSize: 24, verticalAlign: 'middle' }} />
+                    THÔNG TIN
+                  </h4>
                 </Card.Header>
                 <Card.Body style={styles.infoCardBody}>
                   <Form onSubmit={handleSubmit}>
@@ -517,6 +540,7 @@ const ProfileInfo = () => {
                       <Col md={6}>
                         <Form.Group>
                           <Form.Label style={styles.formLabel}>
+                            <AiOutlineUser style={{ marginRight: 6, fontSize: 18, verticalAlign: 'middle' }} />
                             Họ và tên
                           </Form.Label>
                           <Form.Control
@@ -531,6 +555,7 @@ const ProfileInfo = () => {
                       <Col md={6}>
                         <Form.Group>
                           <Form.Label style={styles.formLabel}>
+                            <AiOutlineUser style={{ marginRight: 6, fontSize: 18, verticalAlign: 'middle' }} />
                             Giới tính
                           </Form.Label>
                           <div>
@@ -572,6 +597,7 @@ const ProfileInfo = () => {
                       <Col md={6}>
                         <Form.Group>
                           <Form.Label style={styles.formLabel}>
+                            <AiOutlineIdcard style={{ marginRight: 6, fontSize: 18, verticalAlign: 'middle' }} />
                             Ngày sinh
                           </Form.Label>
                           <Form.Control
@@ -585,7 +611,10 @@ const ProfileInfo = () => {
                       </Col>
                       <Col md={6}>
                         <Form.Group>
-                          <Form.Label style={styles.formLabel}>CMND</Form.Label>
+                          <Form.Label style={styles.formLabel}>
+                            <AiOutlineIdcard style={{ marginRight: 6, fontSize: 18, verticalAlign: 'middle' }} />
+                            CMND
+                          </Form.Label>
                           <Form.Control
                             type="text"
                             name="cccdNumber"
@@ -727,6 +756,7 @@ const ProfileInfo = () => {
                       <Col md={6}>
                         <Form.Group>
                           <Form.Label style={styles.formLabel}>
+                            <AiOutlineUser style={{ marginRight: 6, fontSize: 18, verticalAlign: 'middle' }} />
                             Số điện thoại
                           </Form.Label>
                           <Form.Control
@@ -741,6 +771,7 @@ const ProfileInfo = () => {
                       <Col md={6}>
                         <Form.Group>
                           <Form.Label style={styles.formLabel}>
+                            <AiOutlineUser style={{ marginRight: 6, fontSize: 18, verticalAlign: 'middle' }} />
                             Email
                           </Form.Label>
                           <Form.Control
@@ -755,7 +786,10 @@ const ProfileInfo = () => {
                       </Col>
                     </Row>
                     <Form.Group className="mb-4">
-                      <Form.Label style={styles.formLabel}>Địa chỉ</Form.Label>
+                      <Form.Label style={styles.formLabel}>
+                        <AiOutlineUser style={{ marginRight: 6, fontSize: 18, verticalAlign: 'middle' }} />
+                        Địa chỉ
+                      </Form.Label>
                       <Form.Control
                         as="textarea"
                         rows={3}
