@@ -510,7 +510,7 @@ const ProfileAvatar = () => {
 
         {/* Ant Design Modal for Avatar View */}
         <Modal
-          title="Xem Avatar"
+          title=""
           open={isModalVisible}
           onCancel={handleCloseAvatarModal}
           footer={null}
