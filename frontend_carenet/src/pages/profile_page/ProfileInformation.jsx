@@ -342,12 +342,26 @@ const ProfileInfo = () => {
     address: currentUser.address.country,
   });
 
+  // Format phone number for display (e.g., 0123456789 -> 0123 456 789)
+  const formatPhoneNumber = (phone) => {
+    if (!phone) return "";
+    // Remove all non-digit characters
+    const digits = phone.replace(/\D/g, "");
+    // Format: 4-3-3 (Vietnam style: 0123 456 789)
+    if (digits.length === 10) {
+      return digits.replace(/(\d{4})(\d{3})(\d{3})/, "$1 $2 $3");
+    }
+    // Fallback: just return digits
+    return digits;
+  };
+
   // Nhập data vào form
   const handleChange = (e) => {
     const { name, value } = e.target;
+    // For phone, remove spaces as user types
     setFormData({
       ...formData,
-      [name]: value,
+      [name]: name === "phone" ? value.replace(/\s/g, "") : value,
     });
   };
 
@@ -763,9 +777,12 @@ const ProfileInfo = () => {
                           <Form.Control
                             type="text"
                             name="phone"
-                            value={formData.phone}
+                            value={formatPhoneNumber(formData.phone)}
                             onChange={handleChange}
                             style={styles.formControl}
+                            inputMode="numeric"
+                            maxLength={12} // 10 digits + 2 spaces
+                            placeholder="0123 456 789"
                           />
                         </Form.Group>
                       </Col>
