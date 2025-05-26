@@ -248,8 +248,16 @@ const ProfileAvatar = () => {
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setSelectedFile(e.target.files[0]); // Set the actual file
+      // Always revoke previous preview URL to avoid memory leaks and stale previews
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+      setSelectedFile(file); // Set the actual file
       setPreviewUrl(URL.createObjectURL(file)); // Create a URL for previewing the image
+      // Reset the file input value so the same file can be selected again after cancel
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   };
 
@@ -287,13 +295,17 @@ const ProfileAvatar = () => {
   };
 
   const handleCancelUpload = () => {
-    // Reset the selected file and preview URL
-    setSelectedFile(null);
-    setPreviewUrl(null); // Reset the preview if necessary
-
-    // Optionally close any modals or perform additional actions
-    setIsModalVisible(false); // Close the modal if you have one
-    CustomFailedToast("Avatar upload canceled."); // Inform the user that the upload was canceled
+    // Only reset if a file is actually selected (i.e., user is in the process of uploading)
+    if (selectedFile || previewUrl) {
+      setSelectedFile(null);
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+      setPreviewUrl(null);
+      CustomFailedToast("Hủy avatar tải lên thành công.");
+    }
+    // Always close the modal if open
+    setIsModalVisible(false);
   };
 
   // Xử lí upload avatar
