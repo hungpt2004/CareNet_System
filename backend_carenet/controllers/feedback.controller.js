@@ -46,8 +46,8 @@ exports.createFeedback = asyncHandler(async (req, res) => {
     });
 
     // 5. If status is "finished", update to "completed" after feedback
-    if (historyEvent.status === "finished") {
-      await HistoryEvent.findByIdAndUpdate(historyEvent._id, { status: "completed" });
+    if (historyEvent.status === "completed") {
+      await HistoryEvent.findByIdAndUpdate(historyEvent._id, { status: "finished" });
     }
 
     return res.status(201).json({

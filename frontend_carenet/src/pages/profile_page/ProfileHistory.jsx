@@ -506,7 +506,6 @@ const ProfileHistory = () => {
   // Handle feedback submission
   const handleSubmitFeedback = async () => {
     setSubmittingFeedback(true);
-    console.log("Submitting feedback:", feedbackText); // Debug: check value
     const feedbackData = {
       rating,
       content: feedbackText,
@@ -521,23 +520,23 @@ const ProfileHistory = () => {
       if (res.data && res.data.message) {
         CustomSuccessToast(res.data.message);
         setIsModalVisible(false);
-        // Update the status of the effort in the UI immediately if needed
-        setEffortData((prevEfforts) =>
-          prevEfforts.map((effort) => {
-            if (
-              effort._id === selectedEffort._id &&
-              (effort.status === "completed" || effort.status === "finished")
-            ) {
-              // If status was "finished", backend sets it to "completed" after feedback
-              // So we update it here for immediate UI feedback
-              return {
-                ...effort,
-                status: "completed",
-              };
-            }
-            return effort;
-          })
-        );
+        // Fetch the latest status from backend for this event only
+        const updatedEventRes = await axiosInstance.get(`/profile/get-all-history-events`);
+        if (
+          updatedEventRes.data &&
+          updatedEventRes.data.historyEvents &&
+          Array.isArray(updatedEventRes.data.historyEvents)
+        ) {
+          // Find the updated effort by id
+          const updatedEffort = updatedEventRes.data.historyEvents.find(e => e._id === selectedEffort._id);
+          setEffortData((prevEfforts) =>
+            prevEfforts.map((effort) =>
+              effort._id === selectedEffort._id && updatedEffort
+                ? { ...effort, ...updatedEffort }
+                : effort
+            )
+          );
+        }
       }
     } catch (err) {
       console.error("Error submitting feedback:", err);
@@ -757,25 +756,25 @@ const ProfileHistory = () => {
                             </div>
 
                             <Tooltip
-                              title={
-                                effort.status !== "finished"
-                                  ? "Tình trạng của bạn phải là Kết thúc mới cho phép gửi đánh giá"
-                                  : ""
-                              }
-                              color="#0E606E"
-                              placement="top"
-                            >
-                              <span>
-                                <Button
-                                  className="feedback-btn"
-                                  style={styles.feedbackButton}
-                                  onClick={() => effort.status === "finished" && handleFeedbackClick(effort)}
-                                  disabled={effort.status !== "finished"}
-                                >
-                                  Đánh Giá
-                                </Button>
-                              </span>
-                            </Tooltip>
+                            title={
+                              effort.status !== "completed"
+                                ? "Tình trạng của bạn phải là Hoàn thành mới cho phép gửi đánh giá"
+                                : ""
+                            }
+                            color="#0E606E"
+                            placement="top"
+                          >
+                            <span>
+                              <Button
+                                className="feedback-btn"
+                                style={styles.feedbackButton}
+                                onClick={() => effort.status === "completed" && handleFeedbackClick(effort)}
+                                disabled={effort.status !== "completed"}
+                              >
+                                Đánh Giá
+                              </Button>
+                            </span>
+                          </Tooltip>
                           </motion.div>
                         ))}
                       </AnimatePresence>
