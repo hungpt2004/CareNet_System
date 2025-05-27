@@ -88,7 +88,7 @@ const CustomNavbarLogged = () => {
       }}
     >
       <Container fluid>
-        <Navbar.Brand href="#home" className="fw-bold">
+        <Navbar.Brand href="/" className="fw-bold">
           <Row>
             <Col><Image
               src="/volunteer_img/Carenet.png"
