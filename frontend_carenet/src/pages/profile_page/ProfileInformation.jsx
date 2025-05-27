@@ -19,7 +19,7 @@ import {
   CustomSuccessToast,
   CustomToast,
 } from "../../components/toast/CustomToast";
-
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import defaultAvatar from "../../assets/defaultAvatar.png";
 import { AiOutlineUser, AiOutlinePicture, AiOutlineHistory, AiOutlineHeart, AiOutlineStar, AiOutlineIdcard, AiOutlineLogout, AiOutlineUpload } from "react-icons/ai";
 
@@ -355,14 +355,51 @@ const ProfileInfo = () => {
     return digits;
   };
 
-  // Nhập data vào form
+  // Format date of birth for display (e.g., 27/05/2025)
+  const formatDob = (dob) => {
+    if (!dob) return "";
+    // Accept ISO or Date object, return dd/mm/yyyy
+    let dateObj;
+    if (typeof dob === "string" && dob.includes("-")) {
+      dateObj = new Date(dob);
+    } else if (dob instanceof Date) {
+      dateObj = dob;
+    } else {
+      // Try parsing dd/mm/yyyy
+      const [d, m, y] = dob.split("/");
+      if (d && m && y) return `${d.padStart(2, "0")}/${m.padStart(2, "0")}/${y}`;
+      return dob;
+    }
+    if (isNaN(dateObj)) return dob;
+    return dateObj.toLocaleDateString("en-GB");
+  };
+
+  // Validate and format input for phone and dob
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // For phone, remove spaces as user types
-    setFormData({
-      ...formData,
-      [name]: name === "phone" ? value.replace(/\s/g, "") : value,
-    });
+    if (name === "phone") {
+      setFormData({
+        ...formData,
+        phone: value.replace(/\s/g, ""),
+      });
+    } else if (name === "dob") {
+      // Only allow dd/mm/yyyy format (numbers and /)
+      let clean = value.replace(/[^0-9/]/g, "");
+      // Auto-insert / as user types
+      if (clean.length === 2 && value.length === 3 && value[2] !== "/") clean = clean.slice(0,2) + "/" + clean.slice(2);
+      if (clean.length === 5 && value.length === 6 && value[5] !== "/") clean = clean.slice(0,5) + "/" + clean.slice(5);
+      // Limit to 10 chars (dd/mm/yyyy)
+      clean = clean.slice(0, 10);
+      setFormData({
+        ...formData,
+        dob: clean,
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
   };
 
   // Xử lí nộp form và cập nhật form
@@ -614,13 +651,28 @@ const ProfileInfo = () => {
                             <AiOutlineIdcard style={{ marginRight: 6, fontSize: 18, verticalAlign: 'middle' }} />
                             Ngày sinh
                           </Form.Label>
-                          <Form.Control
-                            type="text"
-                            name="dob"
-                            value={formData.dob}
-                            onChange={handleChange}
-                            style={styles.formControl}
-                          />
+                          {/* Custom tooltip for date format */}
+                          <OverlayTrigger
+                            placement="bottom"
+                            overlay={
+                              <Tooltip id="dob-tooltip">
+                                Định dạng hợp lệ: <b>dd/mm/yyyy</b>
+                              </Tooltip>
+                            }
+                          >
+                            <Form.Control
+                              type="text"
+                              name="dob"
+                              value={formatDob(formData.dob)}
+                              onChange={handleChange}
+                              style={styles.formControl}
+                              placeholder="dd/mm/yyyy"
+                              maxLength={10}
+                              pattern="^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/\d{4}$"
+                            />
+                          </OverlayTrigger>
+
+
                         </Form.Group>
                       </Col>
                       <Col md={6}>
@@ -774,16 +826,25 @@ const ProfileInfo = () => {
                             <AiOutlineUser style={{ marginRight: 6, fontSize: 18, verticalAlign: 'middle' }} />
                             Số điện thoại
                           </Form.Label>
-                          <Form.Control
-                            type="text"
-                            name="phone"
-                            value={formatPhoneNumber(formData.phone)}
-                            onChange={handleChange}
-                            style={styles.formControl}
-                            inputMode="numeric"
-                            maxLength={12} // 10 digits + 2 spaces
-                            placeholder="0123 456 789"
-                          />
+                          <OverlayTrigger
+                            placement="bottom"
+                            overlay={
+                              <Tooltip id="phone-tooltip">
+                                Vui lòng nhập số điện thoại hợp lệ gồm 10 chữ số.
+                              </Tooltip>
+                            }
+                          >
+                            <Form.Control
+                              type="text"
+                              name="phone"
+                              value={formatPhoneNumber(formData.phone)}
+                              onChange={handleChange}
+                              style={styles.formControl}
+                              inputMode="numeric"
+                              maxLength={12} // 10 digits + 2 spaces
+                              placeholder="0123 456 789"
+                            />
+                          </OverlayTrigger>
                         </Form.Group>
                       </Col>
                       <Col md={6}>
