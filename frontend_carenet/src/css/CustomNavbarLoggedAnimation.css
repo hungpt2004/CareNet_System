@@ -1,0 +1,25 @@
+/* Animation for CustomNavbarLogged dropdown links */
+.custom-animated-link {
+  position: relative;
+  transition: background 0.3s, color 0.3s;
+  overflow: hidden;
+}
+.custom-animated-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0;
+  height: 2px;
+  background: #0E606E;
+  transition: width 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+.custom-animated-link:hover,
+.custom-animated-link:focus {
+  background: rgba(14, 96, 110, 0.08);
+  color: #0E606E !important;
+}
+.custom-animated-link:hover::after,
+.custom-animated-link:focus::after {
+  width: 100%;
+}

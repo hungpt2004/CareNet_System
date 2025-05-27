@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Button, Container, Nav, Navbar, Image, Row, Col } from "react-bootstrap";
 import styles from '../../css/AppColors.module.css'
+import '../../css/CustomNavbarLoggedAnimation.css';
 import useAuthStore from "../../hooks/authStore";
 import { useNavigate } from "react-router-dom";
 import defaultAvatar from "../../assets/defaultAvatar.png";
+import { AiOutlineUser, AiOutlineCustomerService, AiOutlineCalendar, AiOutlineStar, AiOutlineIdcard, AiOutlineDashboard, AiOutlineLogout } from "react-icons/ai";
 const CustomNavbarLogged = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -137,7 +139,7 @@ const CustomNavbarLogged = () => {
                 <div
                   className="position-absolute end-0 mt-2 py-2 bg-white rounded shadow"
                   style={{
-                    width: '220px',
+                    width: '260px',
                     zIndex: 1051,
                   }}
                 >
@@ -146,13 +148,13 @@ const CustomNavbarLogged = () => {
                     <div className="text-muted small">{currentUser?.email}</div>
                   </div>
                   <Nav className="flex-column">
-                    <Nav.Link href="/profile-information" className="px-4 py-2">Thông tin cá nhân</Nav.Link>
-                    <Nav.Link href="/support" className="px-4 py-2">CSKH</Nav.Link>
-                    <Nav.Link href="/my-events" className="px-4 py-2">Quản Lý Ghi Danh</Nav.Link>
-                    <Nav.Link href="/feedback-page" className="px-4 py-2">Quản Lý Đánh Giá</Nav.Link>
-                    <Nav.Link href="/owner-post" className="px-4 py-2">Tài khoản Organization</Nav.Link>
-                    <Nav.Link href="/dashboard" className="px-4 py-2">Tài khoản Admin</Nav.Link>
-                    <Nav.Link onClick={handleLogout} className="px-4 py-2 text-danger">Đăng xuất</Nav.Link>
+                    <Nav.Link href="/profile-information" className="px-4 py-2 custom-animated-link"><AiOutlineUser style={{marginRight: 8, fontSize: 18, verticalAlign: 'middle'}} />Thông tin cá nhân</Nav.Link>
+                    <Nav.Link href="/support" className="px-4 py-2 custom-animated-link"><AiOutlineCustomerService style={{marginRight: 8, fontSize: 18, verticalAlign: 'middle'}} />CSKH</Nav.Link>
+                    <Nav.Link href="/my-events" className="px-4 py-2 custom-animated-link"><AiOutlineCalendar style={{marginRight: 8, fontSize: 18, verticalAlign: 'middle'}} />Quản Lý Ghi Danh</Nav.Link>
+                    <Nav.Link href="/feedback-page" className="px-4 py-2 custom-animated-link"><AiOutlineStar style={{marginRight: 8, fontSize: 18, verticalAlign: 'middle'}} />Quản Lý Đánh Giá</Nav.Link>
+                    <Nav.Link href="/owner-post" className="px-4 py-2 custom-animated-link" style={{ whiteSpace: 'nowrap' }}><AiOutlineIdcard style={{marginRight: 8, fontSize: 18, verticalAlign: 'middle'}} />Tài khoản Organization</Nav.Link>
+                    <Nav.Link href="/dashboard" className="px-4 py-2 custom-animated-link"><AiOutlineDashboard style={{marginRight: 8, fontSize: 18, verticalAlign: 'middle'}} />Tài khoản Admin</Nav.Link>
+                    <Nav.Link onClick={handleLogout} className="px-4 py-2 text-danger custom-animated-link"><AiOutlineLogout style={{marginRight: 8, fontSize: 18, verticalAlign: 'middle'}} />Đăng xuất</Nav.Link>
                   </Nav>
                 </div>
               )}
