@@ -15,7 +15,7 @@ exports.sendVerificationLink = async (
  ) => {
    try {
      await emailTransporter.sendMail({
-       from: process.env.EMAIL_USERNAME,
+       from: `Dịch vụ hỗ trợ Carenet" <${process.env.EMAIL_USERNAME}>`,
        to: email,
        subject: "Xác thực tài khoản",
        html: VERIFICATION_EMAIL_TEMPLATE

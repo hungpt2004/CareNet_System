@@ -165,7 +165,7 @@ const CustomNavbarLogged = () => {
           <Nav className="ms-auto">
             <Nav.Link href="/" className="fw-bold hover-underline mx-3">TRANG CHỦ</Nav.Link>
             <Nav.Link href="#features" className="fw-bold hover-underline mx-3">THÀNH TỰU</Nav.Link>
-            <Nav.Link href="#how-it-works" className="fw-bold hover-underline mx-3">VẬN HÀNH</Nav.Link>
+            <Nav.Link href="/forum-chat" className="fw-bold hover-underline mx-3">DIỄN ĐÀN</Nav.Link>
             <Nav.Link href="#testimonials" className="fw-bold hover-underline mx-3">CHIA SẺ</Nav.Link>
             <Nav.Link href="#contact" className="fw-bold hover-underline mx-3">LIÊN HỆ</Nav.Link>
             <Nav.Link href="/organization-register" className="fw-bold hover-underline mx-3">ĐĂNG KÍ TỔ CHỨC</Nav.Link>

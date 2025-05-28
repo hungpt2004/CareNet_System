@@ -13,10 +13,12 @@ const GuestLayout = () => {
 
   return (
     <div className="d-flex flex-column min-vh-100">
-      {currentUser ? <CustomNavbarLogged/> : <CustomNavbar />}
+      {currentUser ? <CustomNavbarLogged /> : <CustomNavbar />}
 
-      {/* Main Content with padding for fixed navbar */}
-      <main className="flex-grow-1" style={{ paddingTop: '100px' }}>
+      {/* Spacer để tránh bị che bởi navbar fixed */}
+      <div style={{ height: '100px' }} /> {/* Đúng bằng chiều cao navbar */}
+
+      <main className="flex-grow-1">
         <Container fluid>
           <div className="px-4">
             <Breadcrumbs />
@@ -25,7 +27,6 @@ const GuestLayout = () => {
         </Container>
       </main>
 
-      {/* Footer */}
       <Footer />
     </div>
   );

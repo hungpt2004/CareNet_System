@@ -57,11 +57,6 @@ function AuthenGatePage() {
   const [showLoginModal, setShowLoginModal] = useState(false)
   const [showRegisterModal, setShowRegisterModal] = useState(false)
 
-  // State for password visibility
-  const [showLoginPassword, setShowLoginPassword] = useState(false)
-  const [showRegisterPassword, setShowRegisterPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-
   // Login form reference
   const [loginForm] = Form.useForm()
   const [registerForm] = Form.useForm()
@@ -89,9 +84,11 @@ function AuthenGatePage() {
 
   const handleRegisterModalShow = () => setShowRegisterModal(true)
 
-
   // Handle login form submission
   const handleLoginSubmit = async (values) => {
+
+    console.log("Login values:", values)
+
     try {
       setLoginError("")
       await login(values.email, values.password)

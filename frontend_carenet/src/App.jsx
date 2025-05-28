@@ -46,6 +46,8 @@ import AdminOrganizationsPending from './pages/admin_students_page/AdminOrganiza
 import AdminEventsPending from './pages/admin_students_page/AdminEventsPage';
 import OrganizationUserPending from './pages/organization_user_page/OrganizationUserPending';
 import ChatPage from './pages/chat/ChatPage';
+import ForumPage from './pages/forum_page/UserForumChatPage';
+import ForumChatPage from './pages/forum_page/UserForumChatPage';
 
 const guestRoutes = [
   { path: '/', element: <LandingPage /> },
@@ -77,6 +79,7 @@ const privateCustomerRoutes = [
   { path: '/profile-certificate', element: <ProfileCertificate /> },
   { path: '/feedback-page', element: <FeedbackPage /> },
   { path: '/my-events', element: <MyEventsPage /> },
+  { path: '/forum-chat', element: <ForumChatPage/> }
 ];
 
 const privateAdminRoutes = [

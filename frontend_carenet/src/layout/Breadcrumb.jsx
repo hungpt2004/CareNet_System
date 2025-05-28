@@ -25,7 +25,8 @@ const routeNames = {
    'success-register': { name: 'Đăng ký thành công' },
    'feedback-page': { name: 'Trang phản hồi' },
    'payment-success': { name: 'Thanh toán thành công' },
-   'payment-cancel': { name: 'Hủy thanh toán' }
+   'payment-cancel': { name: 'Hủy thanh toán' },
+   'forum-chat': { name: 'Diễn đàn' },
 };
 
 const Breadcrumbs = () => {
