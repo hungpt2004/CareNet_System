@@ -4,7 +4,6 @@ const User = require("../models/user.model");
 const Event = require("../models/event.model");
 const EventRegistration = require("../models/eventRegistration.model");
 const HistoryEvent = require("../models/historyEvent.model");
-const OrganizationLevel = require("../models/organizationLevel.model");
 const asyncHandler = require("../middleware/asyncHandler");
 const { sendApproveRequest, sendRejectRequest } = require("./email.controller");
 const { getIO } = require("../socket");

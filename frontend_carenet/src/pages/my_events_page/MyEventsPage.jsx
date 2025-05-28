@@ -371,23 +371,6 @@ function MyEventsPage() {
                style={{ backgroundColor: 'white', minHeight: "100vh" }}
             >
                <Container className="py-4">
-                  <Breadcrumb
-                     items={[
-                        {
-                           href: '/home',
-                           title: <HomeOutlined />,
-                        },
-                        {
-                           href: '/profile',
-                           title: <span><CalendarOutlined /> Cá nhân</span>,
-                        },
-                        {
-                           href: '/my-events',
-                           title: 'Quản lý ghi danh',
-                        },
-                     ]}
-                     style={{ marginBottom: "16px" }}
-                  />
                   
                   <h2 className="text-center mb-4 mt-3">Quản Lý Ghi Danh</h2>
                   <motion.div variants={itemVariants}>

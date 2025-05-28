@@ -4,7 +4,6 @@ const { authenticateToken } = require('../middleware/isAuthenticate');
 const { getAllOrganizations, updateOrganizationStatus, updateOrganizationLevel, getAllOrganizationLevels} = require("../controllers/organization.controller");
 const { getOrganizationMembers } = require("../controllers/organization.controller");
 const OrganizationRouter = express.Router();
-const { authenticateToken } = require('../middleware/isAuthenticate');
 
 OrganizationRouter.get('/get-all-owned-event', authenticateToken, OrganizationController.getAllOwnerEvent)
 OrganizationRouter.get('/get-filtered-request/:id', OrganizationController.filterRequestsBySkills);

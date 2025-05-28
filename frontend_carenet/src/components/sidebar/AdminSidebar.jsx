@@ -1,16 +1,17 @@
 import React, { useState } from "react";
 import { Nav } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
-import { Home, Users, BookOpen, Calendar, BarChart2, Award, MessageSquare, DollarSign, Layers, Settings, ChevronDown, ChevronRight } from 'lucide-react';
-
-// Custom CSS variables for the color scheme
-const customStyles = {
-  primaryColor: "#5DB996",
-  darkColor: "#2A3F54",
-};
+import { 
+  Home, Users, BookOpen, Calendar, BarChart2, Award, 
+  MessageSquare, DollarSign, Layers, Settings, ChevronDown, 
+  ChevronRight, Crown, Building2, LogOut, Shield 
+} from 'lucide-react';
+import useAuthStore from "../../hooks/authStore";
+import styles from '../../css/AdminSidebar.module.css';
 
 const AdminSidebar = ({ showSidebar, isMobile }) => {
   const [expandedMenus, setExpandedMenus] = useState({});
+  const { currentUser, logout } = useAuthStore();
 
   // Toggle submenu
   const toggleSubmenu = (menuId) => {
@@ -20,8 +21,8 @@ const AdminSidebar = ({ showSidebar, isMobile }) => {
     });
   };
 
-  // Sidebar menu items
-  const menuItems = [
+  // Main menu items
+  const mainMenuItems = [
     {
       id: "dashboard",
       title: "Tổng Quan",
@@ -29,7 +30,7 @@ const AdminSidebar = ({ showSidebar, isMobile }) => {
       path: "/dashboard",
     },
     {
-      id: "users",
+      id: "requests",
       title: "Duyệt Yêu Cầu",
       icon: <Users size={20} />,
       submenu: [
@@ -39,194 +40,152 @@ const AdminSidebar = ({ showSidebar, isMobile }) => {
     },
     {
       id: "organizations",
-      title: "Tổ Chức ",
-      icon: <Award size={20} />,
+      title: "Quản Lý Tổ Chức",
+      icon: <Building2 size={20} />,
       submenu: [
-        { title: "Quản Lý Tổ Chức", path: "/admin-organization" },
-        { title: "Quản Lý Bài Đăng", path: "/admin-post" },
-
+        { title: "Danh sách tổ chức", path: "/admin-organization" },
+        { title: "Quản lý bài đăng", path: "/admin-post" },
+        { title: "Báo cáo tổ chức", path: "/admin-organization-reports" },
       ],
     },
     {
-      id: "upgrade",
-      title: "Nâng Cấp",
-      icon: <Award size={20} />,
+      id: "users",
+      title: "Quản Lý Người Dùng",
+      icon: <Users size={20} />,
       submenu: [
-        { title: "Nâng cấp chức năng", path: "/upgrade-pro" },
+        { title: "Tất cả người dùng", path: "/admin-users" },
+        { title: "Người dùng bị khóa", path: "/admin-blocked-users" },
+      ],
+    },
+    {
+      id: "system",
+      title: "Hệ Thống",
+      icon: <Settings size={20} />,
+      submenu: [
+        { title: "Cài đặt hệ thống", path: "/admin-settings" },
+        { title: "Logs hệ thống", path: "/admin-logs" },
+      ],
+    },
+    {
+      id: "analytics",
+      title: "Thống Kê",
+      icon: <BarChart2 size={20} />,
+      submenu: [
+        { title: "Báo cáo tổng quan", path: "/admin-analytics" },
+        { title: "Thống kê hoạt động", path: "/admin-activity-stats" },
       ],
     },
   ];
 
+
+  const renderMenuItem = (item) => {
+    if (item.submenu) {
+      return (
+        <div key={item.id} className={styles.sidebarMenuItem}>
+          <div
+            className={`${styles.sidebarLink} ${styles.submenuToggle}`}
+            onClick={() => toggleSubmenu(item.id)}
+          >
+            <div className={styles.sidebarLinkContent}>
+              <span className={styles.sidebarIcon}>{item.icon}</span>
+              <span className={styles.sidebarText}>{item.title}</span>
+            </div>
+            <span className={styles.submenuArrow}>
+              {expandedMenus[item.id] ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+            </span>
+          </div>
+          <div className={`${styles.sidebarSubmenu} ${expandedMenus[item.id] ? styles.expanded : ''}`}>
+            {item.submenu.map((subItem, index) => (
+              <NavLink
+                key={index}
+                to={subItem.path}
+                className={({ isActive }) => 
+                  `${styles.sidebarSubmenuLink} ${isActive ? styles.active : ''}`
+                }
+              >
+                <span className={styles.submenuText}>{subItem.title}</span>
+              </NavLink>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <NavLink
+        key={item.id}
+        to={item.path}
+        className={({ isActive }) => 
+          `${styles.sidebarLink} ${item.className || ''} ${isActive ? styles.active : ''}`
+        }
+      >
+        <div className={styles.sidebarLinkContent}>
+          <span className={styles.sidebarIcon}>{item.icon}</span>
+          <span className={styles.sidebarText}>{item.title}</span>
+        </div>
+      </NavLink>
+    );
+  };
+
   return (
     <>
-      <div className={`sidebar ${showSidebar ? "expanded" : "collapsed"}`}>
-        <div className="sidebar-content">
-          <div className="sidebar-user p-3 border-bottom">
-            <div className="d-flex align-items-center">
-              <div className="avatar-container me-3">
-                <img
-                  src="https://i.pinimg.com/736x/13/c2/9e/13c29eee725ec2125487ddf0cf119c3c.jpg"
-                  alt="Admin User"
-                  className="rounded-circle"
-                  width="50"
-                  height="50"
-                />
-              </div>
-              <div>
-                <h6 className="mb-0 text-white">CareNet Admin</h6>
-                <small className="text-light">Administrator</small>
-              </div>
+      <div className={`${styles.adminSidebar} ${showSidebar ? styles.show : ''} ${isMobile ? styles.mobile : ''}`}>
+        {/* Header */}
+        <div className={styles.sidebarHeader}>
+          <div className={styles.logoSection}>
+            <div className={styles.logo}>
+              <span className={styles.logoText}>CareNet</span>
             </div>
           </div>
+        </div>
 
-          <div className="sidebar-menu p-2">
-            <Nav className="flex-column">
-              {menuItems.map((item) => (
-                <div key={item.id} className="nav-item-container">
-                  {item.submenu ? (
-                    <>
-                      <div
-                        className="d-flex align-items-center justify-content-between sidebar-link"
-                        onClick={() => toggleSubmenu(item.id)}
-                        style={{ cursor: 'pointer', padding: '0.5rem 1rem' }}
-                      >
-                        <div className="d-flex align-items-center">
-                          <span className="icon-container me-2">{item.icon}</span>
-                          <span>{item.title}</span>
-                        </div>
-                        {expandedMenus[item.id] ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                      </div>
+        {/* User Info */}
+        <div className={styles.sidebarUserInfo}>
+          <div className={styles.userAvatar}>
+            <img 
+              src={currentUser?.avatar || "https://i.pinimg.com/736x/13/c2/9e/13c29eee725ec2125487ddf0cf119c3c.jpg"} 
+              alt="Avatar" 
+            />
+          </div>
+          <div className={styles.userDetails}>
+            <h4 className={styles.userName}>{currentUser?.fullname || "CareNet Admin"}</h4>
+            <p className={styles.userRole}>
+              <Shield size={14} />
+              Quản trị hệ thống
+            </p>
+          </div>
+        </div>
 
-                      <div className={`submenu ${expandedMenus[item.id] ? "show" : ""}`}>
-                        {item.submenu.map((subitem, index) => (
-                          <NavLink 
-                            key={index} 
-                            to={subitem.path} 
-                            className={({ isActive }) => 
-                              `sidebar-sublink d-block ${isActive ? "active" : ""}`
-                            }
-                          >
-                            {subitem.title}
-                          </NavLink>
-                        ))}
-                      </div>
-                    </>
-                  ) : (
-                    <NavLink 
-                      to={item.path} 
-                      className={({ isActive }) => 
-                        `d-flex align-items-center sidebar-link ${isActive ? "active" : ""}`
-                      }
-                    >
-                      <span className="icon-container me-2">{item.icon}</span>
-                      <span>{item.title}</span>
-                    </NavLink>
-                  )}
-                </div>
-              ))}
+        {/* Main Navigation */}
+        <div className={styles.sidebarContent}>
+          <div className={styles.sidebarMainMenu}>
+            <h6 className={styles.sidebarSectionTitle}>Menu Chính</h6>
+            <Nav className={styles.sidebarNav}>
+              {mainMenuItems.map(renderMenuItem)}
             </Nav>
+          </div>
+
+          {/* Bottom Section */}
+          <div className={styles.sidebarBottomSection}>
+            <h6 className={styles.sidebarSectionTitle}>Cài Đặt</h6>
+            {/* Logout Button */}
+            <div className={styles.sidebarLogout}>
+              <button 
+                className={styles.logoutButton}
+                onClick={logout}
+              >
+                <LogOut size={20} />
+                <span>Đăng xuất</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Mobile Sidebar Overlay */}
       {isMobile && showSidebar && (
-        <div 
-          className="sidebar-overlay"
-        ></div>
+        <div className={styles.sidebarOverlay}></div>
       )}
-
-      <style>{`
-        .sidebar {
-          position: fixed;
-          top: 60px;
-          left: 0;
-          bottom: 0;
-          width: 260px;
-          background-color: ${customStyles.darkColor};
-          color: #fff;
-          transition: all 0.3s;
-          overflow-y: auto;
-          z-index: 1020;
-        }
-        
-        .sidebar.collapsed {
-          width: 0;
-          overflow: hidden;
-        }
-        
-        .sidebar-content {
-          width: 260px;
-        }
-        
-        .sidebar-link {
-          color: rgba(255, 255, 255, 0.8) !important;
-          padding: 0.6rem 1rem;
-          border-radius: 5px;
-          margin-bottom: 2px;
-          text-decoration: none;
-        }
-        
-        .sidebar-link:hover {
-          background-color: rgba(255, 255, 255, 0.1);
-          color: #fff !important;
-        }
-        
-        .sidebar-link.active {
-          background-color: ${customStyles.primaryColor};
-          color: #fff !important;
-        }
-        
-        .sidebar-sublink {
-          color: rgba(255, 255, 255, 0.7) !important;
-          padding: 0.5rem 1rem 0.5rem 2.5rem;
-          font-size: 0.9rem;
-          text-decoration: none;
-        }
-        
-        .sidebar-sublink:hover {
-          color: #fff !important;
-          background-color: rgba(255, 255, 255, 0.05);
-        }
-        
-        .sidebar-sublink.active {
-          color: #fff !important;
-          background-color: rgba(93, 185, 150, 0.3);
-        }
-        
-        .submenu {
-          max-height: 0;
-          overflow: hidden;
-          transition: max-height 0.3s ease-out;
-        }
-        
-        .submenu.show {
-          max-height: 500px;
-        }
-        
-        .icon-container {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 24px;
-        }
-        
-        .sidebar-overlay {
-          position: fixed;
-          top: 60px;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background-color: rgba(0, 0, 0, 0.5);
-          z-index: 1010;
-        }
-        
-        @media (max-width: 991.98px) {
-          .sidebar.expanded {
-            width: 260px;
-          }
-        }
-      `}</style>
     </>
   );
 };

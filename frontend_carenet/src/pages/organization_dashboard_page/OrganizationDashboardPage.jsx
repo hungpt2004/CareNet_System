@@ -184,12 +184,6 @@ const OrganizationDashboardPage = () => {
   return (
     <div style={{ padding: "24px", background: "#f5f7fa", minHeight: "100vh" }}>
       <CustomToast />
-      <div style={{ marginBottom: "24px" }}>
-        <Title level={2} style={{ margin: 0, color: "#1a3353" }}>
-          Tổng quan tổ chức
-        </Title>
-        <Text type="secondary">Quản lý doanh thu và hoạt động của tổ chức</Text>
-      </div>
 
       {/* Year and Month Selector with Calculate Button */}
       <div

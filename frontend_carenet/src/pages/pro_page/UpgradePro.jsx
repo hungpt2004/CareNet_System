@@ -327,7 +327,7 @@ const UpgradePro = () => {
                   <div style={styles.pricingHeader}>
                     <h2 style={styles.pricingTitle}>Pro</h2>
                     <div style={styles.price}>
-                      {isYearly ? "200.000" : "250.000"}
+                      499.000
                       <span style={styles.pricePeriod}>/tháng</span>
                     </div>
                     <p style={styles.description}>
