@@ -13,4 +13,10 @@ userRouter.post(
   userController.createHobbies
 );
 
+userRouter.get(
+  "/feedbacks",
+  authenticateToken,
+  userController.getMyFeedback
+)
+
 module.exports = userRouter;

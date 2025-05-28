@@ -8,7 +8,6 @@ const EventSchema = new mongoose.Schema({
   rating: { type: Number },
   maxParticipants: {type: Number, default: 0},
   currentParticipants: { type: Number, default: 0 },
-  // pointReward: { type: Number, default: 0 }, // điểm cộng khi hoàn thành
   assignChecker: { type: mongoose.Schema.ObjectId, ref: "User" },
   startAt: { type: Date, required: true, default: Date.now },
   endAt: { type: Date, required: true, default: null },
@@ -46,9 +45,17 @@ const EventSchema = new mongoose.Schema({
     default: "hiring",
   },
 
+  adminStatus: {
+    type: String,
+    enum: ["pending", "approved", "rejected"],
+    default: "pending",
+  },
+
   createdAt: { type: Date, default: Date.now },
 
   acceptDate: { type: Date, default: Date.now },
+
+  rejectReason: { type: String, default: null },
 
   // Những user đã điểm danh
   attendedUsers: [
@@ -64,7 +71,14 @@ const EventSchema = new mongoose.Schema({
     },
   ],
 
-  // Lọc theo nguoi dung phu hop voi skill need
+  // Certificate fields
+  // certificateId: { type: mongoose.Schema.Types.ObjectId, ref: "Certificate", default: null},
+
+  // certificateLink: { type: String, default: null},
+
+
+}, {
+  timestamps: true,
 });
 
 // Lưu fulladress middleware

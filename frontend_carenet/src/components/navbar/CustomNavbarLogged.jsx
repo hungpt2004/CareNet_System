@@ -5,6 +5,7 @@ import useAuthStore from "../../hooks/authStore";
 import { useNavigate } from "react-router-dom";
 import { FaBell } from "react-icons/fa";
 import io from 'socket.io-client';
+import axiosInstance from "../../utils/axiosInstance";
 
 const CustomNavbarLogged = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -62,6 +63,23 @@ const CustomNavbarLogged = () => {
       setNotifications(prev => [newNotification, ...prev]);
     });
 
+    // Lắng nghe sự kiện requestRejected
+    socketRef.current.on('requestRejected', (data) => {
+      console.log('Received requestRejected event:', data);
+      const newNotification = {
+        id: Date.now(),
+        message: data.message,
+        time: 'Vừa xong',
+        eventId: data.eventId,
+        eventTitle: data.eventTitle,
+        startAt: data.startAt,
+        endAt: data.endAt,
+        location: data.location
+      };
+
+      setNotifications(prev => [newNotification, ...prev]);
+    });
+
     return () => {
       if (currentUser?._id) {
         console.log('Leaving user room:', currentUser._id);
@@ -98,7 +116,6 @@ const CustomNavbarLogged = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
@@ -148,9 +165,10 @@ const CustomNavbarLogged = () => {
           <Nav className="ms-auto">
             <Nav.Link href="/" className="fw-bold hover-underline mx-3">TRANG CHỦ</Nav.Link>
             <Nav.Link href="#features" className="fw-bold hover-underline mx-3">THÀNH TỰU</Nav.Link>
-            <Nav.Link href="#how-it-works" className="fw-bold hover-underline mx-3">VẬN HÀNH</Nav.Link>
+            <Nav.Link href="/forum-chat" className="fw-bold hover-underline mx-3">DIỄN ĐÀN</Nav.Link>
             <Nav.Link href="#testimonials" className="fw-bold hover-underline mx-3">CHIA SẺ</Nav.Link>
             <Nav.Link href="#contact" className="fw-bold hover-underline mx-3">LIÊN HỆ</Nav.Link>
+            <Nav.Link href="/organization-register" className="fw-bold hover-underline mx-3">ĐĂNG KÍ TỔ CHỨC</Nav.Link>
           </Nav>
 
           {isLoggedIn ? (
@@ -241,7 +259,8 @@ const CustomNavbarLogged = () => {
                       <Nav.Link href="/support" className="px-4 py-2">CSKH</Nav.Link>
                       <Nav.Link href="/my-events" className="px-4 py-2">Quản Lý Ghi Danh</Nav.Link>
                       <Nav.Link href="/feedback-page" className="px-4 py-2">Quản Lý Đánh Giá</Nav.Link>
-                      <Nav.Link href="/owner-post" className="px-4 py-2">Tài khoản Organization</Nav.Link>
+                      <Nav.Link href="/chat" className="px-4 py-2">Tin nhắn</Nav.Link>
+                      <Nav.Link href="/owner-dashboard" className="px-4 py-2">Tài khoản Organization</Nav.Link>
                       <Nav.Link href="/dashboard" className="px-4 py-2">Tài khoản Admin</Nav.Link>
                       <Nav.Link onClick={handleLogout} className="px-4 py-2 text-danger">Đăng xuất</Nav.Link>
                     </Nav>

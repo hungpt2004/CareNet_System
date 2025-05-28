@@ -30,11 +30,11 @@ const AdminSidebar = ({ showSidebar, isMobile }) => {
     },
     {
       id: "users",
-      title: "Tình Nguyện Viên",
+      title: "Duyệt Yêu Cầu",
       icon: <Users size={20} />,
       submenu: [
-        { title: "Quản lý TNV", path: "/student" },
-        { title: "Điểm danh TNV", path: "/admin-attendance" },
+        { title: "Duyệt tạo tổ chức", path: "/request-organization" },
+        { title: "Duyệt tạo sự kiện", path: "/request-event" },
       ],
     },
     {

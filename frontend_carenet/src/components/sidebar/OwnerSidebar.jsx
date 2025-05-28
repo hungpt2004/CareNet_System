@@ -36,10 +36,8 @@ const OwnerSidebar = ({ showSidebar, isMobile }) => {
       title: "Tình Nguyện Viên",
       icon: <Users size={20} />,
       submenu: [
-        { title: "Danh sách TNV", path: "/admin-participant" },
-        { title: "Điểm danh TNV", path: "/owner-attendance" },
-        { title: "Phê duyệt TNV", path: "/owner-user" },
-        { title: "Phê duyệt hủy tham gia", path: "/owner-dashboard" },
+        { title: "Phê duyệt tham gia", path: "/owner-user" },
+        { title: "Phê duyệt hủy tham gia", path: "/owner-pending" },
       ],
     },
     {
