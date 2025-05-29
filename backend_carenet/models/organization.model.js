@@ -19,7 +19,7 @@ const OrganizationSchema = new Schema({
   },
   createdAt: {type: Date, default: Date.now},
   licenseDocuments: [{type: String, default: []}],
-  rating: {type: Number, default: 0},
+  rating: {type: Number},
 });
 
 module.exports = mongoose.model('Organization', OrganizationSchema);

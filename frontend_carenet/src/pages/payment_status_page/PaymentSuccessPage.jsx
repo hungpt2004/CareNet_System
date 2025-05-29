@@ -1,44 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
-import { Link, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import styles from '../../css/PaymentSuccess.module.css';
-import axiosInstance from '../../utils/AxiosInstance';
-import { CustomFailedToast, CustomSuccessToast } from '../../components/toast/CustomToast';
-import { formatDateVN } from '../../utils/FormatDateVN';
-import { formatCurrencyVND } from '../../utils/FormatPriceVN';
 
 function PaymentSuccessPage() {
-
-  const [certificatePurchase, setCertificatePurchase] = useState(null);
-  const [certificate, setCertificate] = useState(null);
-
-  const { certificateId } = useParams();
+  // For demonstration, we'll simulate a transaction ID
+  const transactionId = 'TXN' + Math.floor(Math.random() * 10000000);
+  const amount = '$' + (Math.random() * 1000).toFixed(2);
   
-  const changeSuccessPayment = async () => {
-  
-    try {
-      const response = await axiosInstance.post('/payment/success-payment', {
-        certificateId: certificateId
-      });
-
-      if(response.data.status === 'success' && response.data.certificatePurchase && response.data.certificate){
-        CustomSuccessToast('Thanh toán thành công');
-        setCertificatePurchase(response.data.certificatePurchase);
-        setCertificate(response.data.certificate);
-      } else {
-        CustomFailedToast('Thanh toán thất bại');
-      }
-
-    } catch (error) {
-      console.log(error);
-    }
-
-  }
-
-  useEffect(() => {
-    changeSuccessPayment();
-  }, []);
-
   useEffect(() => {
     // Simulating confetti effect on success page load
     const confettiElements = [];
@@ -82,17 +51,17 @@ function PaymentSuccessPage() {
                 
                 <div className={styles.transactionDetails}>
                   <div className={styles.detailRow}>
-                    <span className={styles.detailLabel}>Mã chứng chỉ:</span>
-                    <span className={styles.detailValue}>{certificateId}</span>
+                    <span className={styles.detailLabel}>Transaction ID:</span>
+                    <span className={styles.detailValue}>{transactionId}</span>
                   </div>
                   <div className={styles.detailRow}>
-                    <span className={styles.detailLabel}>Giá tiền:</span>
-                    <span className={styles.detailValue}>{formatCurrencyVND(30000)}</span>
+                    <span className={styles.detailLabel}>Amount Paid:</span>
+                    <span className={styles.detailValue}>{amount}</span>
                   </div>
                   <div className={styles.detailRow}>
-                    <span className={styles.detailLabel}>Ngày trả:</span>
+                    <span className={styles.detailLabel}>Date:</span>
                     <span className={styles.detailValue}>
-                      {formatDateVN(Date.now())}
+                      {new Date().toLocaleString()}
                     </span>
                   </div>
                 </div>

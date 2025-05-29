@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Card, Select, Button, Modal, Input, message, Space, Typography, Radio, Tooltip } from 'antd';
 import { CheckCircle2, XCircle, Calendar, Building2, AlertCircle } from 'lucide-react';
+import axios from 'axios';
 import axiosInstance from '../../utils/AxiosInstance';
 import { formatDateVN } from '../../utils/FormatDateVN';
 import useAuthStore from '../../hooks/authStore';
-import { CustomFailedToast, CustomSuccessToast, CustomToast } from '../../components/toast/CustomToast';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -31,7 +31,7 @@ const StaffAttendancePage = () => {
 
   const fetchEvents = async () => {
     try {
-      const response = await axiosInstance.get('/staff/get-assign-event');
+      const response = await axiosInstance.get('/organization/get-owned-event');
       if (response.data.status === "success" && response.data.eventData) {
         setEvents(response.data.eventData);
       }
@@ -41,12 +41,12 @@ const StaffAttendancePage = () => {
     }
   };
 
-  const fetchEventRegistrations = async () => {
+  const fetchEventRegistrations = async (eventId) => {
     setLoading(true);
     try {
-      const response = await axiosInstance.get(`/staff/get-volunteer-list`);
-      if (response.data.status === 'success' && response.data.listVolunteers) {
-        setRegistrations(response.data.listVolunteers);
+      const response = await axiosInstance.get(`/organization/get-request-event/${eventId}`);
+      if (response.data.status === 'success') {
+        setRegistrations(response.data.eventRegistrationData);
       }
     } catch (error) {
       console.error('Error fetching event registrations:', error);
@@ -85,27 +85,20 @@ const StaffAttendancePage = () => {
     if (!selectedEvent || !selectedUser) return;
 
     try {
-      
-      console.log(selectedUser, attendanceMessage, attitudeRating);
-
-      const response = await axiosInstance.post(`/staff/take-attendance`, {
+      const response = await axios.post(`/api/attendance/${selectedEvent}`, {
         userId: selectedUser,
         message: attendanceMessage,
-        // status: attendanceType,
+        status: attendanceType,
         levelRating: attitudeRating,
-        // penaltyPoints: attendanceType === 'absent' ? penaltyPoints : 0
+        penaltyPoints: attendanceType === 'absent' ? penaltyPoints : 0
       });
 
       if (response.data.status === 'success') {
-        CustomSuccessToast(`Điểm danh thành công user: ${selectedUser.fullname}`)
+        message.success('Điểm danh thành công');
         fetchEventRegistrations(selectedEvent);
-      } else if (response.data.status === 'fail') {
-        CustomFailedToast(`${response.data.message}`)
       }
     } catch (error) {
       message.error('Điểm danh thất bại');
-      console.log(error);
-      CustomFailedToast(`${error.response.data.message}`)
     }
 
     setIsModalVisible(false);
@@ -128,7 +121,7 @@ const StaffAttendancePage = () => {
     },
     {
       title: 'Số điện thoại',
-      dataIndex:  ['user', 'phone'],
+      dataIndex: ['user', 'phone'],
       key: 'phone',
     },
     {
@@ -188,7 +181,6 @@ const StaffAttendancePage = () => {
 
   return (
     <div style={{ padding: '24px' }}>
-      <CustomToast/>
       <Card>
         <Space direction="vertical" size="large" style={{ width: '100%' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

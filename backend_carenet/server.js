@@ -1,10 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-require("./models/organization.model");
-require("./models/organizationLevel.model");
-require("./models/organizationSubscription.model");
-require("./models/user.model");
-require("./models/event.model");
 const mongoose = require('mongoose');
 const socketIO = require('./socket');
 const http = require("http");

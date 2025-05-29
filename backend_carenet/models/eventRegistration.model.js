@@ -8,21 +8,13 @@ const EventRegistrationSchema = new Schema({
    registeredAt: { type: Date, default: Date.now },
    status: {
      type: String,
-     enum: ["pending", "approved", "rejected", "cancelled", "pendingCancel"],
+     enum: ["pending", "approved", "rejected", "cancelled"],
      default: "pending"
    },
    answers: [{type: String, default: null}],
    cancellationReason: { type: String, default: null},
    approvedBy: { type: mongoose.Schema.Types.ObjectId, ref: "Admin", default: null},
    approvedAt: { type: Date, default: null},
-   certificateUrl: {
-     type: String
-   },
-   certificateGeneratedAt: {
-     type: Date
-   }
- }, {
-   timestamps: true,
  });
 
  

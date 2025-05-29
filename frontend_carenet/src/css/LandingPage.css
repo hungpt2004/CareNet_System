@@ -75,7 +75,6 @@
    transform: translateY(-5px);
    transition: 1s ease-in inherit;
  }
- 
  .button:hover{
    transition: 1s ease-in inherit;
    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);

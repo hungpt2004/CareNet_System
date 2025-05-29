@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react"
 import { MapPin, Calendar, Users, Clock, ArrowRight } from "lucide-react"
 import styles from "../../../css/EventCard.module.css"
-import colorStyles from "../../../css/AppColors.module.css"
 import { useNavigate } from "react-router-dom"
 import axios from "axios"
 import convertRatingToStars from "../../../utils/FormatRatingStar"
@@ -58,7 +57,7 @@ export default function EventCard({ event, currentUser, customStyles, formatDate
       </div>
 
 
-      <div className={styles.cardBody} style={{ backgroundColor: `${colorStyles.primaryColor}` }}>
+      <div className={styles.cardBody} style={{ backgroundColor: '#f5f5f5' }}>
         <div className={styles.mainContent}>
 
           <h3 className={styles.eventTitle}>{event.title}</h3>

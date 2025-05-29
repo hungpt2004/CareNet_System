@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Card, Button, Table, Badge, Spinner, Alert } from "react-bootstrap";
 import { motion } from "framer-motion";
 import { Receipt, CreditCard, ArrowClockwise } from "react-bootstrap-icons";
+import { AiOutlineUser, AiOutlinePicture, AiOutlineHistory, AiOutlineHeart, AiOutlineStar, AiOutlineIdcard, AiOutlineShoppingCart, AiOutlineLogout } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 import axios from '../../utils/AxiosInstance';
 
@@ -68,25 +69,28 @@ const CertificatePurchasePage = () => {
               <Card.Body className="p-0">
                 <div className="d-flex align-items-center p-3 border-bottom">
                   <img
-                    src="https://img.freepik.com/premium-vector/avatar-profile-icon-flat-style-female-user-profile-vector-illustration-isolated-background-women-profile-sign-business-concept_157943-38866.jpg?semt=ais_hybrid"
+                    src={
+                                          JSON.parse(localStorage.getItem("user")).avatarUrl ||
+                                          defaultAvatar
+                                        }
                     alt="Avatar"
                     style={{ width: 60, height: 60, borderRadius: "50%", marginRight: "1rem", border: "2px solid #0E606E" }}
                   />
                   <div>
                     <h5 className="mb-0">Hung Pham Trong</h5>
-                    <small className="text-muted">Normal Account</small>
+                    <small className="text-muted">Tài Khoản Cá Nhân</small>
                   </div>
                 </div>
                 <div className="p-2">
                   {[
-                    { name: "Information", path: "/profile-information" },
-                    { name: "Update Avatar", path: "/profile-avatar" },
-                    { name: "History Effort", path: "/profile-history" },
-                    { name: "Favourite", path: "/profile-favourite" },
-                    { name: "Score", path: "/profile-score" },
-                    { name: "Certificate", path: "/profile-certificate" },
-                    { name: "Certificate Purchases", path: "/profile-certificate-purchases", active: true },
-                    { name: "Log Out", path: "/" }
+                    { name: "Thông Tin", path: "/profile-information", icon: <AiOutlineUser style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} /> },
+                    { name: "Cập Nhật Avatar", path: "/profile-avatar", icon: <AiOutlinePicture style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} /> },
+                    { name: "Lịch Sử Nỗ Lực", path: "/profile-history", icon: <AiOutlineHistory style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} /> },
+                    { name: "Yêu Thích", path: "/profile-favourite", icon: <AiOutlineHeart style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} /> },
+                    { name: "Số Điểm", path: "/profile-score", icon: <AiOutlineStar style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} /> },
+                    { name: "Chứng Chỉ", path: "/profile-certificate", icon: <AiOutlineIdcard style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} /> },
+                    { name: "Mua Chứng Chỉ", path: "/profile-certificate-purchases", active: true, icon: <AiOutlineShoppingCart style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} /> },
+                    { name: "Đăng Xuất", path: "/", icon: <AiOutlineLogout style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} /> }
                   ].map((item, index) => (
                     <div
                       key={index}
@@ -99,7 +103,8 @@ const CertificatePurchasePage = () => {
                       }}
                       onClick={() => navigate(item.path)}
                     >
-                      {item.name}
+                      {item.icon}
+                      <span>{item.name}</span>
                     </div>
                   ))}
                 </div>
@@ -134,9 +139,9 @@ const CertificatePurchasePage = () => {
                   <Table responsive striped hover>
                     <thead>
                       <tr>
-                        <th>Chứng chỉ</th>
+                        <th>Tên sự kiện</th>
                         <th>Số tiền</th>
-                        <th>Phương thức</th>
+                        <th>Phương thức thanh toán</th>
                         <th>Trạng thái</th>
                         <th>Ngày tạo</th>
                         <th>Ngày thanh toán</th>

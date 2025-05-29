@@ -3,7 +3,6 @@ const EventRegistration = require("../models/eventRegistration.model");
 const Feedback = require("../models/feedback.model");
 const asyncHandler = require("../middleware/asyncHandler");
 const User = require("../models/user.model");
-const Attendance = require("../models/attendance.model");
 const mongoose = require("mongoose");
 const { sendSuccessRegisterEvent } = require("./email.controller");
 const HistoryEventModel = require("../models/historyEvent.model");
@@ -132,18 +131,10 @@ exports.registerEvent = asyncHandler(async (req, res) => {
       registeredAt: newRegistration.registeredAt,
     });
 
-    // Lưu vào attendance
-    const newAttendance = new Attendance({
-      eventId: id,
-      userId: currentUser._id,
-      status: "registered",
-      registeredAt: newRegistration.registeredAt,
-    });
 
     // Lưu vào database
     await newRegistration.save();
     await newHistoryEvent.save();
-    await newAttendance.save();
 
     // Update số lượng người tham gia tăng lên
     await Event.findByIdAndUpdate(id, { $inc: { currentParticipants: 1 } });
@@ -191,7 +182,7 @@ exports.getFinishedEvents = asyncHandler(async (req, res) => {
       organizationId: currentUser.organizationId,
       // endAt: { $lt: new Date() }
     }).populate("organizationId");
-
+    
     return res.status(200).json({
       status: "success",
       message: "Lấy sự kiện đã hoàn thành",
@@ -205,55 +196,25 @@ exports.getFinishedEvents = asyncHandler(async (req, res) => {
   }
 });
 
-exports.updateEventInformation = asyncHandler(async (req, res) => {
-  const { eventId } = req.params;
-
-  const { title, description, startAt, endAt, status } = req.body;
-
-  const currentEvent = await Event.findOne({ _id: eventId });
-  if (!currentEvent)
-    return res
-      .status(500)
-      .json({ status: "fail", message: "Không tìm thấy event hiện tại" });
-});
-
-exports.getEventsByOrganizationId = asyncHandler(async (req, res) => {
+exports.getPendingVolunteers = asyncHandler(async (req, res) => {
+  const currentUser = req.user.user;
+  console.log(currentUser.organizationId);
+  
   try {
-    const { organizationId } = req.query;
-
-    if (!organizationId) {
-      return res.status(400).json({
-        status: "fail",
-        message: "Vui lòng cung cấp organizationId",
-      });
-    }
-
-    const events = await Event.find({ organizationId: organizationId })
-      .populate("assignChecker", "fullname email")
-      .lean();
-
-    console.log(
-      `Fetched ${events.length} events for organization ${organizationId}`,
-      events
-    );
+    const pendingVolunteers = await EventRegistration.find({
+      organizationId: currentUser.organizationId,
+      status: "pending",
+    }).populate("user");
     return res.status(200).json({
       status: "success",
-      data: events,
+      message: "Lấy tình nguyện viên đang chờ phê duyệt",
+      volunteers: pendingVolunteers,
     });
   } catch (error) {
-    console.error("Error fetching events:", error.message, error.stack);
     return res.status(500).json({
       status: "fail",
-      message: "Lỗi khi lấy danh sách sự kiện: " + error.message,
+      message: "Lấy tình nguyện viên đang chờ phê duyệt thất bại",
     });
   }
 });
 
-exports.getAllProcessingEvent = asyncHandler(async (req, res) => {
-  const events = await Event.find({ status: "processing" });
-
-  return res.status(200).json({
-    status: "success",
-    eventData: events,
-  });
-});
