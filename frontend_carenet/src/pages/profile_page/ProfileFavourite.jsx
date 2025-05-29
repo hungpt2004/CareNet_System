@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Container, Row, Col, Card, Pagination } from "react-bootstrap";
 import { motion } from "framer-motion";
 import { HeartFill } from "react-bootstrap-icons";
-import { AiOutlineUser, AiOutlinePicture, AiOutlineHistory, AiOutlineHeart, AiOutlineStar, AiOutlineIdcard, AiOutlineLogout } from "react-icons/ai";
+import { AiOutlineUser, AiOutlinePicture, AiOutlineHistory, AiOutlineHeart, AiOutlineStar, AiOutlineIdcard, AiOutlineLogout, AiOutlineShoppingCart } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 import defaultAvatar from "../../assets/defaultAvatar.png";
 const ProfileFavourite = () => {
@@ -292,10 +292,19 @@ const ProfileFavourite = () => {
                     <AiOutlineIdcard style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
                     <span>Chứng Chỉ</span>
                   </div>
+                  <div
+                    className="menu-item"
+                    style={styles.menuItem}
+                    onClick={() => navigate("/profile-certificate-purchases")}
+                  >
+                    <AiOutlineShoppingCart style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
+                    <span>Mua Chứng Chỉ</span>
+                  </div>
                   <div className="menu-item" style={styles.menuItem}>
                     <AiOutlineLogout style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
                     <span>Đăng Xuất</span>
                   </div>
+                  
                 </div>
               </Card.Body>
             </Card>

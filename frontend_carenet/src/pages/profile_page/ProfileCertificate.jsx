@@ -14,7 +14,7 @@ import { motion } from "framer-motion";
 import { Download, Printer, Eye } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
 import defaultAvatar from "../../assets/defaultAvatar.png";
-import { AiOutlineUser, AiOutlinePicture, AiOutlineHistory, AiOutlineHeart, AiOutlineStar, AiOutlineIdcard, AiOutlineLogout } from "react-icons/ai";
+import { AiOutlineUser, AiOutlinePicture, AiOutlineHistory, AiOutlineHeart, AiOutlineStar, AiOutlineIdcard, AiOutlineLogout, AiOutlineShoppingCart } from "react-icons/ai";
 const ProfileCertificate = () => {
   // CSS styles defined directly in the component
   const styles = {
@@ -513,7 +513,10 @@ const ProfileCertificate = () => {
               <Card.Body className="p-0">
                 <div style={styles.userProfile}>
                   <img
-                    src={JSON.parse(localStorage.getItem("user")).avatarUrl||defaultAvatar}
+                    src={
+                      JSON.parse(localStorage.getItem("user")).avatarUrl ||
+                      defaultAvatar
+                    }
                     alt="User Avatar"
                     className="avatar-img"
                     style={styles.avatar}
@@ -529,7 +532,13 @@ const ProfileCertificate = () => {
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-information")}
                   >
-                    <AiOutlineUser style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
+                    <AiOutlineUser
+                      style={{
+                        marginRight: 8,
+                        fontSize: 20,
+                        verticalAlign: "middle",
+                      }}
+                    />
                     <span>Thông Tin</span>
                   </div>
                   <div
@@ -537,7 +546,13 @@ const ProfileCertificate = () => {
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-avatar")}
                   >
-                    <AiOutlinePicture style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
+                    <AiOutlinePicture
+                      style={{
+                        marginRight: 8,
+                        fontSize: 20,
+                        verticalAlign: "middle",
+                      }}
+                    />
                     <span>Cập Nhật Avatar</span>
                   </div>
                   <div
@@ -545,7 +560,13 @@ const ProfileCertificate = () => {
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-history")}
                   >
-                    <AiOutlineHistory style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
+                    <AiOutlineHistory
+                      style={{
+                        marginRight: 8,
+                        fontSize: 20,
+                        verticalAlign: "middle",
+                      }}
+                    />
                     <span>Lịch Sử Nỗ Lực</span>
                   </div>
                   <div
@@ -553,7 +574,13 @@ const ProfileCertificate = () => {
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-favourite")}
                   >
-                    <AiOutlineHeart style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
+                    <AiOutlineHeart
+                      style={{
+                        marginRight: 8,
+                        fontSize: 20,
+                        verticalAlign: "middle",
+                      }}
+                    />
                     <span>Yêu Thích</span>
                   </div>
                   <div
@@ -561,7 +588,13 @@ const ProfileCertificate = () => {
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-score")}
                   >
-                    <AiOutlineStar style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
+                    <AiOutlineStar
+                      style={{
+                        marginRight: 8,
+                        fontSize: 20,
+                        verticalAlign: "middle",
+                      }}
+                    />
                     <span>Số Điểm</span>
                   </div>
                   <div
@@ -569,11 +602,37 @@ const ProfileCertificate = () => {
                     style={{ ...styles.menuItem, ...styles.menuItemActive }}
                     onClick={() => navigate("/profile-certificate")}
                   >
-                    <AiOutlineIdcard style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
+                    <AiOutlineIdcard
+                      style={{
+                        marginRight: 8,
+                        fontSize: 20,
+                        verticalAlign: "middle",
+                      }}
+                    />
                     <span>Chứng Chỉ</span>
                   </div>
+                  <div
+                    className="menu-item"
+                    style={styles.menuItem}
+                    onClick={() => navigate("/profile-certificate-purchases")}
+                  >
+                    <AiOutlineShoppingCart
+                      style={{
+                        marginRight: 8,
+                        fontSize: 20,
+                        verticalAlign: "middle",
+                      }}
+                    />
+                    <span>Mua Chứng Chỉ</span>
+                  </div>
                   <div className="menu-item" style={styles.menuItem}>
-                    <AiOutlineLogout style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
+                    <AiOutlineLogout
+                      style={{
+                        marginRight: 8,
+                        fontSize: 20,
+                        verticalAlign: "middle",
+                      }}
+                    />
                     <span>Đăng Xuất</span>
                   </div>
                 </div>
@@ -590,7 +649,13 @@ const ProfileCertificate = () => {
             <Card style={styles.infoCard}>
               <Card.Header style={styles.infoHeader}>
                 <h4 className="mb-0">
-                  <AiOutlineIdcard style={{ marginRight: 10, fontSize: 24, verticalAlign: 'middle' }} />
+                  <AiOutlineIdcard
+                    style={{
+                      marginRight: 10,
+                      fontSize: 24,
+                      verticalAlign: "middle",
+                    }}
+                  />
                   CHỨNG CHỈ
                 </h4>
               </Card.Header>

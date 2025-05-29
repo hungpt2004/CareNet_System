@@ -75,6 +75,7 @@ exports.sendApproveRequest = async (
          .replace("{eventLocation}", eventLocation)
          .replace("{currentYear}", new Date().getFullYear())
       });
+      console.log("Đã gửi email duyệt yêu cầu thành công");
    } catch (error) {
       console.log(error)
    }

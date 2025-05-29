@@ -21,7 +21,7 @@ import {
 } from "../../components/toast/CustomToast";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import defaultAvatar from "../../assets/defaultAvatar.png";
-import { AiOutlineUser, AiOutlinePicture, AiOutlineHistory, AiOutlineHeart, AiOutlineStar, AiOutlineIdcard, AiOutlineLogout, AiOutlineUpload } from "react-icons/ai";
+import { AiOutlineUser, AiOutlinePicture, AiOutlineHistory, AiOutlineHeart, AiOutlineStar, AiOutlineIdcard, AiOutlineLogout, AiOutlineUpload, AiOutlineShoppingCart } from "react-icons/ai";
 
 const ProfileInfo = () => {
   // Get current user
@@ -562,6 +562,14 @@ const ProfileInfo = () => {
                     >
                       <AiOutlineIdcard style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
                       <span>Chứng Chỉ </span>
+                    </div>
+                    <div
+                      className="menu-item"
+                      style={styles.menuItem}
+                      onClick={() => navigate("/profile-certificate-purchases")}
+                    >
+                      <AiOutlineShoppingCart style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
+                      <span>Mua Chứng Chỉ</span>
                     </div>
                     <div className="menu-item" style={styles.menuItem}>
                       <AiOutlineLogout style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />

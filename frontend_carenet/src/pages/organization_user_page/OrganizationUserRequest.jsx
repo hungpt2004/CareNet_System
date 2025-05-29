@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Table, Spin, Select, Input, Button, Modal, message, Tag, Typography, Form } from "antd";
 import axiosInstance from "../../utils/AxiosInstance";
 import { CustomSuccessToast, CustomToast } from "../../components/toast/CustomToast";
 import CustomSpinner from "../../components/spinner/CustomSpinner";
+import io from 'socket.io-client';
 
 const OrganizationUserRequests = () => {
   const [loading, setLoading] = useState(false);
@@ -18,6 +19,20 @@ const OrganizationUserRequests = () => {
   const [rejectModalVisible, setRejectModalVisible] = useState(false);
   const [rejectForm] = Form.useForm();
   const [rejectingRequestId, setRejectingRequestId] = useState(null);
+  const socketRef = useRef(null);
+
+  // Khởi tạo Socket.IO connection
+  useEffect(() => {
+    socketRef.current = io('http://localhost:5000', {
+      withCredentials: true
+    });
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
+    };
+  }, []);
 
   // Fetch owned events
   const fetchOwnedEvents = async () => {
@@ -38,9 +53,11 @@ const OrganizationUserRequests = () => {
   // Fetch event registrations
   const fetchEventRegistrations = async (eventId) => {
     try {
+      console.log('Fetching event registrations for event:', eventId);
       setLoading(true);
       const response = await axiosInstance.get(`/organization/get-request-event/${eventId}`);
       if (response.data.status === "success") {
+        console.log('Fetched registrations:', response.data.eventRegistrationData);
         setRequests(response.data.eventRegistrationData);
         setFilteredRequests(response.data.eventRegistrationData);
       }
@@ -60,17 +77,48 @@ const OrganizationUserRequests = () => {
   const handleApprove = async (requestId) => {
     try {
       setLoading(true);
-      const response = await axiosInstance.post(`/organization/approve-request/${requestId}`,{
-        fullname: selectedRequest?.user?.fullname,
-        email: selectedRequest?.user?.email,
-      });
-      if (response.data.status === "success") {
-        fetchEventRegistrations(selectedEventId); // Refresh data
-        CustomSuccessToast("Duyệt yêu cầu thành công");
+      console.log('Approving request:', { requestId, selectedRequest });
+
+      // Tìm request trong danh sách nếu chưa có trong selectedRequest
+      const requestToApprove = selectedRequest || requests.find(r => r._id === requestId);
+      if (!requestToApprove) {
+        console.error('Request not found:', requestId);
+        message.error("Không tìm thấy yêu cầu");
+        return;
       }
 
+      const response = await axiosInstance.post(`/organization/approve-request/${requestId}`, {
+        fullname: requestToApprove.user?.fullname,
+        email: requestToApprove.user?.email,
+      });
+      
+      if (response.data.status === "success") {
+        console.log('Request approved successfully:', response.data);
+
+        // Gửi thông báo realtime qua Socket.IO
+        const eventTitle = events.find(e => e._id === selectedEventId)?.title;
+        const notificationData = {
+          userId: requestToApprove.user._id,
+          eventId: selectedEventId,
+          eventTitle: eventTitle,
+          message: `Đơn đăng ký tham gia sự kiện "${eventTitle}" đã được duyệt`
+        };
+        console.log('Emitting Socket.IO notification:', notificationData);
+        socketRef.current.emit('requestApproved', notificationData);
+
+        // Đóng modal chi tiết nếu đang mở
+        setDetailVisible(false);
+        setSelectedRequest(null);
+        
+        // Refresh data và hiển thị thông báo
+        await fetchEventRegistrations(selectedEventId);
+        console.log('Event registrations refreshed');
+        
+        CustomSuccessToast("Duyệt yêu cầu thành công");
+      }
     } catch (error) {
       console.error("Error approving request:", error);
+      message.error("Không thể duyệt yêu cầu");
     } finally {
       setLoading(false);
     }

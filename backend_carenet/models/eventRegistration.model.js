@@ -14,7 +14,8 @@ const EventRegistrationSchema = new Schema({
    answers: [{type: String, default: null}],
    cancellationReason: { type: String, default: null},
    approvedBy: { type: mongoose.Schema.Types.ObjectId, ref: "Admin", default: null},
-   approvedAt: { type: Date, default: null}
+   approvedAt: { type: Date, default: null},
  });
+
  
  module.exports = mongoose.model("EventRegistration", EventRegistrationSchema);

@@ -20,7 +20,6 @@ cd backend_carenet
 - **AI Matching**: Gemini Flash 2.0
 - **Email Service**: Nodemailer + Scheduler
 - **Authentication**: JWT + CCCD verification
-- **Deployment**: Docker, PM2, Vercel/Render
 
 ---
 

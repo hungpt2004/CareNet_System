@@ -5,6 +5,7 @@ const EventRegistration = require("../models/eventRegistration.model");
 const HistoryEvent = require("../models/historyEvent.model");
 const asyncHandler = require("../middleware/asyncHandler");
 const { sendApproveRequest } = require("./email.controller");
+const { getIO } = require("../socket");
 
 exports.getOwnEvent = asyncHandler(async (req, res) => {
   const currentUser = req.user.user;
@@ -40,7 +41,10 @@ exports.getRequestEventById = asyncHandler(async (req, res) => {
 
     const currentEventRegistration = await EventRegistration.find({
       event: currentEvent._id,
-    }).populate("user", "fullname email phone hobbies dob status reputationPoints totalHours activityPoints");
+    }).populate(
+      "user",
+      "fullname email phone hobbies dob status reputationPoints totalHours activityPoints"
+    );
 
     if (!currentEventRegistration.length) {
       return res.status(404).json({
@@ -64,33 +68,40 @@ exports.getRequestEventById = asyncHandler(async (req, res) => {
 exports.approveRequest = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { fullname, email } = req.body;
+  console.log("Approving request:", { requestId: id, fullname, email });
+
   try {
     const currentEventRegistration = await EventRegistration.findById(id);
     if (!currentEventRegistration) {
+      console.log("Request not found:", id);
       return res.status(404).json({
         status: "fail",
         message: "Không tìm thấy yêu cầu",
       });
     }
+    console.log("Found event registration:", currentEventRegistration);
 
     const currentEvent = await Event.findById(currentEventRegistration.event);
     if (!currentEvent) {
+      console.log("Event not found:", currentEventRegistration.event);
       return res.status(404).json({
         status: "fail",
         message: "Không tìm thấy sự kiện",
       });
     }
+    console.log("Found event:", currentEvent);
 
     const request = await EventRegistration.findByIdAndUpdate(
       id,
       { status: "approved" },
       { new: true }
     );
+    console.log("Updated registration status:", request);
 
     // Tìm và cập nhật HistoryEvent tương ứng
-    const historyEvent = await HistoryEvent.findOne({ 
-      eventId: currentEvent._id,
-      userId: currentEventRegistration.user
+    const historyEvent = await HistoryEvent.findOne({
+      event: currentEvent._id,
+      user: currentEventRegistration.user,
     });
 
     if (historyEvent) {
@@ -99,6 +110,7 @@ exports.approveRequest = asyncHandler(async (req, res) => {
         { status: "approved" },
         { new: true }
       );
+      console.log("Updated history event status:", historyEvent._id);
     }
 
     const fullAddress = `
@@ -108,20 +120,59 @@ exports.approveRequest = asyncHandler(async (req, res) => {
     ${currentEvent.location.province}
     `;
 
+    // Gửi email thông báo
+    console.log("Sending approval email to:", email);
     await sendApproveRequest(
       fullname,
       email,
       currentEvent.title,
       currentEvent.startAt,
       currentEvent.endAt,
-      fullAddress,
+      fullAddress
     );
+
+    // Đưa user về bận
+    await User.findOneAndUpdate(
+      { _id: currentEventRegistration.user },
+      {
+        $set: { status: "busy" },
+      }
+    );
+
+    // Gửi thông báo realtime qua Socket.IO
+    const notificationData = {
+      type: "request_approved",
+      message: `Đơn đăng ký tham gia sự kiện "${currentEvent.title}" đã được duyệt`,
+      eventId: currentEvent._id,
+      eventTitle: currentEvent.title,
+      startAt: currentEvent.startAt,
+      endAt: currentEvent.endAt,
+      location: fullAddress,
+      timestamp: new Date(),
+    };
+    console.log("Emitting Socket.IO notification:", notificationData);
+
+    const io = getIO();
+    if (!io) {
+      console.error("Socket.IO instance not found");
+      return res.status(500).json({
+        status: "fail",
+        message: "Lỗi kết nối thông báo",
+      });
+    }
+
+    io.to(currentEventRegistration.user.toString()).emit(
+      "requestApproved",
+      notificationData
+    );
+    console.log("Socket.IO notification sent successfully");
 
     return res.status(200).json({
       status: "success",
       message: "Duyệt yêu cầu thành công",
     });
   } catch (err) {
+    console.error("Error in approveRequest:", err);
     return res.status(500).json({
       status: "fail",
       message: "Lỗi khi duyệt yêu cầu",
@@ -251,3 +302,26 @@ exports.filterRequestsBySkills = asyncHandler(async (req, res) => {
     });
   }
 });
+
+exports.getOwnStaff = asyncHandler(async (req, res) => {
+  const currentUser = req.user.user;
+
+  try {
+    const organizer = await User.findOne({_id: currentUser._id})
+    const organization = await Organization.findOne({_id: organizer.organizationId})
+    const staff = await User.find({
+      organizationId: organization._id,
+      role: "staff"
+    })
+    return res.status(200).json({
+      status: "success",
+      staff: staff,
+    })
+  } catch (error) {
+    return res.status(500).json({
+      status: "fail",
+      message: "Lỗi khi lấy nhân viên",
+    });
+  }
+});
+
