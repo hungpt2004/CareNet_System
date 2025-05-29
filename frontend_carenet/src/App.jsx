@@ -40,13 +40,7 @@ import PaymentSuccessPage from './pages/payment_status_page/PaymentSuccessPage';
 import PaymentCancelPage from './pages/payment_status_page/PaymentCancelPage';
 import MyEventsPage from './pages/my_events_page/MyEventsPage';
 import AdminFeedbackPage from "./pages/admin_students_page/AdminFeedbackPage";
-import OrganizationEvents from './pages/organization_post_page/OrganizationEventManagement';
-import OrganizationDashboardPage from './pages/organization_dashboard_page/OrganizationDashboardPage';
-import StaffAttendancePage from './pages/staff_attendance_page/StaffAttendancePage';
-import OrganizationStaffManagement from './pages/organization_user_page/OrganizationStaffManagement';
-import StaffLayout from './layout/StaffLayout';
 
-import CertificatePurchasePage from './pages/profile_page/CertificatePurchasePage';
 const guestRoutes = [
   { path: '/', element: <LandingPage /> },
   { path: '/search', element: <VolunteerEventSearch /> },
@@ -75,7 +69,6 @@ const privateCustomerRoutes = [
   { path: '/profile-certificate', element: <ProfileCertificate /> },
   { path: '/feedback-page', element: <FeedbackPage /> },
   { path: '/my-events', element: <MyEventsPage /> },
-  { path: '/profile-certificate-purchases', element: <CertificatePurchasePage /> },
 ];
 
 const privateAdminRoutes = [
@@ -86,30 +79,37 @@ const privateAdminRoutes = [
   { path: '/admin-organization', element: <AdminOrganizations /> },
   { path: '/admin-post', element: <AdminVolunteerPosts /> },
   { path: '/admin-attendance', element: <AdminEventAttendance /> },
+  { path: '/upgrade-pro', element: <UpgradePro /> },
 ];
 
 const privateOwnerRoutes = [
-  { path: '/owner-dashboard', element: <OrganizationDashboardPage /> },
   { path: '/owner-post', element: <OrganizationPostPage /> },
   { path: '/owner-user', element: <OrganizationUserRequests /> },
   { path: '/owner-attendance', element: <OrganizationEventAttendance /> },
   { path: '/admin-participant', element: <AdminEventParticipants /> },
   {path: '/owner-feedback', element: <AdminFeedbackPage />},
-  { path: '/upgrade-pro', element: <UpgradePro /> },
-  { path: '/owner-finished-events', element: <OrganizationEvents /> },
-  { path: '/owner-staff', element: <OrganizationStaffManagement /> },
 ];
 
-const privateStaffRoutes = [
-  { path: '/staff-attendance', element: <StaffAttendancePage /> },
-];
 
 function App() {
   return (
     <ToastProvider>
       <Router>
         <Routes>
-          {/* Customer Routes */}
+          {/* Public Routes */}
+          {publicRoutes.map(({ path, element }) => (
+              <Route key={path} path={path} element={element} />
+          ))}
+
+
+          {/* Guest */}
+          <Route element={<GuestLayout />}>
+            {guestRoutes.map(({ path, element }) => (
+              <Route key={path} path={path} element={element} />
+            ))}
+          </Route>
+
+          {/* Customer Routes - Requires login with 'customer' role */}
           <Route element={<CustomerLayout />}>
             {privateCustomerRoutes.map(({ path, element }) => (
               <Route
@@ -124,22 +124,10 @@ function App() {
             ))}
           </Route>
 
-          {/* Staff Routes - Separate layout for staff */}
-          <Route element={<StaffLayout />}>
-            {privateStaffRoutes.map(({ path, element }) => (
-              <Route
-                key={path}
-                path={path}
-                element={
-                  <ProtectedRoute allowedRoles={['staff']}>
-                    {element}
-                  </ProtectedRoute>
-                }
-              />
-            ))}
-          </Route>
+          {/* STAFF */}
 
-          {/* Admin Routes */}
+
+          {/* Admin Routes - Requires login with 'admin' role */}
           <Route element={<AdminLayout />}>
             {privateAdminRoutes.map(({ path, element }) => (
               <Route
@@ -154,7 +142,7 @@ function App() {
             ))}
           </Route>
 
-          {/* Owner Routes */}
+          {/* Owner Routes - Requires login with 'owner' role */}
           <Route element={<OwnerLayout />}>
             {privateOwnerRoutes.map(({ path, element }) => (
               <Route
@@ -168,19 +156,6 @@ function App() {
               />
             ))}
           </Route>
-
-          {/* Public Routes */}
-          {publicRoutes.map(({ path, element }) => (
-              <Route key={path} path={path} element={element} />
-          ))}
-
-          {/* Guest Routes */}
-          <Route element={<GuestLayout />}>
-            {guestRoutes.map(({ path, element }) => (
-              <Route key={path} path={path} element={element} />
-            ))}
-          </Route>
-
         </Routes>
       </Router>
     </ToastProvider>

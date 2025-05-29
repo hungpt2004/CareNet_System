@@ -1,22 +1,20 @@
 import React, { useState } from "react";
 import { Nav } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
-// import {
-//   Home,
-//   Users,
-//   BookOpen,
-//   Calendar,
-//   BarChart2,
-//   Award,
-//   MessageSquare,
-//   DollarSign,
-//   Layers,
-//   Settings,
-//   ChevronDown,
-//   ChevronRight,
-// } from "lucide-react";
-import { Home, Users, BookOpen, Calendar, BarChart2, Award, MessageSquare, DollarSign, Layers, Settings, ChevronDown, ChevronRight, Crown } from 'lucide-react';
-import useAuthStore from "../../hooks/authStore";
+import {
+  Home,
+  Users,
+  BookOpen,
+  Calendar,
+  BarChart2,
+  Award,
+  MessageSquare,
+  DollarSign,
+  Layers,
+  Settings,
+  ChevronDown,
+  ChevronRight,
+} from "lucide-react";
 
 // Custom CSS variables for the color scheme
 const customStyles = {
@@ -26,8 +24,6 @@ const customStyles = {
 
 const OwnerSidebar = ({ showSidebar, isMobile }) => {
   const [expandedMenus, setExpandedMenus] = useState({});
-
-  const currentUser = useAuthStore((state) => state.currentUser);
 
   // Toggle submenu
   const toggleSubmenu = (menuId) => {
@@ -43,7 +39,7 @@ const OwnerSidebar = ({ showSidebar, isMobile }) => {
       id: "dashboard",
       title: "Dashboard",
       icon: <Home size={20} />,
-      path: "/owner-dashboard",
+      path: "/dashboard",
     },
     {
       id: "users",
@@ -54,7 +50,6 @@ const OwnerSidebar = ({ showSidebar, isMobile }) => {
         { title: "Điểm danh TNV", path: "/owner-attendance" },
         { title: "Phê duyệt TNV", path: "/owner-user" },
         { title: "Đánh giá TNV", path: "/owner-feedback" },
-        { title: "Phê duyệt hủy tham gia", path: "/owner-dashboard" },
       ],
     },
     {
@@ -62,17 +57,9 @@ const OwnerSidebar = ({ showSidebar, isMobile }) => {
       title: "Quản Lý Nội Bộ ",
       icon: <Award size={20} />,
       submenu: [
-        { title: "Quản Lý Sự Kiện", path: "/owner-finished-events" },
-        { title: "Tạo bài viết", path: "/owner-post" },
-        { title: "Quản Lý Thành Viên", path: "/owner-staff" },
+        { title: "Quản Lý Bài Viết", path: "/owner-post" },
+        { title: "Quản Lý Thành Viên", path: "/owner-user" },
       ],
-    },
-    {
-      id: "upgrade",
-      title: "Nâng Cấp Gói",
-      icon: <Crown size={20} />,
-      path: "/upgrade-pro",
-      className: "upgrade-button"
     },
   ];
 
@@ -84,7 +71,7 @@ const OwnerSidebar = ({ showSidebar, isMobile }) => {
             <div className="d-flex align-items-center">
               <div className="avatar-container me-3">
                 <img
-                  src={currentUser?.avatar || "https://i.pinimg.com/736x/8a/a9/c5/8aa9c5d8429f561000f1de8e7f6d5a32.jpg"}
+                  src="https://i.pinimg.com/736x/8a/a9/c5/8aa9c5d8429f561000f1de8e7f6d5a32.jpg"
                   alt="Admin User"
                   className="rounded-circle"
                   width="50"
@@ -92,8 +79,8 @@ const OwnerSidebar = ({ showSidebar, isMobile }) => {
                 />
               </div>
               <div>
-                <h6 className="mb-0 text-white">{currentUser?.fullname}</h6>
-                <small className="text-light">{currentUser?.email}</small>
+                <h6 className="mb-0 text-white">FPT University</h6>
+                <small className="text-light">Organization</small>
               </div>
             </div>
           </div>
@@ -248,19 +235,6 @@ const OwnerSidebar = ({ showSidebar, isMobile }) => {
           bottom: 0;
           background-color: rgba(0, 0, 0, 0.5);
           z-index: 1010;
-        }
-        
-        .upgrade-button {
-          background-color: ${customStyles.primaryColor} !important;
-          color: white !important;
-          margin-top: 1rem;
-          border-radius: 5px;
-          transition: all 0.3s ease;
-        }
-
-        .upgrade-button:hover {
-          background-color: #4ca887 !important;
-          transform: translateY(-2px);
         }
         
         @media (max-width: 991.98px) {

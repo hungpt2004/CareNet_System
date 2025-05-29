@@ -1,30 +1,26 @@
-const express = require('express');
-const cors = require('cors');
-const mongoose = require('mongoose');
-const socketIO = require('./socket');
 const http = require("http");
+const app = require("./app");
 // const setupWebSocket = require("./services/websocketService");
 const { gracefulShutdown } = require("./utils/gracefulShutdown");
 const connectDB = require("./config/connectDatabase");
-const app = require("./app");
 require('dotenv').config();
 
+let server; // Khai báo server và wss ở ngoài để dùng trong shutdown
+let wss;
 
-// Create HTTP server for Socket.IO
-const server = http.createServer(app);
+const startServer = async () => {
+  await connectDB();
 
-// Initialize Socket.IO
-socketIO.init(server);
+  server = http.createServer(app); // Tạo http server
+//   wss = setupWebSocket(server);    // Tạo socket server
 
-// Connect to MongoDB
-connectDB();
+  server.listen(process.env.PORT, () => {
+    console.log(`🚀 Server is running on port ${process.env.PORT}`);
+  });
+};
 
-// Start server
-const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+startServer();
 
 // Bắt các tín hiệu
-process.on("SIGINT", () => gracefulShutdown(server, socketIO.wss));  // Ctrl + C
-process.on("SIGTERM",() => gracefulShutdown(server, socketIO.wss));  // Kill signal
+process.on("SIGINT", () => gracefulShutdown(server, wss));  // Ctrl + C
+process.on("SIGTERM",() => gracefulShutdown(server, wss));  // Kill signal

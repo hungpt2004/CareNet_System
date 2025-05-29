@@ -1,7 +1,6 @@
 "use client"
 import { Navbar, Container, Nav, Button, Badge, Dropdown, Image } from "react-bootstrap"
 import { Menu, Bell, User, ChevronDown, LogOut, Settings } from "lucide-react"
-import useAuthStore from "../../hooks/authStore";
 
 // Custom CSS variables for the color scheme
 const customStyles = {
@@ -9,9 +8,6 @@ const customStyles = {
 }
 
 const OwnerNavbar = ({ toggleSidebar }) => {
-
-  const currentUser = useAuthStore((state) => state.currentUser);
-
   return (
     <Navbar bg="white" expand="lg" className="top-navbar shadow-sm py-2" fixed="top">
       <Container fluid className="px-4">
@@ -55,8 +51,8 @@ const OwnerNavbar = ({ toggleSidebar }) => {
                 height="40"
               />
               <div className="d-none d-md-block">
-                <h6 className="mb-0">{currentUser?.fullname}</h6>
-                <small className="text-muted">{currentUser?.email}</small>
+                <h6 className="mb-0">FPT University</h6>
+                <small className="text-muted">Organizations</small>
               </div>
               <ChevronDown size={16} className="ms-2" />
             </Dropdown.Toggle>

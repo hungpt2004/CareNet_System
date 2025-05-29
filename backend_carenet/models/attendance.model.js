@@ -18,11 +18,6 @@ const AttendanceSchema = new Schema({
      default: "registered"
    },
    checkInTime: {type: Date, default:  Date.now},
-   levelRating: {
-    type: String,
-    enum: ["Very Good", "Good", "Average", "Bad", "Very Bad"],
-    default: "Good"
-   },
    checkOutTime: {type: Date, default:  null},
    message: {type: String, default: null},
 });
