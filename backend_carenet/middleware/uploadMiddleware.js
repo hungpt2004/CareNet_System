@@ -31,10 +31,10 @@ const createUploadMiddleware = (options = {}) => {
     },
     fileFilter: (req, file, cb) => {
       // Kiểm tra loại file
-      if (file.mimetype.startsWith('image/')) {
+      if (file.mimetype.startsWith('image/') || file.mimetype === 'application/pdf') {
         cb(null, true);
       } else {
-        cb(new Error('Chỉ chấp nhận file ảnh'), false);
+        cb(new Error('Chỉ chấp nhận file ảnh hoặc PDF'), false);
       }
     }
   });
@@ -60,9 +60,45 @@ const eventImageUpload = createUploadMiddleware({
   maxFileSize: 10 * 1024 * 1024 // 10MB
 }).array('images', 10);
 
-// 1. Hàm upload ảnh lưu vào schema
-// 2. Tạo thông tin schema sau 
-// 2 route khác nhau, 2 lần submit
+// Middleware upload giấy tờ tổ chức
+// Được phép upload 5 file (ảnh hoặc PDF)
+const organizationDocumentUpload = createUploadMiddleware({
+  folder: 'organization_documents',
+  allowedFormats: ['jpg', 'jpeg', 'png', 'pdf'],
+  transformation: [{ quality: 'auto:best' }],
+  maxFileSize: 5 * 1024 * 1024 // 5MB
+}).array('documents', 10);
+
+// Middleware upload certifcateQR
+// Được phép upload 1 file (ảnh hoặc PDF)
+const certificateQRupload = createUploadMiddleware({
+  folder: 'certificate',
+  allowedFormats: ['jpg', 'jpeg', 'png', 'pdf'],
+  transformation: [{ quality: 'auto:best' }],
+  maxFileSize: 5 * 1024 * 1024 // 5MB
+});
+
+
+// Add debug logs
+const debugOrganizationDocumentUpload = (req, res, next) => {
+  console.log('Debug - Starting organization document upload middleware');
+  console.log('Debug - Request headers:', req.headers);
+  console.log('Debug - Request body:', req.body);
+  
+  organizationDocumentUpload(req, res, (err) => {
+    if (err) {
+      console.error('Debug - Upload error:', err);
+      return res.status(400).json({
+        status: 'error',
+        message: 'Upload failed',
+        error: err.message
+      });
+    }
+    console.log('Debug - Upload successful');
+    console.log('Debug - Files:', req.files);
+    next();
+  });
+};
 
 // Dữ liệu trả về từ cloudinary ví dụ
 /*
@@ -95,4 +131,6 @@ module.exports = {
   avatarUpload,
   eventImageUpload,
   cccdUpload,
+  organizationDocumentUpload: debugOrganizationDocumentUpload,
+  createUploadMiddleware
 };

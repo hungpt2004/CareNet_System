@@ -400,6 +400,13 @@ const ProfileScore = () => {
                     <AiOutlineShoppingCart style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
                     <span>Mua Chứng Chỉ</span>
                   </div>
+                   <div
+                    className="menu-item"
+                    style={styles.menuItem}
+                    onClick={() => navigate("/profile-certificate-purchases")}
+                  >
+                    <span>CertificatePurchases</span>
+                  </div>
                   <div className="menu-item" style={styles.menuItem}>
                     <AiOutlineLogout style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
                     <span>Đăng Xuất</span>

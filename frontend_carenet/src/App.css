@@ -3,8 +3,8 @@
   --color-accent-light: #E3F0AF;
   --color-accent: #118B50;
   --color-primary: #2e8b57;
-  --font-primary: 'Rubik', sans-serif;
-  --font-secondary: 'Mulish', sans-serif;
+  --font-family: "Montserrat", sans-serif;
+  --font-family: "Montserrat", sans-serif;
 }
 
 * {

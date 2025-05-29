@@ -1,32 +1,16 @@
 import React, { useState } from "react";
 import { Nav } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
-// import {
-//   Home,
-//   Users,
-//   BookOpen,
-//   Calendar,
-//   BarChart2,
-//   Award,
-//   MessageSquare,
-//   DollarSign,
-//   Layers,
-//   Settings,
-//   ChevronDown,
-//   ChevronRight,
-// } from "lucide-react";
-import { Home, Users, BookOpen, Calendar, BarChart2, Award, MessageSquare, DollarSign, Layers, Settings, ChevronDown, ChevronRight, Crown } from 'lucide-react';
+import { 
+  Home, Users, Calendar, BarChart2, Award, 
+  MessageSquare, ChevronDown, ChevronRight, Crown, LogOut 
+} from 'lucide-react';
 import useAuthStore from "../../hooks/authStore";
-
-// Custom CSS variables for the color scheme
-const customStyles = {
-  primaryColor: "#5DB996",
-  darkColor: "#2A3F54",
-};
+import styles from '../../css/OwnerSidebar.module.css';
 
 const OwnerSidebar = ({ showSidebar, isMobile }) => {
   const [expandedMenus, setExpandedMenus] = useState({});
-
+  const { logout } = useAuthStore();
   const currentUser = useAuthStore((state) => state.currentUser);
 
   // Toggle submenu
@@ -37,12 +21,12 @@ const OwnerSidebar = ({ showSidebar, isMobile }) => {
     });
   };
 
-  // Sidebar menu items
-  const menuItems = [
+  // Main menu items
+  const mainMenuItems = [
     {
       id: "dashboard",
-      title: "Dashboard",
-      icon: <Home size={20} />,
+      title: "Thống Kê",
+      icon: <BarChart2 size={20} />,
       path: "/owner-dashboard",
     },
     {
@@ -54,27 +38,92 @@ const OwnerSidebar = ({ showSidebar, isMobile }) => {
         { title: "Điểm danh TNV", path: "/owner-attendance" },
         { title: "Phê duyệt TNV", path: "/owner-user" },
         { title: "Đánh giá TNV", path: "/owner-feedback" },
-        { title: "Phê duyệt hủy tham gia", path: "/owner-dashboard" },
+        { title: "Phê duyệt hủy tham gia", path: "/owner-pending" },
       ],
     },
     {
-      id: "organizations",
-      title: "Quản Lý Nội Bộ ",
-      icon: <Award size={20} />,
+      id: "events",
+      title: "Quản Lý Sự Kiện",
+      icon: <Calendar size={20} />,
       submenu: [
-        { title: "Quản Lý Sự Kiện", path: "/owner-finished-events" },
-        { title: "Tạo bài viết", path: "/owner-post" },
-        { title: "Quản Lý Thành Viên", path: "/owner-staff" },
+        { title: "Tất cả sự kiện", path: "/owner-events" },
+        { title: "Tạo sự kiện mới", path: "/owner-post" },
+        { title: "Danh sách sự kiện", path: "/owner-finished-events" },
       ],
     },
+    {
+      id: "staff",
+      title: "Quản Lý Thành Viên",
+      icon: <Award size={20} />,
+      path: "/owner-staff",
+    },
+    {
+      id: "messages",
+      title: "Tin Nhắn",
+      icon: <MessageSquare size={20} />,
+      path: "/owner-messages",
+    },
+  ];
+
+  // Bottom menu items
+  const bottomMenuItems = [
     {
       id: "upgrade",
       title: "Nâng Cấp Gói",
       icon: <Crown size={20} />,
       path: "/upgrade-pro",
-      className: "upgrade-button"
+      className: styles.upgradeButton
     },
   ];
+
+  const renderMenuItem = (item) => {
+    if (item.submenu) {
+      return (
+        <div key={item.id} className={styles.sidebarMenuItem}>
+          <div
+            className={`${styles.sidebarLink} ${styles.submenuToggle}`}
+            onClick={() => toggleSubmenu(item.id)}
+          >
+            <div className={styles.sidebarLinkContent}>
+              <span className={styles.sidebarIcon}>{item.icon}</span>
+              <span className={styles.sidebarText}>{item.title}</span>
+            </div>
+            <span className={styles.submenuArrow}>
+              {expandedMenus[item.id] ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+            </span>
+          </div>
+          <div className={`${styles.sidebarSubmenu} ${expandedMenus[item.id] ? styles.expanded : ''}`}>
+            {item.submenu.map((subItem, index) => (
+              <NavLink
+                key={index}
+                to={subItem.path}
+                className={({ isActive }) => 
+                  `${styles.sidebarSubmenuLink} ${isActive ? styles.active : ''}`
+                }
+              >
+                <span className={styles.submenuText}>{subItem.title}</span>
+              </NavLink>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <NavLink
+        key={item.id}
+        to={item.path}
+        className={({ isActive }) => 
+          `${styles.sidebarLink} ${item.className || ''} ${isActive ? styles.active : ''}`
+        }
+      >
+        <div className={styles.sidebarLinkContent}>
+          <span className={styles.sidebarIcon}>{item.icon}</span>
+          <span className={styles.sidebarText}>{item.title}</span>
+        </div>
+      </NavLink>
+    );
+  };
 
   return (
     <>
@@ -95,8 +144,15 @@ const OwnerSidebar = ({ showSidebar, isMobile }) => {
                 <h6 className="mb-0 text-white">{currentUser?.fullname}</h6>
                 <small className="text-light">{currentUser?.email}</small>
               </div>
+      <div className={`${styles.ownerSidebar} ${showSidebar ? styles.show : ''} ${isMobile ? styles.mobile : ''}`}>
+        {/* Header */}
+        <div className={styles.sidebarHeader}>
+          <div className={styles.logoSection}>
+            <div className={styles.logo}>
+              <span className={styles.logoText}>CareNet</span>
             </div>
           </div>
+        </div>
 
           <div className="sidebar-menu p-2">
             <Nav className="flex-column">
@@ -157,7 +213,46 @@ const OwnerSidebar = ({ showSidebar, isMobile }) => {
                   )}
                 </div>
               ))}
+        {/* User Info */}
+        <div className={styles.sidebarUserInfo}>
+          <div className={styles.userAvatar}>
+            <img 
+              src={currentUser?.avatar || "https://i.pinimg.com/736x/8a/a9/c5/8aa9c5d8429f561000f1de8e7f6d5a32.jpg"} 
+              alt="Avatar" 
+            />
+          </div>
+          <div className={styles.userDetails}>
+            <h4 className={styles.userName}>{currentUser?.fullname || "Admin"}</h4>
+            <p className={styles.userRole}>Quản trị viên</p>
+          </div>
+        </div>
+
+        {/* Main Navigation */}
+        <div className={styles.sidebarContent}>
+          <div className={styles.sidebarMainMenu}>
+            <h6 className={styles.sidebarSectionTitle}>Menu Chính</h6>
+            <Nav className={styles.sidebarNav}>
+              {mainMenuItems.map(renderMenuItem)}
             </Nav>
+          </div>
+
+          {/* Bottom Section */}
+          <div className={styles.sidebarBottomSection}>
+            <h6 className={styles.sidebarSectionTitle}>Cài Đặt</h6>
+            <Nav className={styles.sidebarNav}>
+              {bottomMenuItems.map(renderMenuItem)}
+            </Nav>
+            
+            {/* Logout Button */}
+            <div className={styles.sidebarLogout}>
+              <button 
+                className={styles.logoutButton}
+                onClick={logout}
+              >
+                <LogOut size={20} />
+                <span>Đăng xuất</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -269,6 +364,9 @@ const OwnerSidebar = ({ showSidebar, isMobile }) => {
           }
         }
       `}</style>
+      {isMobile && showSidebar && (
+        <div className={styles.sidebarOverlay}></div>
+      )}
     </>
   );
 };

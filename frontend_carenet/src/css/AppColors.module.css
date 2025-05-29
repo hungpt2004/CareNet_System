@@ -76,10 +76,6 @@
   transition: background-color 0.2s ease;
 }
 
-.button:hover {
-  background-color: var(--color-primary);
-}
-
 .buttonOutline {
   background-color: transparent;
   color: var(--color-accent);

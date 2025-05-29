@@ -8,6 +8,9 @@ import defaultAvatar from "../../assets/defaultAvatar.png";
 import { AiOutlineUser, AiOutlineCustomerService, AiOutlineCalendar, AiOutlineStar, AiOutlineIdcard, AiOutlineDashboard, AiOutlineLogout } from "react-icons/ai";
 import { FaBell } from "react-icons/fa";
 import io from 'socket.io-client';
+import { FaBell } from "react-icons/fa";
+import io from 'socket.io-client';
+import axiosInstance from "../../utils/axiosInstance";
 
 const CustomNavbarLogged = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -65,6 +68,23 @@ const CustomNavbarLogged = () => {
       setNotifications(prev => [newNotification, ...prev]);
     });
 
+    // Lắng nghe sự kiện requestRejected
+    socketRef.current.on('requestRejected', (data) => {
+      console.log('Received requestRejected event:', data);
+      const newNotification = {
+        id: Date.now(),
+        message: data.message,
+        time: 'Vừa xong',
+        eventId: data.eventId,
+        eventTitle: data.eventTitle,
+        startAt: data.startAt,
+        endAt: data.endAt,
+        location: data.location
+      };
+
+      setNotifications(prev => [newNotification, ...prev]);
+    });
+
     return () => {
       if (currentUser?._id) {
         console.log('Leaving user room:', currentUser._id);
@@ -101,7 +121,6 @@ const CustomNavbarLogged = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
@@ -154,6 +173,10 @@ const CustomNavbarLogged = () => {
             <Nav.Link href="#how-it-works" className="fw-bold hover-underline mx-3">VẬN HÀNH</Nav.Link>
             <Nav.Link href="#testimonials" className="fw-bold hover-underline mx-3">CHIA SẺ</Nav.Link>
             <Nav.Link href="#contact" className="fw-bold hover-underline mx-3">LIÊN HỆ</Nav.Link>
+            <Nav.Link href="/forum-chat" className="fw-bold hover-underline mx-3">DIỄN ĐÀN</Nav.Link>
+            <Nav.Link href="#testimonials" className="fw-bold hover-underline mx-3">CHIA SẺ</Nav.Link>
+            <Nav.Link href="#contact" className="fw-bold hover-underline mx-3">LIÊN HỆ</Nav.Link>
+            <Nav.Link href="/organization-register" className="fw-bold hover-underline mx-3">ĐĂNG KÍ TỔ CHỨC</Nav.Link>
           </Nav>
 
           {isLoggedIn ? (
@@ -209,20 +232,26 @@ const CustomNavbarLogged = () => {
               <div className="position-relative" ref={dropdownRef}>
                 <div
                   onClick={toggleDropdown}
-                  style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                  style={{
+                    cursor: 'pointer',
+                    width: '44px',
+                    height: '44px',
+                    borderRadius: '50%',
+                    overflow: 'hidden',
+                    border: '2px solid #5DB996',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: '#fff'
+                  }}
                 >
                   <Image
-                    src={currentUser?.avatarUrl || defaultAvatar}
+                    src={currentUser?.avatar || currentUser?.avatarUrl || defaultAvatar}
                     alt="User Avatar"
-                    className="rounded-circle me-2"
                     width="44"
                     height="44"
-                    style={{ objectFit: 'cover', border: '1px solid #ddd', background: '#fff' }}
+                    style={{ objectFit: 'cover' }}
                   />
-                  {/* <div className="d-none d-lg-block">
-                    <div className="fw-bold">{currentUser?.fullname}</div>
-                    <div className="text-muted small">{currentUser?.email}</div>
-                  </div> */}
                 </div>
 
                 {dropdownOpen && (
@@ -230,6 +259,7 @@ const CustomNavbarLogged = () => {
                     className="position-absolute end-0 mt-2 py-2 bg-white rounded shadow"
                     style={{
                       width: '240px',
+                      width: '220px',
                       zIndex: 1051,
                     }}
                   >
@@ -242,7 +272,8 @@ const CustomNavbarLogged = () => {
                       <Nav.Link href="/support" className="px-4 py-2 custom-animated-link"><AiOutlineCustomerService style={{marginRight: 8, fontSize: 18, verticalAlign: 'middle'}} />CSKH</Nav.Link>
                       <Nav.Link href="/my-events" className="px-4 py-2 custom-animated-link"><AiOutlineCalendar style={{marginRight: 8, fontSize: 18, verticalAlign: 'middle'}} />Quản Lý Ghi Danh</Nav.Link>
                       <Nav.Link href="/feedback-page" className="px-4 py-2 custom-animated-link"><AiOutlineStar style={{marginRight: 8, fontSize: 18, verticalAlign: 'middle'}} />Quản Lý Đánh Giá</Nav.Link>
-                      <Nav.Link href="/owner-post" className="px-4 py-2 custom-animated-link" style={{ whiteSpace: 'nowrap' }}><AiOutlineIdcard style={{marginRight: 8, fontSize: 18, verticalAlign: 'middle'}} />Tài khoản Organization</Nav.Link>
+                      <Nav.Link href="/chat" className="px-4 py-2 custom-animated-link"><AiOutlineCustomerService style={{marginRight: 8, fontSize: 18, verticalAlign: 'middle'}} />Tin nhắn</Nav.Link>
+                      <Nav.Link href="/owner-dashboard" className="px-4 py-2 custom-animated-link" style={{ whiteSpace: 'nowrap' }}><AiOutlineIdcard style={{marginRight: 8, fontSize: 18, verticalAlign: 'middle'}} />Tài khoản Organization</Nav.Link>
                       <Nav.Link href="/dashboard" className="px-4 py-2 custom-animated-link"><AiOutlineDashboard style={{marginRight: 8, fontSize: 18, verticalAlign: 'middle'}} />Tài khoản Admin</Nav.Link>
                       <Nav.Link onClick={handleLogout} className="px-4 py-2 text-danger custom-animated-link"><AiOutlineLogout style={{marginRight: 8, fontSize: 18, verticalAlign: 'middle'}} />Đăng xuất</Nav.Link>
                     </Nav>

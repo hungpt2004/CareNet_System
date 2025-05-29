@@ -17,13 +17,10 @@ import FeedbackManagement from "./pages/feedbackmanagerment_page/FeedbackManagem
 import SupportRequestPage from './pages/support_page/SupportRequestPage';
 import AdminLayout from './layout/AdminLayout';
 import AdminCourses from './pages/admin_course_page/AdminCoursesPage';
-import AdminStudents from './pages/admin_students_page/AdminStudentsPage';
 import AdminDashboard from './pages/admin_dashboard_page/AdminDashboardPage';
 import AdminOrganizations from './pages/admin_organization_page/admin_organization';
 import AdminVolunteerPosts from './pages/admin_posts_page/AdminPostPage';
-import AdminEventAttendance from './pages/admin_students_page/AdminAttendancePage';
 import AdminEventParticipants from './pages/admin_students_page/AdminEventParticipant';
-import { ToastProvider } from './components/toast/ToastNotification';
 import OwnerLayout from './layout/OwnerLayout';
 import OrganizationPostPage from './pages/organization_post_page/OrganizationPostPage';
 import ProfileScore from './pages/profile_page/ProfileScore';
@@ -45,19 +42,28 @@ import OrganizationDashboardPage from './pages/organization_dashboard_page/Organ
 import StaffAttendancePage from './pages/staff_attendance_page/StaffAttendancePage';
 import OrganizationStaffManagement from './pages/organization_user_page/OrganizationStaffManagement';
 import StaffLayout from './layout/StaffLayout';
+import OrganizationRegisterPage from './pages/organization_register_page/OrganizationRegisterPage';
+import AdminOrganizationsPending from './pages/admin_students_page/AdminOrganizationsPage';
+import AdminEventsPending from './pages/admin_students_page/AdminEventsPage';
+import OrganizationUserPending from './pages/organization_user_page/OrganizationUserPending';
+import ChatPage from './pages/chat/ChatPage';
+import ForumPage from './pages/forum_page/UserForumChatPage';
+import ForumChatPage from './pages/forum_page/UserForumChatPage';
 
 import CertificatePurchasePage from './pages/profile_page/CertificatePurchasePage';
 const guestRoutes = [
   { path: '/', element: <LandingPage /> },
   { path: '/search', element: <VolunteerEventSearch /> },
   { path: '/onboarding', element: <OnBoardingPage /> },
+  { path: '/organization-register', element: <OrganizationRegisterPage /> },
+    { path: '/chat', element: <ChatPage/>}
 ];
 
 const publicRoutes = [
   { path: '/login', element: <AuthenGatePage /> },
   { path: '/forgot-password', element: <ForgotPasswordPage /> },
-  { path: '/payment-success', element: <PaymentSuccessPage/> },
-  { path: '/payment-cancel', element: <PaymentCancelPage/> },
+  { path: '/payment-success/:certificateId', element: <PaymentSuccessPage/> },
+  { path: '/payment-cancel/:certificateId', element: <PaymentCancelPage/> },
 ]
 
 const privateCustomerRoutes = [
@@ -76,22 +82,25 @@ const privateCustomerRoutes = [
   { path: '/feedback-page', element: <FeedbackPage /> },
   { path: '/my-events', element: <MyEventsPage /> },
   { path: '/profile-certificate-purchases', element: <CertificatePurchasePage /> },
+  { path: '/forum-chat', element: <ForumChatPage/> }
 ];
 
 const privateAdminRoutes = [
   { path: '/dashboard', element: <AdminDashboard /> },
   { path: '/course', element: <AdminCourses /> },
-  { path: '/student', element: <AdminStudents /> },
+  { path: '/request-organization', element: <AdminOrganizationsPending /> },
   { path: '/admin-support', element: <AdminSupportRequests /> },
   { path: '/admin-organization', element: <AdminOrganizations /> },
   { path: '/admin-post', element: <AdminVolunteerPosts /> },
   { path: '/admin-attendance', element: <AdminEventAttendance /> },
+  { path: '/request-event', element: <AdminEventsPending /> },
 ];
 
 const privateOwnerRoutes = [
   { path: '/owner-dashboard', element: <OrganizationDashboardPage /> },
   { path: '/owner-post', element: <OrganizationPostPage /> },
   { path: '/owner-user', element: <OrganizationUserRequests /> },
+  { path: '/owner-pending', element: <OrganizationUserPending /> },
   { path: '/owner-attendance', element: <OrganizationEventAttendance /> },
   { path: '/admin-participant', element: <AdminEventParticipants /> },
   {path: '/owner-feedback', element: <AdminFeedbackPage />},
@@ -106,7 +115,6 @@ const privateStaffRoutes = [
 
 function App() {
   return (
-    <ToastProvider>
       <Router>
         <Routes>
           {/* Customer Routes */}
@@ -181,9 +189,16 @@ function App() {
             ))}
           </Route>
 
+            <Route
+  path="/admin-organization"
+  element={
+    <ProtectedRoute allowedRoles={['admin']}>
+      <AdminOrganizations />
+    </ProtectedRoute>
+  }
+/>
         </Routes>
       </Router>
-    </ToastProvider>
   );
 }
 

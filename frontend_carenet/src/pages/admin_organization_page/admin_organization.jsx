@@ -1,7 +1,21 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, Table, Button, Badge, Form, InputGroup, Row, Col, Dropdown, Modal, Tab, Nav } from "react-bootstrap"
+import { useState, useEffect } from "react";
+import axios from '../../utils/AxiosInstance';
+import {
+  Card,
+  Table,
+  Button,
+  Badge,
+  Form,
+  InputGroup,
+  Row,
+  Col,
+  Dropdown,
+  Modal,
+  Tab,
+  Nav,
+} from "react-bootstrap";
 import {
   Search,
   Filter,
@@ -18,228 +32,274 @@ import {
   Mail,
   Info,
   BarChart2,
-} from "lucide-react"
+  ToggleLeft,
+  ToggleRight,
+} from "lucide-react";
 
-// Sử dụng màu sắc từ AppColors.module.css
 const customStyles = {
-  primaryColor: "#118b50", // --color-primary
-  accentColor: "#5db996", // --color-accent
-  accentLightColor: "#e3f0af", // --color-accent-light
-  backgroundColor: "#f6f4ef", // --color-background
-}
+  primaryColor: "#118b50",
+  accentColor: "#5db996",
+  accentLightColor: "#e3f0af",
+  backgroundColor: "#f6f4ef",
+};
 
 const AdminOrganizations = () => {
-  // Dữ liệu mẫu về tổ chức tình nguyện
-  const [organizations, setOrganizations] = useState([
-    {
-      id: "ORG-1001",
-      name: "Hội Bảo vệ Môi trường Xanh",
-      type: "Môi trường",
-      location: "TP. Hồ Chí Minh",
-      foundedDate: "2015-05-12",
-      members: 145,
-      activeProjects: 8,
-      status: "active",
-      logo: "https://via.placeholder.com/50",
-      description:
-        "Tổ chức phi lợi nhuận hoạt động trong lĩnh vực bảo vệ môi trường, trồng cây xanh và giáo dục cộng đồng về vấn đề môi trường.",
-      contact: {
-        email: "info@moitruongxanh.org",
-        phone: "028 1234 5678",
-        website: "www.moitruongxanh.org",
-        address: "123 Nguyễn Văn Linh, Quận 7, TP. Hồ Chí Minh",
-      },
-      socialMedia: {
-        facebook: "facebook.com/moitruongxanh",
-        instagram: "instagram.com/moitruongxanh",
-        twitter: "twitter.com/moitruongxanh",
-      },
-      recentEvents: [
-        { name: "Ngày hội trồng cây xanh", date: "2023-10-15", participants: 78 },
-        { name: "Dọn rác bãi biển Vũng Tàu", date: "2023-09-22", participants: 120 },
-        { name: "Hội thảo về biến đổi khí hậu", date: "2023-08-05", participants: 45 },
-      ],
-    },
-    {
-      id: "ORG-1002",
-      name: "Tình nguyện vì Trẻ em",
-      type: "Giáo dục",
-      location: "Hà Nội",
-      foundedDate: "2010-03-20",
-      members: 230,
-      activeProjects: 12,
-      status: "active",
-      logo: "https://via.placeholder.com/50",
-      description:
-        "Tổ chức hoạt động trong lĩnh vực giáo dục và phát triển trẻ em tại các vùng khó khăn, cung cấp học bổng và xây dựng trường học.",
-      contact: {
-        email: "contact@tinhnguyenvitreem.org",
-        phone: "024 9876 5432",
-        website: "www.tinhnguyenvitreem.org",
-        address: "45 Trần Duy Hưng, Cầu Giấy, Hà Nội",
-      },
-      socialMedia: {
-        facebook: "facebook.com/tinhnguyenvitreem",
-        instagram: "instagram.com/tinhnguyenvitreem",
-        twitter: "twitter.com/tinhnguyenvitreem",
-      },
-      recentEvents: [
-        { name: "Xây trường học tại Lào Cai", date: "2023-11-10", participants: 35 },
-        { name: "Trao học bổng cho học sinh nghèo", date: "2023-10-05", participants: 50 },
-        { name: "Dạy học tình nguyện mùa hè", date: "2023-07-15", participants: 80 },
-      ],
-    },
-    {
-      id: "ORG-1003",
-      name: "Hỗ trợ Y tế Cộng đồng",
-      type: "Y tế",
-      location: "Đà Nẵng",
-      foundedDate: "2018-09-15",
-      members: 95,
-      activeProjects: 5,
-      status: "active",
-      logo: "https://via.placeholder.com/50",
-      description:
-        "Tổ chức cung cấp dịch vụ y tế miễn phí cho người dân tại các vùng sâu vùng xa, tổ chức khám chữa bệnh và tư vấn sức khỏe.",
-      contact: {
-        email: "info@ytecongdong.org",
-        phone: "0236 7654 321",
-        website: "www.ytecongdong.org",
-        address: "78 Nguyễn Văn Thoại, Sơn Trà, Đà Nẵng",
-      },
-      socialMedia: {
-        facebook: "facebook.com/ytecongdong",
-        instagram: "instagram.com/ytecongdong",
-        twitter: "twitter.com/ytecongdong",
-      },
-      recentEvents: [
-        { name: "Khám bệnh miễn phí tại Quảng Nam", date: "2023-11-20", participants: 25 },
-        { name: "Tập huấn sơ cấp cứu cơ bản", date: "2023-09-30", participants: 40 },
-        { name: "Hiến máu nhân đạo", date: "2023-08-15", participants: 65 },
-      ],
-    },
-    {
-      id: "ORG-1004",
-      name: "Hỗ trợ Người cao tuổi",
-      type: "Xã hội",
-      location: "Cần Thơ",
-      foundedDate: "2016-11-01",
-      members: 75,
-      activeProjects: 4,
-      status: "inactive",
-      logo: "https://via.placeholder.com/50",
-      description:
-        "Tổ chức hỗ trợ người cao tuổi có hoàn cảnh khó khăn, tổ chức các hoạt động chăm sóc sức khỏe và tinh thần cho người cao tuổi.",
-      contact: {
-        email: "contact@nguoicaotuoi.org",
-        phone: "0292 8765 432",
-        website: "www.nguoicaotuoi.org",
-        address: "56 Hòa Bình, Ninh Kiều, Cần Thơ",
-      },
-      socialMedia: {
-        facebook: "facebook.com/nguoicaotuoi",
-        instagram: "instagram.com/nguoicaotuoi",
-        twitter: "twitter.com/nguoicaotuoi",
-      },
-      recentEvents: [
-        { name: "Thăm hỏi người cao tuổi dịp Tết", date: "2023-01-15", participants: 30 },
-        { name: "Khám sức khỏe định kỳ", date: "2023-06-10", participants: 45 },
-        { name: "Hội thảo về dinh dưỡng cho người cao tuổi", date: "2023-04-22", participants: 35 },
-      ],
-    },
-    {
-      id: "ORG-1005",
-      name: "Bảo vệ Động vật Hoang dã",
-      type: "Động vật",
-      location: "Nghệ An",
-      foundedDate: "2019-02-28",
-      members: 60,
-      activeProjects: 3,
-      status: "active",
-      logo: "https://via.placeholder.com/50",
-      description:
-        "Tổ chức hoạt động trong lĩnh vực bảo vệ động vật hoang dã, chống buôn bán trái phép và bảo tồn các loài động vật quý hiếm.",
-      contact: {
-        email: "info@dongvathoangda.org",
-        phone: "0238 5432 109",
-        website: "www.dongvathoangda.org",
-        address: "34 Lê Lợi, Vinh, Nghệ An",
-      },
-      socialMedia: {
-        facebook: "facebook.com/dongvathoangda",
-        instagram: "instagram.com/dongvathoangda",
-        twitter: "twitter.com/dongvathoangda",
-      },
-      recentEvents: [
-        { name: "Giải cứu động vật hoang dã", date: "2023-10-05", participants: 15 },
-        { name: "Tuyên truyền bảo vệ động vật", date: "2023-09-12", participants: 50 },
-        { name: "Trồng rừng tạo môi trường sống", date: "2023-07-20", participants: 40 },
-      ],
-    },
-  ])
+  const [organizations, setOrganizations] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [showModal, setShowModal] = useState(false);
+  const [selectedOrganization, setSelectedOrganization] = useState(null);
+  const [organizationLevels, setOrganizationLevels] = useState([]);
+  const [newLevelId, setNewLevelId] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [members, setMembers] = useState([]);
+  const [events, setEvents] = useState([]);
 
-  // State cho filter và search
-  const [searchTerm, setSearchTerm] = useState("")
-  const [typeFilter, setTypeFilter] = useState("all")
-  const [statusFilter, setStatusFilter] = useState("all")
+  useEffect(() => {
+    const fetchOrganizations = async () => {
+      try {
+        setLoading(true);
+        const token = localStorage.getItem("token");
+        console.log("Token:", token ? "Present" : "Missing");
+        if (!token) {
+          throw new Error("No token found. Please log in.");
+        }
+        const [orgResponse, levelsResponse] = await Promise.all([
+          axios.get("/organization/get-all-organizations", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get("/organization/get-all-levels", {
+            headers: { Authorization: `Bearer ${token}` },
+          }).catch((err) => {
+            console.error("Error fetching levels:", err);
+            return { data: { data: [] } };
+          }),
+        ]);
+        console.log("API Response (Organizations):", JSON.stringify(orgResponse.data, null, 2));
+        const orgData = orgResponse.data.data || [];
+        const levelsData = levelsResponse.data.data || [];
+        console.log("Organizations data:", orgData);
+        setOrganizations(orgData);
+        setOrganizationLevels(levelsData);
+        if (levelsData.length === 0) {
+          console.warn("No organization levels fetched. Check if the backend endpoint is working or if the database has data.");
+        }
+        setLoading(false);
+      } catch (err) {
+        console.error("API Error:", {
+          status: err.response?.status,
+          data: err.response?.data,
+          message: err.message,
+          response: err.response ? JSON.stringify(err.response.data, null, 2) : "No response data",
+        });
+        let errorMessage = err.response?.data?.message || "Không thể tải danh sách tổ chức";
+        if (err.response?.status === 401) errorMessage = "Vui lòng đăng nhập lại";
+        else if (err.response?.status === 403) errorMessage = "Bạn không có quyền truy cập";
+        else if (err.response?.status === 404) errorMessage = "API không tồn tại";
+        setError(errorMessage);
+        setLoading(false);
+      }
+    };
 
-  // State cho modal chi tiết
-  const [showModal, setShowModal] = useState(false)
-  const [selectedOrganization, setSelectedOrganization] = useState(null)
+    fetchOrganizations();
+  }, []);
 
-  // Lấy danh sách các loại tổ chức duy nhất
-  const types = [...new Set(organizations.map((org) => org.type))]
+  const fetchMembers = async (organizationId) => {
+    try {
+      const token = localStorage.getItem("token");
+      console.log(`Fetching members for organizationId: ${organizationId}`);
+      const response = await axios.get(`/organization/get-members?organizationId=${organizationId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      console.log("API Response (Members):", JSON.stringify(response.data, null, 2));
+      const fetchedMembers = response.data.data || [];
+      setMembers(fetchedMembers);
+      if (fetchedMembers.length === 0) {
+        console.warn(`No members found for organizationId: ${organizationId}`);
+      }
+    } catch (err) {
+      console.error("Error fetching members:", {
+        status: err.response?.status,
+        data: err.response?.data,
+        message: err.message,
+      });
+      setMembers([]);
+      alert("Lỗi khi tải danh sách thành viên: " + (err.response?.data?.message || err.message));
+    }
+  };
 
-  // Lọc tổ chức dựa trên tìm kiếm và bộ lọc
+  const fetchEvents = async (organizationId) => {
+    try {
+      const token = localStorage.getItem("token");
+      console.log(`Fetching events for organizationId: ${organizationId}`);
+      const response = await axios.get(`/event/events-by-organization?organizationId=${organizationId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      console.log("API Response (Events):", JSON.stringify(response.data, null, 2));
+      const fetchedEvents = response.data.data || [];
+      setEvents(fetchedEvents);
+      if (fetchedEvents.length === 0) {
+        console.warn(`No events found for organizationId: ${organizationId}`);
+      }
+    } catch (err) {
+      console.error("Error fetching events:", {
+        status: err.response?.status,
+        data: err.response?.data,
+        message: err.message,
+      });
+      setEvents([]);
+      alert("Lỗi khi tải danh sách sự kiện: " + (err.response?.data?.message || err.message));
+    }
+  };
+
+  const updateOrganizationStatus = async (organizationId, currentStatus) => {
+    try {
+      const newStatus = currentStatus === "active" ? "inactive" : "active";
+      const token = localStorage.getItem("token");
+      const response = await axios.put(
+        "/organization/update-status",
+        { organizationId, status: newStatus },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      console.log("Update status response:", response.data);
+
+      setOrganizations((prev) =>
+        prev.map((org) =>
+          org._id === organizationId
+            ? { ...org, organizationStatus: newStatus }
+            : org
+        )
+      );
+      alert("Cập nhật trạng thái thành công!");
+    } catch (err) {
+      console.error("Error updating status:", err);
+      alert("Lỗi khi cập nhật trạng thái: " + (err.response?.data?.message || err.message));
+    }
+  };
+
+  const updateOrganizationLevel = async () => {
+    if (!selectedOrganization || !newLevelId) {
+      alert("Vui lòng chọn loại tổ chức mới!");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.put(
+        "/organization/update-level",
+        { organizationId: selectedOrganization._id, levelId: newLevelId },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      console.log("Update level response:", response.data);
+
+      setOrganizations((prev) =>
+        prev.map((org) =>
+          org._id === selectedOrganization._id
+            ? { ...org, levelId: organizationLevels.find(level => level._id === newLevelId) }
+            : org
+        )
+      );
+      alert("Cập nhật loại tổ chức thành công!");
+      setNewLevelId("");
+      setShowModal(false);
+    } catch (err) {
+      console.error("Error updating level:", err);
+      alert("Lỗi khi cập nhật loại tổ chức: " + (err.response?.data?.message || err.message));
+    }
+  };
+
+  const openEditModal = (org) => {
+  setSelectedOrganization(org);
+  setNewLevelId(org.levelId?._id || "");
+  setShowModal(true);
+};
+
+  const viewOrganizationDetails = (organization) => {
+    setSelectedOrganization(organization);
+    setMembers([]);
+    setEvents([]);
+    console.log("Opening details for organization:", organization._id);
+    fetchMembers(organization._id);
+    fetchEvents(organization._id);
+    setShowModal(true);
+  };
+
+  const types = [...new Set(organizations
+    .filter(org => org.levelId && org.levelId.name)
+    .map((org) => org.levelId.name)
+  )];
+  console.log("Organization types:", types);
+
   const filteredOrganizations = organizations.filter((org) => {
-    // Lọc theo từ khóa tìm kiếm
     const matchesSearch =
-      org.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      org.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      org.location.toLowerCase().includes(searchTerm.toLowerCase())
+      org.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (org.userId?.address?.province && org.userId.address.province.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    // Lọc theo loại tổ chức
-    const matchesType = typeFilter === "all" || org.type === typeFilter
+    const matchesType = typeFilter === "all" || (org.levelId && org.levelId.name === typeFilter);
 
-    // Lọc theo trạng thái
-    const matchesStatus = statusFilter === "all" || org.status === statusFilter
+    const matchesStatus =
+      statusFilter === "all" || org.organizationStatus === statusFilter;
 
-    return matchesSearch && matchesType && matchesStatus
-  })
+    return matchesSearch && matchesType && matchesStatus;
+  });
+  console.log("Filtered organizations:", filteredOrganizations);
 
-  // Xử lý thay đổi tìm kiếm
   const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value)
-  }
+    setSearchTerm(e.target.value);
+  };
 
-  // Lấy badge trạng thái
   const getStatusBadge = (status) => {
     switch (status) {
       case "active":
-        return <Badge bg="success">Đang hoạt động</Badge>
+        return <Badge bg="success">Đang hoạt động</Badge>;
       case "inactive":
-        return <Badge bg="secondary">Tạm ngưng</Badge>
+        return <Badge bg="secondary">Tạm ngưng</Badge>;
       case "pending":
-        return <Badge bg="warning">Chờ duyệt</Badge>
+        return <Badge bg="warning">Chờ duyệt</Badge>;
+      case "hiring":
+        return <Badge bg="info">Đang tuyển</Badge>;
+      case "processing":
+        return <Badge bg="primary">Đang thực hiện</Badge>;
+      case "completed":
+        return <Badge bg="success">Hoàn thành</Badge>;
+      case "cancelled":
+        return <Badge bg="danger">Đã hủy</Badge>;
       default:
         return (
           <Badge bg="light" text="dark">
             Không xác định
           </Badge>
-        )
+        );
     }
-  }
+  };
 
-  // Xem chi tiết tổ chức
-  const viewOrganizationDetails = (organization) => {
-    setSelectedOrganization(organization)
-    setShowModal(true)
-  }
-
-  // Format date
   const formatDate = (dateString) => {
-    const options = { year: "numeric", month: "numeric", day: "numeric" }
-    return new Date(dateString).toLocaleDateString("vi-VN", options)
+    try {
+      const options = { year: "numeric", month: "numeric", day: "numeric" };
+      return new Date(dateString).toLocaleDateString("vi-VN", options);
+    } catch {
+      return "N/A";
+    }
+  };
+
+  const formatLocation = (location) => {
+    if (!location || typeof location !== 'object') return "N/A";
+    const { fullAddress } = location;
+    return fullAddress || "N/A";
+  };
+
+  if (loading) {
+    return <div>Đang tải...</div>;
+  }
+
+  if (error) {
+    return <div>Lỗi: {error}</div>;
   }
 
   return (
@@ -255,7 +315,6 @@ const AdminOrganizations = () => {
         </Button>
       </div>
 
-      {/* Thống kê tổng quan */}
       <Row className="mb-4">
         <Col md={3} className="mb-3 mb-md-0">
           <Card className="border-0 shadow-sm h-100">
@@ -272,7 +331,9 @@ const AdminOrganizations = () => {
                 <Users size={24} />
               </div>
               <div>
-                <h3 className="mb-0 fw-bold">605</h3>
+                <h3 className="mb-0 fw-bold">
+                  {organizations.reduce((sum, org) => sum + (org.staffCount || 0), 0)}
+                </h3>
                 <p className="text-muted mb-0">Tổng thành viên</p>
               </div>
             </Card.Body>
@@ -284,8 +345,8 @@ const AdminOrganizations = () => {
               <div
                 className="rounded-circle me-3 d-flex align-items-center justify-content-center"
                 style={{
-                  width: "50px",
-                  height: "50px",
+                  width: "40px",
+                  height: "40px",
                   backgroundColor: `${customStyles.accentLightColor}`,
                   color: customStyles.primaryColor,
                 }}
@@ -293,7 +354,7 @@ const AdminOrganizations = () => {
                 <Globe size={24} />
               </div>
               <div>
-                <h3 className="mb-0 fw-bold">5</h3>
+                <h3 className="mb-0 fw-bold">{organizations.length}</h3>
                 <p className="text-muted mb-0">Tổ chức</p>
               </div>
             </Card.Body>
@@ -305,8 +366,8 @@ const AdminOrganizations = () => {
               <div
                 className="rounded-circle me-3 d-flex align-items-center justify-content-center"
                 style={{
-                  width: "50px",
-                  height: "50px",
+                  width: "40px",
+                  height: "40px",
                   backgroundColor: `${customStyles.accentLightColor}`,
                   color: customStyles.primaryColor,
                 }}
@@ -314,7 +375,9 @@ const AdminOrganizations = () => {
                 <BarChart2 size={24} />
               </div>
               <div>
-                <h3 className="mb-0 fw-bold">32</h3>
+                <h3 className="mb-0 fw-bold">
+                  {organizations.reduce((sum, org) => sum + (org.eventCount || 0), 0)}
+                </h3>
                 <p className="text-muted mb-0">Dự án đang hoạt động</p>
               </div>
             </Card.Body>
@@ -326,8 +389,8 @@ const AdminOrganizations = () => {
               <div
                 className="rounded-circle me-3 d-flex align-items-center justify-content-center"
                 style={{
-                  width: "50px",
-                  height: "50px",
+                  width: "40px",
+                  height: "40px",
                   backgroundColor: `${customStyles.accentLightColor}`,
                   color: customStyles.primaryColor,
                 }}
@@ -335,7 +398,12 @@ const AdminOrganizations = () => {
                 <MapPin size={24} />
               </div>
               <div>
-                <h3 className="mb-0 fw-bold">5</h3>
+                <h3 className="mb-0 fw-bold">
+                  {[...new Set(organizations
+                    .filter(org => org.userId && typeof org.userId === 'object' && org.userId.address && org.userId.address.province)
+                    .map((org) => org.userId.address.province)
+                  )].length}
+                </h3>
                 <p className="text-muted mb-0">Khu vực hoạt động</p>
               </div>
             </Card.Body>
@@ -352,14 +420,18 @@ const AdminOrganizations = () => {
                   <Search size={18} />
                 </InputGroup.Text>
                 <Form.Control
-                  placeholder="Tìm kiếm theo tên, ID, địa điểm..."
+                  placeholder="Tìm kiếm theo tên, tỉnh/thành..."
                   value={searchTerm}
                   onChange={handleSearchChange}
                 />
               </InputGroup>
             </Col>
             <Col md={6} lg={8} className="d-flex gap-2 mt-3 mt-md-0">
-              <Form.Select className="w-auto" value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}>
+              <Form.Select
+                className="w-auto"
+                value={typeFilter}
+                onChange={(e) => setTypeFilter(e.target.value)}
+              >
                 <option value="all">Tất cả loại tổ chức</option>
                 {types.map((type, index) => (
                   <option key={index} value={type}>
@@ -368,7 +440,11 @@ const AdminOrganizations = () => {
                 ))}
               </Form.Select>
 
-              <Form.Select className="w-auto" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+              <Form.Select
+                className="w-auto"
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+              >
                 <option value="all">Tất cả trạng thái</option>
                 <option value="active">Đang hoạt động</option>
                 <option value="inactive">Tạm ngưng</option>
@@ -391,7 +467,7 @@ const AdminOrganizations = () => {
             <Table hover className="align-middle">
               <thead className="bg-light">
                 <tr>
-                  <th>ID</th>
+                  <th>STT</th>
                   <th>Tên tổ chức</th>
                   <th>Loại</th>
                   <th>Địa điểm</th>
@@ -404,60 +480,89 @@ const AdminOrganizations = () => {
               </thead>
               <tbody>
                 {filteredOrganizations.length > 0 ? (
-                  filteredOrganizations.map((org) => (
-                    <tr key={org.id}>
-                      <td>{org.id}</td>
-                      <td>
-                        <div className="d-flex align-items-center">
-                          <img
-                            src={org.logo || "/placeholder.svg"}
-                            alt={org.name}
-                            className="rounded-circle me-2"
-                            width="40"
-                            height="40"
-                          />
-                          <div className="fw-medium">{org.name}</div>
-                        </div>
-                      </td>
-                      <td>{org.type}</td>
-                      <td>{org.location}</td>
-                      <td>{formatDate(org.foundedDate)}</td>
-                      <td>
-                        <div className="d-flex align-items-center">
-                          <Users size={16} className="me-1 text-muted" />
-                          <span>{org.members}</span>
-                        </div>
-                      </td>
-                      <td>{org.activeProjects}</td>
-                      <td>{getStatusBadge(org.status)}</td>
-                      <td>
-                        <Dropdown align="end">
-                          <Dropdown.Toggle variant="light" size="sm" className="border-0">
-                            <MoreHorizontal size={18} />
-                          </Dropdown.Toggle>
-                          <Dropdown.Menu>
-                            <Dropdown.Item onClick={() => viewOrganizationDetails(org)}>
-                              <Eye size={16} className="me-2" />
-                              Xem chi tiết
-                            </Dropdown.Item>
-                            <Dropdown.Item href="#edit">
-                              <Edit size={16} className="me-2" />
-                              Chỉnh sửa
-                            </Dropdown.Item>
-                            <Dropdown.Divider />
-                            <Dropdown.Item href="#delete" className="text-danger">
-                              <Trash2 size={16} className="me-2" />
-                              Xóa
-                            </Dropdown.Item>
-                          </Dropdown.Menu>
-                        </Dropdown>
-                      </td>
-                    </tr>
-                  ))
+                  filteredOrganizations.map((org, index) => {
+                    console.log("Rendering organization:", {
+                      id: org._id,
+                      name: org.name,
+                      userId: org.userId,
+                      avatar: typeof org.userId === 'object' ? org.userId?.avatar : 'userId is string',
+                      staffCount: org.staffCount,
+                      eventCount: org.eventCount,
+                      status: org.organizationStatus
+                    });
+                    return (
+                      <tr key={org._id}>
+                        <td>{index + 1}</td>
+                        <td>
+                          <div className="d-flex align-items-center">
+                            <img
+                              src={typeof org.userId === 'object' && org.userId?.avatar ? org.userId.avatar : "https://via.placeholder.com/50"}
+                              alt={org.name || "Organization"}
+                              className="rounded-circle me-2"
+                              width="40"
+                              height="40"
+                              onError={(e) => console.log("Image load error for:", typeof org.userId === 'object' ? org.userId?.avatar : 'userId is string', e)}
+                            />
+                            <div className="fw-medium">{org.name || "N/A"}</div>
+                          </div>
+                        </td>
+                        <td>{org.levelId?.name || "N/A"}</td>
+                        <td>{formatLocation(org.userId)}</td>
+                        <td>{typeof org.userId === 'object' && org.userId?.dob ? formatDate(org.userId.dob) : "N/A"}</td>
+                        <td>
+                          <div className="d-flex align-items-center">
+                            <Users size={16} className="me-1 text-muted" />
+                            <span>{org.staffCount || 0}</span>
+                          </div>
+                        </td>
+                        <td>{org.eventCount || 0}</td>
+                        <td>{getStatusBadge(org.organizationStatus)}</td>
+                        <td>
+                          <Dropdown align="end">
+                            <Dropdown.Toggle variant="light" size="sm" className="border-0">
+                              <MoreHorizontal size={18} />
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu>
+                              <Dropdown.Item onClick={() => viewOrganizationDetails(org)}>
+                                <Eye size={16} className="me-2" />
+                                Xem chi tiết
+                              </Dropdown.Item>
+                              <Dropdown.Item onClick={() => openEditModal(org)}>
+                                <Edit size={16} className="me-2" />
+                                Chỉnh sửa
+                              </Dropdown.Item>
+                              <Dropdown.Item
+                                onClick={() => updateOrganizationStatus(org._id, org.organizationStatus)}
+                              >
+                                {org.organizationStatus === "active" ? (
+                                  <>
+                                    <ToggleLeft size={16} className="me-2" />
+                                    Tạm ngưng
+                                  </>
+                                ) : (
+                                  <>
+                                    <ToggleRight size={16} className="me-2" />
+                                    Kích hoạt
+                                  </>
+                                )}
+                              </Dropdown.Item>
+                              <Dropdown.Divider />
+                              <Dropdown.Item href="#delete" className="text-danger">
+                                <Trash2 size={16} className="me-2" />
+                                Xóa
+                              </Dropdown.Item>
+                            </Dropdown.Menu>
+                          </Dropdown>
+                        </td>
+                      </tr>
+                    );
+                  })
                 ) : (
                   <tr>
                     <td colSpan="9" className="text-center py-4">
-                      <p className="mb-0 text-muted">Không tìm thấy tổ chức nào phù hợp với điều kiện tìm kiếm</p>
+                      <p className="mb-0 text-muted">
+                        {error || "Không có tổ chức nào để hiển thị"}
+                      </p>
                     </td>
                   </tr>
                 )}
@@ -490,7 +595,6 @@ const AdminOrganizations = () => {
         </Card.Body>
       </Card>
 
-      {/* Modal Chi tiết tổ chức */}
       <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" backdrop="static">
         {selectedOrganization && (
           <>
@@ -498,14 +602,15 @@ const AdminOrganizations = () => {
               <Modal.Title>
                 <div className="d-flex align-items-center">
                   <img
-                    src={selectedOrganization.logo || "/placeholder.svg"}
-                    alt={selectedOrganization.name}
+                    src={typeof selectedOrganization.userId === 'object' && selectedOrganization.userId?.avatar ? selectedOrganization.userId.avatar : "https://via.placeholder.com/50"}
+                    alt={selectedOrganization.name || "Organization"}
                     className="rounded-circle me-2"
                     width="40"
                     height="40"
+                    onError={(e) => console.log("Image load error for:", typeof selectedOrganization.userId === 'object' ? selectedOrganization.userId?.avatar : 'userId is string', e)}
                   />
-                  {selectedOrganization.name}
-                  <div className="ms-2">{getStatusBadge(selectedOrganization.status)}</div>
+                  {selectedOrganization.name || "N/A"}
+                  <div className="ms-2">{getStatusBadge(selectedOrganization.organizationStatus)}</div>
                 </div>
               </Modal.Title>
             </Modal.Header>
@@ -516,10 +621,13 @@ const AdminOrganizations = () => {
                     <Nav.Link eventKey="info">Thông tin chung</Nav.Link>
                   </Nav.Item>
                   <Nav.Item>
+                    <Nav.Link eventKey="edit">Chỉnh sửa</Nav.Link>
+                  </Nav.Item>
+                  <Nav.Item>
                     <Nav.Link eventKey="members">
                       Thành viên{" "}
                       <Badge bg="primary" className="ms-1">
-                        {selectedOrganization.members}
+                        {members.length}
                       </Badge>
                     </Nav.Link>
                   </Nav.Item>
@@ -527,7 +635,7 @@ const AdminOrganizations = () => {
                     <Nav.Link eventKey="events">
                       Sự kiện gần đây{" "}
                       <Badge bg="primary" className="ms-1">
-                        {selectedOrganization.recentEvents.length}
+                        {events.length}
                       </Badge>
                     </Nav.Link>
                   </Nav.Item>
@@ -537,7 +645,7 @@ const AdminOrganizations = () => {
                   <Tab.Pane eventKey="info">
                     <div className="mb-4">
                       <h5 className="mb-3">Mô tả</h5>
-                      <p>{selectedOrganization.description}</p>
+                      <p>{selectedOrganization.description || "Chưa có mô tả"}</p>
                     </div>
 
                     <Row>
@@ -545,38 +653,40 @@ const AdminOrganizations = () => {
                         <h5 className="mb-3">Thông tin liên hệ</h5>
                         <div className="mb-2 d-flex align-items-center">
                           <Mail size={18} className="me-2 text-muted" />
-                          <span>{selectedOrganization.contact.email}</span>
+                          <span>{selectedOrganization.contact?.email || "N/A"}</span>
                         </div>
                         <div className="mb-2 d-flex align-items-center">
                           <Phone size={18} className="me-2 text-muted" />
-                          <span>{selectedOrganization.contact.phone}</span>
+                          <span>{selectedOrganization.phone || "N/A"}</span>
                         </div>
                         <div className="mb-2 d-flex align-items-center">
                           <Globe size={18} className="me-2 text-muted" />
-                          <span>{selectedOrganization.contact.website}</span>
+                          <span>{selectedOrganization.contact?.website || "N/A"}</span>
                         </div>
                         <div className="mb-2 d-flex align-items-center">
                           <MapPin size={18} className="me-2 text-muted" />
-                          <span>{selectedOrganization.contact.address}</span>
+                          <span>{formatLocation(selectedOrganization.userId)}</span>
                         </div>
                       </Col>
                       <Col md={6}>
                         <h5 className="mb-3">Thông tin khác</h5>
                         <div className="mb-2 d-flex align-items-center">
                           <Calendar size={18} className="me-2 text-muted" />
-                          <span>Ngày thành lập: {formatDate(selectedOrganization.foundedDate)}</span>
+                          <span>
+                            Ngày thành lập: {typeof selectedOrganization.userId === 'object' && selectedOrganization.userId?.dob ? formatDate(selectedOrganization.userId.dob) : "N/A"}
+                          </span>
                         </div>
                         <div className="mb-2 d-flex align-items-center">
                           <Users size={18} className="me-2 text-muted" />
-                          <span>Số thành viên: {selectedOrganization.members}</span>
+                          <span>Số thành viên: {selectedOrganization.staffCount || 0}</span>
                         </div>
                         <div className="mb-2 d-flex align-items-center">
                           <BarChart2 size={18} className="me-2 text-muted" />
-                          <span>Dự án đang hoạt động: {selectedOrganization.activeProjects}</span>
+                          <span>Dự án đang hoạt động: {selectedOrganization.eventCount || 0}</span>
                         </div>
                         <div className="mb-2 d-flex align-items-center">
                           <Info size={18} className="me-2 text-muted" />
-                          <span>Loại tổ chức: {selectedOrganization.type}</span>
+                          <span>Loại tổ chức: {selectedOrganization.levelId?.name || "N/A"}</span>
                         </div>
                       </Col>
                     </Row>
@@ -584,17 +694,60 @@ const AdminOrganizations = () => {
                     <div className="mt-4">
                       <h5 className="mb-3">Mạng xã hội</h5>
                       <div className="d-flex gap-2">
-                        <Button variant="outline-primary" size="sm">
+                        <Button
+                          variant="outline-primary"
+                          size="sm"
+                          disabled={!selectedOrganization.socialMedia?.facebook}
+                        >
                           Facebook
                         </Button>
-                        <Button variant="outline-danger" size="sm">
+                        <Button
+                          variant="outline-danger"
+                          size="sm"
+                          disabled={!selectedOrganization.socialMedia?.instagram}
+                        >
                           Instagram
                         </Button>
-                        <Button variant="outline-info" size="sm">
+                        <Button
+                          variant="outline-info"
+                          size="sm"
+                          disabled={!selectedOrganization.socialMedia?.twitter}
+                        >
                           Twitter
                         </Button>
                       </div>
                     </div>
+                  </Tab.Pane>
+
+                  <Tab.Pane eventKey="edit">
+                    <Form>
+                      <Form.Group className="mb-3">
+                        <Form.Label>Loại tổ chức</Form.Label>
+                        <Form.Select
+  value={newLevelId}
+  onChange={(e) => setNewLevelId(e.target.value)}
+>
+  <option value="">Chọn loại tổ chức</option>
+  {organizationLevels.length > 0 ? (
+    organizationLevels.map((level) => (
+      <option key={level._id} value={level._id}>
+        {level.name} ({level.description})
+      </option>
+    ))
+  ) : (
+    <option disabled>Không có loại tổ chức nào</option>
+  )}
+</Form.Select>
+                      </Form.Group>
+                      <Button
+                        variant="primary"
+                        style={{ backgroundColor: customStyles.primaryColor, borderColor: customStyles.primaryColor }}
+                        onClick={updateOrganizationLevel}
+                        disabled={!newLevelId}
+                      >
+                        Lưu thay đổi
+                      </Button>
+                    </Form>
                   </Tab.Pane>
 
                   <Tab.Pane eventKey="members">
@@ -613,16 +766,59 @@ const AdminOrganizations = () => {
                       </div>
                     </div>
 
-                    <div className="text-center py-5">
-                      <Users size={48} className="text-muted mb-3" />
-                      <h5>Chức năng đang phát triển</h5>
-                      <p className="text-muted">Danh sách chi tiết thành viên sẽ được hiển thị tại đây</p>
-                    </div>
+                    <Table hover>
+                      <thead className="bg-light">
+                        <tr>
+                          <th>STT</th>
+                          <th>Hình ảnh</th>
+                          <th>Tên</th>
+                          <th>Email</th>
+                          <th>Vai trò</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {members.length > 0 ? (
+                          members.map((member, index) => {
+                            console.log("Rendering member:", {
+                              _id: member._id,
+                              fullname: member.fullname,
+                              email: member.email,
+                              avatar: member.avatar,
+                              role: member.role
+                            });
+                            return (
+                              <tr key={member._id}>
+                                <td>{index + 1}</td>
+                                <td>
+                                  <img
+                                    src={member.avatar || "https://via.placeholder.com/40"}
+                                    alt={member.fullname || "Member"}
+                                    className="rounded-circle"
+                                    width="40"
+                                    height="40"
+                                    onError={(e) => console.log("Image load error for:", member.avatar, e)}
+                                  />
+                                </td>
+                                <td>{member.fullname || "N/A"}</td>
+                                <td>{member.email || "N/A"}</td>
+                                <td>{member.role || "N/A"}</td>
+                              </tr>
+                            );
+                          })
+                        ) : (
+                          <tr>
+                            <td colSpan="5" className="text-center py-4">
+                              <p className="text-muted">Không có thành viên nào</p>
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </Table>
                   </Tab.Pane>
 
                   <Tab.Pane eventKey="events">
                     <div className="d-flex justify-content-between align-items-center mb-3">
-                      <h5 className="mb-0">Sự kiện gần đây</h5>
+                      <h5 className="mb-0">Danh sách sự kiện</h5>
                       <Button variant="outline-primary" size="sm">
                         Xem tất cả sự kiện
                       </Button>
@@ -631,19 +827,33 @@ const AdminOrganizations = () => {
                     <Table hover>
                       <thead className="bg-light">
                         <tr>
-                          <th>Tên sự kiện</th>
-                          <th>Ngày tổ chức</th>
-                          <th>Số người tham gia</th>
+                          <th>STT</th>
+                          <th>Tiêu đề</th>
+                          <th>Trạng thái</th>
+                          <th>Ngày bắt đầu</th>
+                          <th>Ngày kết thúc</th>
+                          <th>Địa điểm</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {selectedOrganization.recentEvents.map((event, index) => (
-                          <tr key={index}>
-                            <td>{event.name}</td>
-                            <td>{formatDate(event.date)}</td>
-                            <td>{event.participants}</td>
+                        {events.length > 0 ? (
+                          events.map((event, index) => (
+                            <tr key={event._id}>
+                              <td>{index + 1}</td>
+                              <td>{event.title || "N/A"}</td>
+                              <td>{getStatusBadge(event.status)}</td>
+                              <td>{event.startAt ? formatDate(event.startAt) : "N/A"}</td>
+                              <td>{event.endAt ? formatDate(event.endAt) : "N/A"}</td>
+                              <td>{formatLocation(event.location)}</td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan="6" className="text-center py-4">
+                              <p className="text-muted">Không có sự kiện nào</p>
+                            </td>
                           </tr>
-                        ))}
+                        )}
                       </tbody>
                     </Table>
                   </Tab.Pane>
@@ -654,20 +864,12 @@ const AdminOrganizations = () => {
               <Button variant="outline-secondary" onClick={() => setShowModal(false)}>
                 Đóng
               </Button>
-              <Button
-                variant="primary"
-                style={{ backgroundColor: customStyles.primaryColor, borderColor: customStyles.primaryColor }}
-              >
-                <Edit size={16} className="me-2" />
-                Chỉnh sửa
-              </Button>
             </Modal.Footer>
           </>
         )}
       </Modal>
     </div>
-  )
-}
+  );
+};
 
-export default AdminOrganizations
-
+export default AdminOrganizations;

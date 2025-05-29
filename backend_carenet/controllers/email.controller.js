@@ -1,8 +1,11 @@
 const emailTransporter = require("../services/transporterEmail");
-const User = require("../models/user.model");
-const AppError = require("../utils/appError");
-const asyncHandler = require("../middleware/asyncHandler");
-const { VERIFICATION_EMAIL_TEMPLATE, SUCCESS_REGISTER_TEMPLATE, APPROVE_REGISTER_TEMPLATE } = require("../mail_templates/emailTemplates");
+const { 
+   VERIFICATION_EMAIL_TEMPLATE, 
+   SUCCESS_REGISTER_TEMPLATE, 
+   APPROVE_REGISTER_TEMPLATE, 
+   THANK_YOU_TEMPLATE, 
+   REJECT_REGISTER_TEMPLATE 
+} = require("../mail_templates/emailTemplates");
 const { formatDateVN } = require("../utils/formatDateVN");
 require('dotenv').config();
 
@@ -12,7 +15,7 @@ exports.sendVerificationLink = async (
  ) => {
    try {
      await emailTransporter.sendMail({
-       from: process.env.EMAIL_USERNAME,
+       from: `Dịch vụ hỗ trợ Carenet" <${process.env.EMAIL_USERNAME}>`,
        to: email,
        subject: "Xác thực tài khoản",
        html: VERIFICATION_EMAIL_TEMPLATE
@@ -81,4 +84,60 @@ exports.sendApproveRequest = async (
    }
 }
 
+exports.sendThankYouMail = async (
+   userName,
+   email,
+   eventName,
+   eventStartAt,
+   eventEndAt,
+   eventLocation,
+   participants,
+   organizationName,
+) => {
+   try {
+      await emailTransporter.sendMail({
+         from: process.env.EMAIL_USERNAME,
+         to: email,
+         subject: "Cảm ơn bạn đã tham gia sự kiện",
+         html: THANK_YOU_TEMPLATE
+         .replace("{userName}", userName)
+         .replace("{eventName}", eventName)
+         .replace("{organizationName}", organizationName)
+         .replace("{eventStartAt}", formatDateVN(eventStartAt))
+         .replace("{eventEndAt}", formatDateVN(eventEndAt))
+         .replace("{location}", eventLocation)
+         .replace("{participants}", participants)
+         .replace("{currentYear}", new Date().getFullYear())
+      })
+   } catch (error) {
+      console.log(error)
+   }
+}
 
+exports.sendRejectRequest = async (
+   userName,
+   email,
+   eventName,
+   eventStartAt,
+   eventEndAt,
+   eventLocation,
+   rejectionReason,
+   eventsLink
+) => {
+   try { 
+      await emailTransporter.sendMail({
+         from: process.env.EMAIL_USERNAME,
+         to: email,
+         subject: "Thông báo từ chối tham gia sự kiện",
+         html: REJECT_REGISTER_TEMPLATE
+         .replace("{userName}", userName)
+         .replace("{eventName}", eventName)
+         .replace("{eventStartAt}", formatDateVN(eventStartAt))
+         .replace("{eventEndAt}", formatDateVN(eventEndAt))
+         .replace("{eventLocation}", eventLocation)
+         .replace("{rejectionReason}", rejectionReason)
+      })
+   } catch (error) {
+      console.log(error)
+   }
+}

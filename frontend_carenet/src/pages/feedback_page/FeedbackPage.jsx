@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Table,
   Button,
@@ -69,7 +69,7 @@ const FeedbackPage = () => {
   };
 
   // Add CSS to document
-  React.useEffect(() => {
+  useEffect(() => {
     const style = document.createElement("style");
     style.textContent = `
       body {
@@ -147,6 +147,8 @@ const FeedbackPage = () => {
   // Modal state
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingFeedback, setEditingFeedback] = useState(null);
+  const [feedbackData, setFeedbackData] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
 
   // Table columns with icons
