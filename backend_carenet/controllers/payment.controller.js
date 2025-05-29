@@ -47,8 +47,8 @@ exports.createPaymentLink = asyncHandler(async (req, res) => {
     buyerName: currentUser.fullname || "Khách hàng",
     buyerEmail: currentUser.email || "customer@example.com",
     buyerPhone: currentUser.phone || "0123456789",
-    returnUrl: `${process.env.FRONTEND_URL}/payment-success/${certificateId}`,
-    cancelUrl: `${process.env.FRONTEND_URL}/payment-cancel/${certificateId}`,
+    returnUrl: `${process.env.CLIENT_URL}/payment-success/${certificateId}`,
+    cancelUrl: `${process.env.CLIENT_URL}/payment-cancel/${certificateId}`,
     description: "Thanh toán chứng chỉ", // Max 25 characters
     expiredAt: Math.floor(Date.now() / 1000) + 24 * 60 * 60, // 24 hours from now
   };
@@ -147,6 +147,11 @@ exports.cancelPayment = asyncHandler(async (req, res) => {
 
 exports.createPaymentLinkForOrganization = asyncHandler(async (req, res) => {
   const currentUser = req.user.user;
+
+  console.log('---- PHẦN THANH TOÁN TỔ CHỨC ----');
+
+  console.log("User đang thanh toán:", currentUser.fullname);
+
   try {
 
     const order = {
@@ -163,27 +168,54 @@ exports.createPaymentLinkForOrganization = asyncHandler(async (req, res) => {
       buyerName: currentUser.fullname || "Khách hàng",
       buyerEmail: currentUser.email || "customer@example.com",
       buyerPhone: currentUser.phone || "0123456789",
-      returnUrl: `${process.env.FRONTEND_URL}/payment-success/${certificateId}`,
-      cancelUrl: `${process.env.FRONTEND_URL}/payment-cancel/${certificateId}`,
+      returnUrl: `${process.env.CLIENT_URL}/payment-org-success/`,
+      cancelUrl: `${process.env.CLIENT_URL}/payment-org-cancel/`,
       description: "Thanh toán gói dịch vụ", // Max 25 characters
       expiredAt: Math.floor(Date.now() / 1000) + 24 * 60 * 60, // 24 hours from now
     };
 
+    console.log(`Order của tổ chức: ${JSON.stringify(order)}`);
+
     const paymentLink = await payOs.createPaymentLink(order);
 
     const organizationLevel = await OrganizationLevel.findOne({
-      name: "premium", // Assuming 'pro' is the ID for the PRO level
+      name: "Pro", // Assuming 'pro' is the ID for the PRO level
     });
+
+    console.log(`Gói dịch vụ PRO: ${JSON.stringify(organizationLevel)}`);
+
+    if (!organizationLevel) {
+      return res.status(404).json({
+        status: "error",
+        message: "Không tìm thấy gói dịch vụ PRO",
+      });
+    }
+
+    const checkOrgSub = await OrganizationSubscription.findOne({
+      organizationId: currentUser.organizationId,
+      levelId: organizationLevel._id, // Use the ID from the found organization level
+    });
+
+    console.log(`Kiểm tra đăng ký gói dịch vụ: ${checkOrgSub}`);
+
+    if (checkOrgSub) {
+      return res.status(400).json({
+        status: "error",
+        message: "Tổ chức đã đăng ký gói dịch vụ này rồi",
+      });
+    }
 
     // Tạo org subscription
     const organizationSubscription = new OrganizationSubscription({
       organizationId: currentUser.organizationId,
       levelId: organizationLevel._id, // Use the ID from the found organization level
-      price: order.amount,
+      price: 499000,
       subscribedAt: new Date(),
       expiredAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
       status: "not paid",
     });
+
+    console.log(`Gói dịch vụ: ${JSON.stringify(organizationSubscription)}`);
 
     await organizationSubscription.save();
 

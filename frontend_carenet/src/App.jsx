@@ -46,16 +46,17 @@ import AdminOrganizationsPending from './pages/admin_students_page/AdminOrganiza
 import AdminEventsPending from './pages/admin_students_page/AdminEventsPage';
 import OrganizationUserPending from './pages/organization_user_page/OrganizationUserPending';
 import ChatPage from './pages/chat/ChatPage';
-import ForumPage from './pages/forum_page/UserForumChatPage';
 import ForumChatPage from './pages/forum_page/UserForumChatPage';
-
 import CertificatePurchasePage from './pages/profile_page/CertificatePurchasePage';
+import { PaymentSuccessOrgPage } from './pages/payment_status_page/PaymentSuccessOrgPage';
+import { PaymentCancelOrgPage } from './pages/payment_status_page/PaymentCancelOrgPage';
+
 const guestRoutes = [
   { path: '/', element: <LandingPage /> },
   { path: '/search', element: <VolunteerEventSearch /> },
   { path: '/onboarding', element: <OnBoardingPage /> },
   { path: '/organization-register', element: <OrganizationRegisterPage /> },
-    { path: '/chat', element: <ChatPage/>}
+  { path: '/chat', element: <ChatPage/> }
 ];
 
 const publicRoutes = [
@@ -63,6 +64,8 @@ const publicRoutes = [
   { path: '/forgot-password', element: <ForgotPasswordPage /> },
   { path: '/payment-success/:certificateId', element: <PaymentSuccessPage/> },
   { path: '/payment-cancel/:certificateId', element: <PaymentCancelPage/> },
+  { path: '/payment-org-success', element: <PaymentSuccessOrgPage /> },
+  { path: '/payment-org-cancel', element: <PaymentCancelOrgPage /> }
 ]
 
 const privateCustomerRoutes = [

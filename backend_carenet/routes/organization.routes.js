@@ -18,6 +18,7 @@ OrganizationRouter.put("/update-status", authenticateToken, updateOrganizationSt
 OrganizationRouter.put("/update-level", authenticateToken, updateOrganizationLevel);
 OrganizationRouter.get("/get-all-levels", authenticateToken, getAllOrganizationLevels);
 OrganizationRouter.get("/get-members", authenticateToken, getOrganizationMembers);
+OrganizationRouter.get('/get-organization-info', authenticateToken, OrganizationController.getOrganizationById);
 OrganizationRouter.post('/create-events', authenticateToken, OrganizationController.createEvent);
 OrganizationRouter.post('/events/:eventId/certificates/:userId', authenticateToken, OrganizationController.generateEventCertificate);
 OrganizationRouter.post('/register-organization', authenticateToken, OrganizationController.registerOrganization);

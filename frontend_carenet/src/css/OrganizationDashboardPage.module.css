@@ -1,0 +1,572 @@
+/* OrganizationDashboard.module.css */
+
+.dashboardContainer {
+  position: relative;
+}
+
+.mainContent {
+  padding: 24px;
+  background: #f5f7fa;
+  min-height: 100vh;
+  transition: filter 0.3s ease, pointer-events 0.3s ease;
+}
+
+.mainContentBlurred {
+  filter: blur(3px);
+  pointer-events: none;
+}
+
+.controlPanel {
+  margin-bottom: 24px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  background: white;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+
+.selectGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.selectLabel {
+  margin: 0;
+  font-weight: 600;
+  color: #1a3353;
+}
+
+.calculateButton {
+  margin-left: auto;
+  background: #1a3353;
+  border-color: #1a3353;
+}
+
+.calculateButton:hover {
+  background: #2a4464;
+  border-color: #2a4464;
+}
+
+.modalTitle {
+  color: #1a3353;
+  font-weight: bold;
+}
+
+.modalContent {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.modalSelectGroup {
+  flex: 1;
+}
+
+.modalSelectLabel {
+  font-weight: 600;
+  color: #1a3353;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.modalSelect {
+  width: 100%;
+}
+
+.modalDescription {
+  color: #666;
+}
+
+.statsCard {
+  border-radius: 8px;
+  height: 100%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.statsCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.statsTitle {
+  font-size: 14px;
+  color: #1a3353;
+  font-weight: 600;
+}
+
+.statsValue {
+  color: #3f8600;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.statsSubtext {
+  margin-top: 8px;
+}
+
+.statsIcon {
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+.chartCard {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.chartTitle {
+  color: #1a3353;
+  font-weight: 600;
+}
+
+.chartExtra {
+  color: #666;
+}
+
+.chartContainer {
+  width: 100%;
+  height: 300px;
+}
+
+.tableContainer {
+  margin-top: 8px;
+}
+
+.tableMonth {
+  font-weight: 600;
+}
+
+.tableRevenue {
+  color: #3f8600;
+  font-weight: bold;
+}
+
+.tableStatus {
+  border-radius: 4px;
+}
+
+.eventsCard {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.eventsTitle {
+  color: #1a3353;
+  font-weight: 600;
+}
+
+.eventsLink {
+  color: #1a3353;
+  padding: 0;
+}
+
+.eventsContainer {
+  width: 100%;
+}
+
+.eventCard {
+  border-radius: 8px;
+  border: 1px solid #f0f0f0;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.eventCard:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.eventCardBody {
+  padding: 16px;
+}
+
+.eventImage {
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.eventImagePlaceholder {
+  width: 100%;
+  height: 80px;
+  background: #f5f7fa;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.eventContent {
+  width: 100%;
+}
+
+.eventHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.eventTitle {
+  margin: 0;
+  color: #1a3353;
+}
+
+.eventStatus {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.statusIndicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.statusHiring {
+  background-color: #1890ff;
+}
+
+.statusProcessing {
+  background-color: #faad14;
+}
+
+.statusCompleted {
+  background-color: #52c41a;
+}
+
+.statusRejected {
+  background-color: #ff4d4f;
+}
+
+.statusApproved {
+  background-color: #52c41a;
+}
+
+.statusPending {
+  background-color: #faad14;
+}
+
+.eventDescription {
+  font-size: 13px;
+  color: #666;
+}
+
+.eventMeta {
+  margin-top: 4px;
+}
+
+.eventMetaItem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.eventMetaText {
+  font-size: 12px;
+  color: #666;
+}
+
+.eventMetaStrong {
+  color: #1a3353;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.eventMetaEllipsis {
+  font-size: 12px;
+  max-width: 100%;
+  color: #666;
+}
+
+.eventTags {
+  margin-top: 8px;
+}
+
+.eventTag {
+  margin: 0;
+  border-radius: 4px;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 40px 0;
+}
+
+.emptyStateIcon {
+  margin-bottom: 16px;
+  color: #d9d9d9;
+}
+
+.emptyStateText {
+  color: #666;
+}
+
+.notificationsCard {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  margin-bottom: 16px;
+}
+
+.notificationsContainer {
+  height: 300px;
+  overflow-y: auto;
+}
+
+.notificationItem {
+  padding: 12px 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.notificationItemBorder {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.notificationDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-top: 6px;
+}
+
+.notificationDotCertificate {
+  background-color: #1890ff;
+}
+
+.notificationDotRevenue {
+  background-color: #52c41a;
+}
+
+.notificationDotEvent {
+  background-color: #faad14;
+}
+
+.notificationContent {
+  flex: 1;
+}
+
+.notificationMessage {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.notificationTime {
+  font-size: 12px;
+  color: #666;
+}
+
+.analyticsCard {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  margin-top: 16px;
+}
+
+.analyticsItem {
+  margin-bottom: 16px;
+}
+
+.analyticsHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.analyticsLabel {
+  color: #333;
+}
+
+.analyticsValue {
+  font-weight: 600;
+}
+
+.analyticsBar {
+  width: 100%;
+  height: 8px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.analyticsProgress {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+/* Upgrade Overlay */
+.upgradeOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.upgradeModal {
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.upgradeContent {
+  padding: 24px;
+}
+
+.upgradeCrownContainer {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px auto;
+  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+}
+
+.upgradeTitle {
+  color: #1a3353;
+  margin-bottom: 16px;
+}
+
+.upgradeDescription {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 24px;
+  display: block;
+}
+
+.upgradeFeatures {
+  text-align: left;
+  margin: 24px 0;
+}
+
+.upgradeFeaturesTitle {
+  display: block;
+  margin-bottom: 12px;
+  color: #1a3353;
+  font-weight: 600;
+}
+
+.upgradeFeaturesList {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.upgradeFeatureItem {
+  margin-bottom: 8px;
+}
+
+.upgradePricing {
+  margin: 24px 0;
+}
+
+.upgradePrice {
+  font-size: 32px;
+  font-weight: bold;
+  color: #1a3353;
+}
+
+.upgradePricePeriod {
+  font-size: 16px;
+  color: #666;
+  margin-left: 8px;
+}
+
+.upgradeButtons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.upgradeButtonSecondary {
+  border-color: #1a3353;
+  color: #1a3353;
+}
+
+.upgradeButtonPrimary {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  border-color: transparent;
+  color: #000;
+  font-weight: bold;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+}
+
+.upgradeButtonPrimary:hover {
+  background: linear-gradient(135deg, #FFA500, #FF8C00);
+  transform: translateY(-1px);
+}
+
+.upgradeClose {
+  margin-top: 16px;
+}
+
+.upgradeCloseButton {
+  color: #666;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .controlPanel {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  
+  .calculateButton {
+    margin-left: 0;
+  }
+  
+  .modalContent {
+    flex-direction: column;
+  }
+  
+  .eventHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .upgradeButtons {
+    flex-direction: column;
+  }
+  
+  .upgradeModal {
+    width: 95%;
+    margin: 0 auto;
+  }
+}
+
+/* Scrollbar styling */
+.notificationsContainer::-webkit-scrollbar {
+  width: 4px;
+}
+
+.notificationsContainer::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 2px;
+}
+
+.notificationsContainer::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 2px;
+}
+
+.notificationsContainer::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

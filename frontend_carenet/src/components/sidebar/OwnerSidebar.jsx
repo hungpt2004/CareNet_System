@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Nav } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
 import { 
@@ -8,10 +8,27 @@ import {
 } from 'lucide-react';
 import useAuthStore from "../../hooks/authStore";
 import styles from '../../css/OwnerSidebar.module.css';
+import OrganizationService from "../../services/organization-service/organization.service";
 
 const OwnerSidebar = ({ showSidebar, isMobile }) => {
   const [expandedMenus, setExpandedMenus] = useState({});
   const { currentUser, logout } = useAuthStore();
+  const [currentOrganization, setCurrentOrganization] = useState();
+
+  console.log(`Organization ở SideBar: ${JSON.stringify(currentOrganization)}`);
+
+  const _orgService = new OrganizationService();
+
+  const fetchCurrentOrganization = async () => {
+    const {data} = await _orgService.fetchCurrentOrganization();
+    if (data) {
+      setCurrentOrganization(data);
+    }
+  }
+
+  useEffect(() => {
+    fetchCurrentOrganization();
+  }, []);
 
   // Toggle submenu
   const toggleSubmenu = (menuId) => {
@@ -144,7 +161,7 @@ const OwnerSidebar = ({ showSidebar, isMobile }) => {
           </div>
           <div className={styles.userDetails}>
             <h4 className={styles.userName}>{currentUser?.fullname || "Admin"}</h4>
-            <p className={styles.userRole}>Quản trị viên</p>
+            <p className={styles.userRole}>Thành viên gói {currentOrganization?.levelId?.name}</p>
           </div>
         </div>
 

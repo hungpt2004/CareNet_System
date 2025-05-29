@@ -118,3 +118,84 @@
   align-self: flex-end;  /* Đưa tin nhắn người dùng vào bên phải */
   max-width: 80%;
 }
+
+/* Thêm vào AppColors.module.css */
+
+.logoText {
+  background: linear-gradient(135deg, #2e8b57 0%, #118B50 50%, #1a4731 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 2px 2px 4px rgba(46, 139, 87, 0.3);
+  font-weight: 800;
+  letter-spacing: 8px;
+  position: relative;
+  display: inline-block;
+  transition: all 0.3s ease;
+}
+
+.logoText::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #66bb6a 0%, #2e8b57 50%, #1a4731 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.logoText:hover::before {
+  opacity: 1;
+}
+
+.logoText:hover {
+  transform: scale(1.05);
+  letter-spacing: 12px;
+}
+
+/* Alternative style - nếu muốn style khác */
+.logoTextGradient {
+  background: linear-gradient(45deg, #2e8b57, #66bb6a, #118B50, #1a4731);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 3s ease-in-out infinite;
+  font-weight: 800;
+  letter-spacing: 10px;
+  text-shadow: 0 4px 8px rgba(46, 139, 87, 0.2);
+  position: relative;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Glow effect */
+.logoTextGlow {
+  color: #2e8b57;
+  font-weight: 800;
+  letter-spacing: 10px;
+  text-shadow: 
+    0 0 5px rgba(46, 139, 87, 0.5),
+    0 0 10px rgba(46, 139, 87, 0.3),
+    0 0 15px rgba(46, 139, 87, 0.2),
+    0 0 20px rgba(46, 139, 87, 0.1);
+  transition: all 0.3s ease;
+}
+
+.logoTextGlow:hover {
+  text-shadow: 
+    0 0 10px rgba(46, 139, 87, 0.8),
+    0 0 20px rgba(46, 139, 87, 0.6),
+    0 0 30px rgba(46, 139, 87, 0.4),
+    0 0 40px rgba(46, 139, 87, 0.2);
+  transform: scale(1.02);
+  letter-spacing: 12px;
+}

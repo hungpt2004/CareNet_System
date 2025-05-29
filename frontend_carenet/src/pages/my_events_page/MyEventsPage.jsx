@@ -368,11 +368,10 @@ function MyEventsPage() {
                initial="hidden"
                animate="visible"
                variants={containerVariants}
-               style={{ backgroundColor: 'white', minHeight: "100vh" }}
+               style={{ backgroundColor: "white", minHeight: "100vh", width: "100%" }}
             >
-               <Container className="py-4">
+               <Container>
                   
-                  <h2 className="text-center mb-4 mt-3">Quản Lý Ghi Danh</h2>
                   <motion.div variants={itemVariants}>
                      <Table
                         columns={columns}
@@ -395,7 +394,7 @@ function MyEventsPage() {
                         <Modal
                            show={showModal}
                            onHide={() => setShowModal(false)}
-                           size="lg"
+                           size="xl"
                         >
                            <motion.div
                               initial={{ opacity: 0, y: 50 }}

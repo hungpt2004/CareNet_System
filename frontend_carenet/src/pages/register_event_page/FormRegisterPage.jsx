@@ -170,9 +170,10 @@ function RegisterForm() {
    // Xử lý gửi biểu mẫu
    const handleSubmit = async (e) => {
       e.preventDefault();
-      e.stopPropagation();
-
+      console.log("Form submitted"); // Thêm log này để debug
+  
       if (validateForm()) {
+         console.log("Form valid, starting submission"); // Debug log
          setIsLoading(true);
          try {
             // Lấy danh sách câu hỏi từ eventData
@@ -240,20 +241,63 @@ function RegisterForm() {
          <div style={{ backgroundColor: "white", minHeight: "100vh" }}>
             <Container className="py-5">
                <Card className="border-0 shadow-sm p-4 mx-auto" style={{ maxWidth: "600px" }}>
-                  <div className="text-center mb-4">
-                     <div
-                        className="rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3"
-                        style={{
-                           width: "80px",
-                           height: "80px",
-                           backgroundColor: customStyles.primaryColor,
+                  <motion.div 
+                    className="text-center mb-4"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ 
+                      duration: 0.6,
+                      ease: "easeOut"
+                    }}
+                  >
+                    <motion.div
+                      className="rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3"
+                      style={{
+                        width: "80px",
+                        height: "80px",
+                        backgroundColor: customStyles.primaryColor,
+                      }}
+                      initial={{ scale: 0, rotate: -180 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      transition={{ 
+                        delay: 0.2,
+                        duration: 0.8,
+                        type: "spring",
+                        stiffness: 200,
+                        damping: 15
+                      }}
+                    >
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ 
+                          delay: 0.6,
+                          duration: 0.4,
+                          type: "spring",
+                          stiffness: 300
                         }}
-                     >
+                      >
                         <CheckCircle size={40} color="white" />
-                     </div>
-                     <h2>Đăng ký thành công!</h2>
-                     <p className="text-muted">Cảm ơn bạn đã đăng ký làm tình nguyện viên cho sự kiện này.</p>
-                  </div>
+                      </motion.div>
+                    </motion.div>
+                    
+                    <motion.h2
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4, duration: 0.5 }}
+                    >
+                      Đăng ký thành công!
+                    </motion.h2>
+                    
+                    <motion.p 
+                      className="text-muted"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.6, duration: 0.5 }}
+                    >
+                      Cảm ơn bạn đã đăng ký làm tình nguyện viên cho sự kiện này.
+                    </motion.p>
+                  </motion.div>
 
                   <Alert variant="success" className="mb-4">
                      <p className="mb-0">
@@ -475,7 +519,7 @@ function RegisterForm() {
                                                    value={formData.phone}
                                                    onChange={handleChange}
                                                    isInvalid={!!errors.phone}
-                                                   placeholder Gaga="Nhập số điện thoại"
+                                                   placeholder="Nhập số điện thoại"
                                                 />
                                                 <Form.Control.Feedback type="invalid">{errors.phone}</Form.Control.Feedback>
                                              </InputGroup>
@@ -672,15 +716,12 @@ function RegisterForm() {
                                        className="d-grid mt-4"
                                     >
                                        <Button
-                                          type="primary"
+                                          htmlType="submit"  // ✅ Thêm htmlType cho Antd Button
                                           size="large"
                                           disabled={isLoading}
-                                          style={{
-                                             backgroundColor: customStyles.primaryColor,
-                                             borderColor: customStyles.primaryColor,
-                                          }}
+                                          loading={isLoading}  // ✅ Thêm loading prop
                                        >
-                                          {isLoading ? <Spin size="small" /> : "Gửi đăng ký"}
+                                          Gửi đăng ký
                                        </Button>
                                     </motion.div>
                                  </Form>

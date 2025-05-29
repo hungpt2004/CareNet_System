@@ -5,7 +5,6 @@ import useAuthStore from "../../hooks/authStore";
 import { useNavigate } from "react-router-dom";
 import { FaBell } from "react-icons/fa";
 import io from 'socket.io-client';
-import axiosInstance from "../../utils/axiosInstance";
 
 const CustomNavbarLogged = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -150,13 +149,6 @@ const CustomNavbarLogged = () => {
       <Container fluid>
         <Navbar.Brand href="#home" className="fw-bold">
           <Row>
-            <Col><Image
-              src="/volunteer_img/Carenet.png"
-              alt="User"
-              className="rounded-circle me-2"
-              width="60"
-              height="60"
-            /></Col>
             <Col><h1 style={{ letterSpacing: '10px'}} className={`fw-bold ${styles.textPrimary}`}>CARENET</h1></Col>
           </Row>
         </Navbar.Brand>

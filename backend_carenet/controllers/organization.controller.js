@@ -439,7 +439,6 @@ exports.filterRequestsBySkills = asyncHandler(async (req, res) => {
 
 exports.getOwnStaff = asyncHandler(async (req, res) => {
   const currentUser = req.user.user;
-  console.log("Current user:", currentUser);
 
   try {
     // Kiểm tra user có organizationId không
@@ -452,7 +451,6 @@ exports.getOwnStaff = asyncHandler(async (req, res) => {
     }
 
     const organizer = await User.findOne({ _id: currentUser._id });
-    console.log("Organizer:", organizer);
 
     if (!organizer) {
       console.log("Organizer not found");
@@ -480,7 +478,6 @@ exports.getOwnStaff = asyncHandler(async (req, res) => {
       organizationId: organization._id,
       role: "staff",
     });
-    console.log("Found staff:", staff);
 
     return res.status(200).json({
       status: "success",
@@ -987,6 +984,7 @@ exports.getOrganizationMembers = asyncHandler(async (req, res) => {
     });
   }
 });
+
 exports.getEventsByOrganizationId = asyncHandler(async (req, res) => {
   try {
     const { organizationId } = req.query;
@@ -1019,6 +1017,50 @@ exports.getEventsByOrganizationId = asyncHandler(async (req, res) => {
 // Đọc file
 // Lấy tên 
 // Tạo mail
-exports.createStaffList = asyncHandler(async (req, res) => {
+exports.createStaffList = asyncHandler(async (req, res) => {})
 
-})
+exports.getOrganizationById = asyncHandler(async (req, res) => {
+  const currentUser = req.user.user;
+
+  console.log('---- THÔNG TIN TỔ CHỨC ----');
+  console.log(`Param organizationId: ${JSON.stringify(currentUser)}`);
+
+  try {
+    const organizationId = currentUser.organizationId;
+
+    console.log(`Organization ID: ${organizationId}`);
+
+    if (!organizationId) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Người dùng chưa thuộc tổ chức nào",
+      });
+    }
+
+    const organization = await Organization.findById(organizationId)
+      .populate("userId", "fullname email avatar")
+      .populate("levelId", "name description maxPost")
+      .lean();
+
+    if (!organization) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Không tìm thấy tổ chức",
+      });
+    }
+
+    console.log(`Dữ liệu organization ${organization.name}`, JSON.stringify(organization));
+
+    return res.status(200).json({
+      status: "success",
+      data: organization,
+    });
+
+  } catch (error) {
+    console.error("Error fetching organization:", error.message, error.stack);
+    return res.status(500).json({
+      status: "fail",
+      message: "Lỗi khi lấy thông tin tổ chức: " + error.message,
+    });
+  }
+});
