@@ -1,0 +1,296 @@
+/* UpgradePro.module.css */
+
+.mainContainer {
+  padding: 40px 20px;
+  max-width: 1200px;
+}
+
+.heading {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: all 0.6s ease-out;
+}
+
+.headingVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toggleContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 2rem;
+  gap: 10px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s ease-out;
+  transition-delay: 0.2s;
+}
+
+.toggleContainerVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toggleLabel {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.saveText {
+  color: #5DB996;
+  font-weight: 500;
+}
+
+.pricingCard {
+  border-radius: 12px;
+  border: 1px solid #eee;
+  padding: 24px;
+  height: 100%;
+  transform: translateY(30px);
+  opacity: 0;
+  transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  z-index: 1;
+}
+
+.pricingCardVisible {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.pricingCardFree {
+  transition-delay: 0.3s;
+}
+
+.pricingCardPro {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  transition-delay: 0.4s;
+  z-index: 2;
+}
+
+.pricingCardEnterprise {
+  transition-delay: 0.5s;
+}
+
+.pricingHeader {
+  margin-bottom: 20px;
+}
+
+.pricingTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #5DB996;
+}
+
+.price {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: baseline;
+  color: #2d3748;
+}
+
+.pricePeriod {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: normal;
+  margin-left: 5px;
+}
+
+.description {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.featureList {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 30px;
+}
+
+.featureItem {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.featureItem:hover {
+  transform: translateX(5px);
+}
+
+.checkIcon {
+  color: #5DB996;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.buttonBase {
+  width: 100%;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.buttonBase:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(93, 185, 150, 0.3);
+}
+
+.buttonFree {
+  composes: buttonBase;
+  border: 2px solid #5DB996;
+  color: #5DB996;
+  background-color: transparent;
+}
+
+.buttonFree:hover {
+  background-color: #5DB996;
+  color: white;
+}
+
+.buttonPro {
+  composes: buttonBase;
+  background-color: #5DB996;
+  color: white;
+}
+
+.buttonPro:hover {
+  background-color: #4a9d7a;
+}
+
+.buttonEnterprise {
+  composes: buttonFree;
+}
+
+.customText {
+  display: block;
+  font-size: 0.8rem;
+}
+
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 30px;
+  background-color: #5DB996;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.toggle:hover {
+  background-color: #4a9d7a;
+}
+
+.toggleInput {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggleSlider {
+  position: absolute;
+  top: 3px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: white;
+  transition: 0.3s;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.toggleSliderLeft {
+  left: 3px;
+}
+
+.toggleSliderRight {
+  left: 33px;
+}
+
+/* Animations */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+.proCard {
+  transition: all 0.3s ease;
+}
+
+.proCard:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15) !important;
+}
+
+.highlightPlan {
+  animation: pulse 3s ease-in-out infinite;
+}
+
+.featureAnimation {
+  opacity: 0;
+  animation: fadeIn 0.5s forwards;
+}
+
+/* Popular badge for Pro plan */
+.popularBadge {
+  position: absolute;
+  top: -10px;
+  right: 20px;
+  background: linear-gradient(45deg, #5DB996, #4a9d7a);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(93, 185, 150, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .mainContainer {
+    padding: 20px 10px;
+  }
+  
+  .heading {
+    font-size: 2rem;
+    color: black;
+  }
+  
+  .toggleContainer {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .pricingCard {
+    margin-bottom: 20px;
+  }
+}

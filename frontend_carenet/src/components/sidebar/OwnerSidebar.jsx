@@ -1,20 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Nav } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
-import {
-  Home,
-  Users,
-  BookOpen,
-  Calendar,
-  BarChart2,
-  Award,
-  MessageSquare,
-  DollarSign,
-  Layers,
-  Settings,
-  ChevronDown,
-  ChevronRight,
-} from "lucide-react";
+// import {
+//   Home,
+//   Users,
+//   BookOpen,
+//   Calendar,
+//   BarChart2,
+//   Award,
+//   MessageSquare,
+//   DollarSign,
+//   Layers,
+//   Settings,
+//   ChevronDown,
+//   ChevronRight,
+// } from "lucide-react";
 
 // Custom CSS variables for the color scheme
 const customStyles = {
@@ -22,8 +22,34 @@ const customStyles = {
   darkColor: "#2A3F54",
 };
 
+import { 
+  Home, Users, BookOpen, Calendar, BarChart2, Award, 
+  MessageSquare, DollarSign, Layers, Settings, ChevronDown, 
+  ChevronRight, Crown, Building2, LogOut 
+} from 'lucide-react';
+import useAuthStore from "../../hooks/authStore";
+// import styles from '../../css/OwnerSidebar.module.css';
+import OrganizationService from "../../services/organization-service/organization.service";
+
 const OwnerSidebar = ({ showSidebar, isMobile }) => {
   const [expandedMenus, setExpandedMenus] = useState({});
+  const { currentUser, logout } = useAuthStore();
+  const [currentOrganization, setCurrentOrganization] = useState();
+
+  console.log(`Organization ở SideBar: ${JSON.stringify(currentOrganization)}`);
+
+  const _orgService = new OrganizationService();
+
+  const fetchCurrentOrganization = async () => {
+    const {data} = await _orgService.fetchCurrentOrganization();
+    if (data) {
+      setCurrentOrganization(data);
+    }
+  }
+
+  useEffect(() => {
+    fetchCurrentOrganization();
+  }, []);
 
   // Toggle submenu
   const toggleSubmenu = (menuId) => {
@@ -108,6 +134,19 @@ const OwnerSidebar = ({ showSidebar, isMobile }) => {
                           <ChevronRight size={16} />
                         )}
                       </div>
+        {/* User Info */}
+        <div className={styles.sidebarUserInfo}>
+          <div className={styles.userAvatar}>
+            <img 
+              src={currentUser?.avatar || "https://i.pinimg.com/736x/8a/a9/c5/8aa9c5d8429f561000f1de8e7f6d5a32.jpg"} 
+              alt="Avatar" 
+            />
+          </div>
+          <div className={styles.userDetails}>
+            <h4 className={styles.userName}>{currentUser?.fullname || "Admin"}</h4>
+            <p className={styles.userRole}>Thành viên gói {currentOrganization?.levelId?.name}</p>
+          </div>
+        </div>
 
                       <div
                         className={`submenu ${

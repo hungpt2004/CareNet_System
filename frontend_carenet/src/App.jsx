@@ -40,11 +40,27 @@ import PaymentSuccessPage from './pages/payment_status_page/PaymentSuccessPage';
 import PaymentCancelPage from './pages/payment_status_page/PaymentCancelPage';
 import MyEventsPage from './pages/my_events_page/MyEventsPage';
 import AdminFeedbackPage from "./pages/admin_students_page/AdminFeedbackPage";
+// import OrganizationEvents from './pages/organization_post_page/OrganizationEventManagement';
+// import OrganizationDashboardPage from './pages/organization_dashboard_page/OrganizationDashboardPage';
+// import StaffAttendancePage from './pages/staff_attendance_page/StaffAttendancePage';
+// import OrganizationStaffManagement from './pages/organization_user_page/OrganizationStaffManagement';
+// import StaffLayout from './layout/StaffLayout';
+// import OrganizationRegisterPage from './pages/organization_register_page/OrganizationRegisterPage';
+// import AdminOrganizationsPending from './pages/admin_students_page/AdminOrganizationsPage';
+// import AdminEventsPending from './pages/admin_students_page/AdminEventsPage';
+// import OrganizationUserPending from './pages/organization_user_page/OrganizationUserPending';
+// import ChatPage from './pages/chat/ChatPage';
+// import ForumChatPage from './pages/forum_page/UserForumChatPage';
+// import CertificatePurchasePage from './pages/profile_page/CertificatePurchasePage';
+import { PaymentSuccessOrgPage } from './pages/payment_status_page/PaymentSuccessOrgPage';
+import { PaymentCancelOrgPage } from './pages/payment_status_page/PaymentCancelOrgPage';
 
 const guestRoutes = [
   { path: '/', element: <LandingPage /> },
   { path: '/search', element: <VolunteerEventSearch /> },
   { path: '/onboarding', element: <OnBoardingPage /> },
+  // { path: '/organization-register', element: <OrganizationRegisterPage /> },
+  // { path: '/chat', element: <ChatPage/> }
 ];
 
 const publicRoutes = [
@@ -52,6 +68,10 @@ const publicRoutes = [
   { path: '/forgot-password', element: <ForgotPasswordPage /> },
   { path: '/payment-success', element: <PaymentSuccessPage/> },
   { path: '/payment-cancel', element: <PaymentCancelPage/> },
+  { path: '/payment-success/:certificateId', element: <PaymentSuccessPage/> },
+  { path: '/payment-cancel/:certificateId', element: <PaymentCancelPage/> },
+  { path: '/payment-org-success', element: <PaymentSuccessOrgPage /> },
+  { path: '/payment-org-cancel', element: <PaymentCancelOrgPage /> }
 ]
 
 const privateCustomerRoutes = [

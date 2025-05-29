@@ -20,10 +20,6 @@ exports.authenticateToken = (req, res, next) => {
     }
     req.user = user; // Gắn thông tin người dùng vào req.user
 
-    console.log("Đã lưu user vào session")
-
-    console.log(user);
-
     next(); // Tiếp tục xử lý
   });
 };

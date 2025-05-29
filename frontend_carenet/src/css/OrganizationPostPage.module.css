@@ -1,0 +1,554 @@
+/* OrganizationPost.module.css */
+
+.pageContainer {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 24px;
+}
+
+.pageHeader {
+  text-align: center;
+  margin-bottom: 32px;
+  padding: 24px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.pageTitle {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2e8b57;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, #2e8b57, #5DB996);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.pageSubtitle {
+  font-size: 1.1rem;
+  color: #666;
+  margin: 0;
+}
+
+.mainCard {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.stepsContainer {
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  padding: 24px;
+  border-radius: 16px 16px 0 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.formContent {
+  padding: 32px;
+  background: white;
+}
+
+.stepContent {
+  margin-bottom: 24px;
+  animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.formSection {
+  margin-bottom: 32px;
+}
+
+.sectionTitle {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #2e8b57;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sectionIcon {
+  padding: 8px;
+  background: linear-gradient(135deg, #2e8b57, #5DB996);
+  color: white;
+  border-radius: 8px;
+}
+
+.formItem {
+  margin-bottom: 20px;
+}
+
+.formLabel {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.formInput {
+  border-radius: 8px;
+  border: 2px solid #e9ecef;
+  transition: all 0.3s ease;
+  padding: 12px 16px;
+}
+
+.formInput:focus {
+  border-color: #2e8b57;
+  box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.1);
+}
+
+.formTextarea {
+  border-radius: 8px;
+  border: 2px solid #e9ecef;
+  transition: all 0.3s ease;
+  padding: 12px 16px;
+  resize: vertical;
+}
+
+.formTextarea:focus {
+  border-color: #2e8b57;
+  box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.1);
+}
+
+.formSelect {
+  border-radius: 8px;
+}
+
+.mapContainer {
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.mapWrapper {
+  height: 300px;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.locationInputs {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.locationInput {
+  border-radius: 8px;
+  border: 2px solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+.locationInput:focus {
+  border-color: #2e8b57;
+  box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.1);
+}
+
+.questionBuilder {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.addQuestionSection {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.addQuestionButton {
+  background: linear-gradient(135deg, #2e8b57, #5DB996);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(46, 139, 87, 0.2);
+}
+
+.addQuestionButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(46, 139, 87, 0.3);
+  background: linear-gradient(135deg, #5DB996, #2e8b57);
+}
+
+.questionItem {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  border: 1px solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+.questionItem:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.questionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.deleteButton {
+  color: #dc3545;
+  border: 1px solid #dc3545;
+  background: transparent;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.deleteButton:hover {
+  background: #dc3545;
+  color: white;
+  transform: scale(1.05);
+}
+
+.optionsList {
+  margin-top: 12px;
+}
+
+.optionItem {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  border: 1px solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+.optionItem:hover {
+  background: #e9ecef;
+}
+
+.addOptionButton {
+  border: 2px dashed #2e8b57;
+  color: #2e8b57;
+  background: transparent;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  margin-top: 8px;
+}
+
+.addOptionButton:hover {
+  background: rgba(46, 139, 87, 0.1);
+  border-color: #5DB996;
+}
+
+.uploadSection {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+}
+
+.uploadTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16px;
+}
+
+.uploadArea {
+  border: 2px dashed #2e8b57;
+  border-radius: 12px;
+  padding: 24px;
+  background: white;
+  transition: all 0.3s ease;
+  margin-bottom: 16px;
+}
+
+.uploadArea:hover {
+  border-color: #5DB996;
+  background: rgba(46, 139, 87, 0.02);
+}
+
+.uploadButton {
+  background: linear-gradient(135deg, #2e8b57, #5DB996);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  padding: 12px 24px;
+  transition: all 0.3s ease;
+  margin-top: 16px;
+}
+
+.uploadButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(46, 139, 87, 0.3);
+  background: linear-gradient(135deg, #5DB996, #2e8b57);
+}
+
+.uploadButton:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.uploadedFiles {
+  margin-top: 20px;
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.uploadedFilesTitle {
+  color: #2e8b57;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.fileItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.fileItem:last-child {
+  border-bottom: none;
+}
+
+.fileIcon {
+  color: #2e8b57;
+}
+
+.fileLink {
+  color: #2e8b57;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.fileLink:hover {
+  color: #5DB996;
+  text-decoration: underline;
+}
+
+.navigationButtons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 32px;
+  background: #f8f9fa;
+  border-radius: 0 0 20px 20px;
+  border-top: 1px solid #e9ecef;
+}
+
+.prevButton {
+  background: transparent;
+  border: 2px solid #6c757d;
+  color: #6c757d;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  padding: 12px 24px;
+}
+
+.prevButton:hover {
+  background: #6c757d;
+  color: white;
+  transform: translateX(-2px);
+}
+
+.nextButton {
+  background: linear-gradient(135deg, #2e8b57, #5DB996);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  padding: 12px 24px;
+  box-shadow: 0 4px 12px rgba(46, 139, 87, 0.2);
+}
+
+.nextButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(46, 139, 87, 0.3);
+  background: linear-gradient(135deg, #5DB996, #2e8b57);
+}
+
+.buttonIcon {
+  margin: 0 4px;
+}
+
+.staffCard {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  border: 2px solid #e9ecef;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.staffCard:hover {
+  border-color: #2e8b57;
+  box-shadow: 0 4px 12px rgba(46, 139, 87, 0.1);
+}
+
+.staffCardSelected {
+  border-color: #2e8b57;
+  background: rgba(46, 139, 87, 0.05);
+}
+
+.infoCard {
+  background: linear-gradient(135deg, #e3f2fd, #f0f8ff);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #bbdefb;
+  margin-bottom: 20px;
+}
+
+.infoIcon {
+  color: #1976d2;
+  margin-right: 8px;
+}
+
+.errorMessage {
+  color: #dc3545;
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+
+.successMessage {
+  color: #28a745;
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+
+.loadingSpinner {
+  display: inline-block;
+  margin-right: 8px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Custom Antd overrides */
+.pageContainer :global(.ant-steps-item-title) {
+  font-weight: 600 !important;
+  color: #333 !important;
+}
+
+.pageContainer :global(.ant-steps-item-process .ant-steps-item-title) {
+  color: #2e8b57 !important;
+}
+
+.pageContainer :global(.ant-steps-item-finish .ant-steps-item-title) {
+  color: #2e8b57 !important;
+}
+
+.pageContainer :global(.ant-form-item-label > label) {
+  font-weight: 600;
+  color: #333;
+}
+
+.pageContainer :global(.ant-input:focus),
+.pageContainer :global(.ant-input-focused) {
+  border-color: #2e8b57;
+  box-shadow: 0 0 0 2px rgba(46, 139, 87, 0.2);
+}
+
+.pageContainer :global(.ant-select:not(.ant-select-disabled):hover .ant-select-selector) {
+  border-color: #2e8b57;
+}
+
+.pageContainer :global(.ant-select-focused .ant-select-selector) {
+  border-color: #2e8b57 !important;
+  box-shadow: 0 0 0 2px rgba(46, 139, 87, 0.2) !important;
+}
+
+.pageContainer :global(.ant-upload-list-picture-card .ant-upload-list-item) {
+  border-radius: 8px;
+}
+
+.pageContainer :global(.ant-upload-select-picture-card) {
+  border-radius: 8px;
+  border: 2px dashed #2e8b57;
+  background: rgba(46, 139, 87, 0.02);
+}
+
+.pageContainer :global(.ant-upload-select-picture-card:hover) {
+  border-color: #5DB996;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .pageContainer {
+    padding: 16px;
+  }
+  
+  .pageTitle {
+    font-size: 2rem;
+  }
+  
+  .formContent {
+    padding: 20px;
+  }
+  
+  .navigationButtons {
+    padding: 16px 20px;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .addQuestionSection {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  
+  .questionHeader {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pageTitle {
+    font-size: 1.5rem;
+  }
+  
+  .formContent {
+    padding: 16px;
+  }
+  
+  .locationInputs {
+    gap: 8px;
+  }
+}
