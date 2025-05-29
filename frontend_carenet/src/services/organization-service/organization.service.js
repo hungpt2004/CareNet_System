@@ -1,6 +1,8 @@
 import axiosInstance from "../../utils/AxiosInstance";
 
 export default class OrganizationService {
+
+   // 1. Fetch detail organization
    async fetchCurrentOrganization() {
       try {
          const response = await axiosInstance.get('organization/get-organization-info');
@@ -12,4 +14,6 @@ export default class OrganizationService {
          throw error;
       }
    }
+
+   
 }

@@ -19,7 +19,7 @@ import { CustomFailedToast, CustomSuccessToast, CustomToast } from '../../compon
 import { IoMdPerson } from 'react-icons/io';
 import { PlusOutlined } from '@ant-design/icons';
 import useAuthStore from "../../hooks/authStore";
-import styles from '../../css/AppColors.module.css';
+import styles from '../../css/OrganizationPostPage.module.css';
 import Title from 'antd/es/skeleton/Title';
 
 const { TextArea } = Input;
@@ -286,31 +286,50 @@ const OrganizationPostPage = () => {
       title: 'Thông tin cơ bản',
       icon: <Info size={20} />,
       content: (
-        <>
+        <div className={styles.formSection}>
+          <div className={styles.sectionTitle}>
+            <div className={styles.sectionIcon}>
+              <Info size={16} />
+            </div>
+            Thông tin cơ bản về sự kiện
+          </div>
+          
           <Form.Item
             name="title"
-            label="Tên sự kiện"
+            label={<div className={styles.formLabel}>Tên sự kiện</div>}
             rules={[{ required: true, message: 'Vui lòng nhập tên sự kiện!' }]}
+            className={styles.formItem}
           >
-            <Input placeholder="Nhập tên sự kiện" />
+            <Input 
+              placeholder="Nhập tên sự kiện" 
+              className={styles.formInput}
+              size="large"
+            />
           </Form.Item>
 
           <Form.Item
             name="description"
-            label="Mô tả"
+            label={<div className={styles.formLabel}>Mô tả</div>}
             rules={[{ required: true, message: 'Vui lòng nhập mô tả!' }]}
+            className={styles.formItem}
           >
-            <TextArea rows={4} placeholder="Mô tả chi tiết về sự kiện" />
+            <TextArea 
+              rows={4} 
+              placeholder="Mô tả chi tiết về sự kiện" 
+              className={styles.formTextarea}
+            />
           </Form.Item>
 
           <Form.Item
             name="category"
-            label="Danh mục"
+            label={<div className={styles.formLabel}>Danh mục</div>}
             rules={[{ required: true, message: 'Vui lòng chọn hoặc tạo danh mục!' }]}
+            className={styles.formItem}
           >
             <Select
               placeholder="Chọn hoặc tạo danh mục mới"
-              style={{ width: '100%' }}
+              className={styles.formSelect}
+              size="large"
               options={[
                 { value: 'Giáo dục', label: 'Giáo dục' },
                 { value: 'Y tế', label: 'Y tế' },
@@ -329,13 +348,15 @@ const OrganizationPostPage = () => {
 
           <Form.Item
             name="skills"
-            label="Kỹ năng yêu cầu"
+            label={<div className={styles.formLabel}>Kỹ năng yêu cầu</div>}
             rules={[{ required: true, message: 'Vui lòng chọn hoặc tạo kỹ năng!' }]}
+            className={styles.formItem}
           >
             <Select
               mode="tags"
               placeholder="Nhập kỹ năng cần thiết"
-              style={{ width: '100%' }}
+              className={styles.formSelect}
+              size="large"
               tokenSeparators={[',']}
               options={[
                 { value: 'Giao tiếp', label: 'Giao tiếp' },
@@ -355,12 +376,14 @@ const OrganizationPostPage = () => {
 
           <Form.Item
             name="staffId"
-            label="Nhân viên phụ trách"
+            label={<div className={styles.formLabel}>Nhân viên phụ trách</div>}
             rules={[{ required: true, message: 'Vui lòng chọn nhân viên phụ trách!' }]}
+            className={styles.formItem}
           >
             <Select
               placeholder="Chọn nhân viên phụ trách"
-              style={{ width: '100%' }}
+              className={styles.formSelect}
+              size="large"
               onChange={handleStaffChange}
             >
               {staffList.map(staff => (
@@ -370,73 +393,100 @@ const OrganizationPostPage = () => {
               ))}
             </Select>
           </Form.Item>
-        </>
+        </div>
       )
     },
     {
       title: 'Thời gian & Địa điểm',
       icon: <Calendar size={20} />,
       content: (
-        <>
+        <div className={styles.formSection}>
+          <div className={styles.sectionTitle}>
+            <div className={styles.sectionIcon}>
+              <Calendar size={16} />
+            </div>
+            Thời gian và địa điểm tổ chức
+          </div>
+
           <Form.Item
             name="timeRange"
-            label="Thời gian diễn ra"
+            label={<div className={styles.formLabel}>Thời gian diễn ra</div>}
             rules={[{ required: true, message: 'Vui lòng chọn thời gian!' }]}
+            className={styles.formItem}
           >
             <RangePicker 
               showTime 
               format="YYYY-MM-DD HH:mm"
+              size="large"
               style={{ width: '100%' }}
             />
           </Form.Item>
 
-          <Form.Item label="Địa điểm">
-            <MapContainer 
-              center={[location.latitude, location.longitude]} 
-              zoom={13} 
-              style={{ height: "300px", width: "100%", marginBottom: "16px" }}
-            >
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              />
-              <LocationSelector onLocationChange={handleLocationChange} />
-              {location.latitude && location.longitude && (
-                <Marker position={[location.latitude, location.longitude]} />
-              )}
-            </MapContainer>
+          <Form.Item label={<div className={styles.formLabel}>Địa điểm</div>}>
+            <div className={styles.mapContainer}>
+              <MapContainer 
+                center={[location.latitude, location.longitude]} 
+                zoom={13} 
+                className={styles.mapWrapper}
+              >
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                />
+                <LocationSelector onLocationChange={handleLocationChange} />
+                {location.latitude && location.longitude && (
+                  <Marker position={[location.latitude, location.longitude]} />
+                )}
+              </MapContainer>
+            </div>
 
-            <Space direction="vertical" style={{ width: '100%' }}>
+            <div className={styles.locationInputs}>
               <Form.Item
                 name={['location', 'street']}
                 rules={[{ required: true, message: 'Vui lòng nhập địa chỉ!' }]}
               >
-                <Input placeholder="Số nhà, tên đường" />
+                <Input 
+                  placeholder="Số nhà, tên đường" 
+                  className={styles.locationInput}
+                  size="large"
+                />
               </Form.Item>
 
               <Form.Item
                 name={['location', 'ward']}
                 rules={[{ required: true, message: 'Vui lòng nhập phường/xã!' }]}
               >
-                <Input placeholder="Phường/Xã" />
+                <Input 
+                  placeholder="Phường/Xã" 
+                  className={styles.locationInput}
+                  size="large"
+                />
               </Form.Item>
 
               <Form.Item
                 name={['location', 'district']}
                 rules={[{ required: true, message: 'Vui lòng nhập quận/huyện!' }]}
               >
-                <Input placeholder="Quận/Huyện" />
+                <Input 
+                  placeholder="Quận/Huyện" 
+                  className={styles.locationInput}
+                  size="large"
+                />
               </Form.Item>
 
               <Form.Item
                 name={['location', 'province']}
                 rules={[{ required: true, message: 'Vui lòng nhập tỉnh/thành phố!' }]}
               >
-                <Input placeholder="Tỉnh/Thành phố" />
+                <Input 
+                  placeholder="Tỉnh/Thành phố" 
+                  className={styles.locationInput}
+                  size="large"
+                />
               </Form.Item>
-            </Space>
+            </div>
           </Form.Item>
-        </>
+        </div>
       )
     },
     {
@@ -521,12 +571,20 @@ const OrganizationPostPage = () => {
       title: 'Form đăng ký',
       icon: <HelpCircle size={20} />,
       content: (
-        <>
-          <div className="mb-4">
-            <Space>
+        <div className={styles.formSection}>
+          <div className={styles.sectionTitle}>
+            <div className={styles.sectionIcon}>
+              <HelpCircle size={16} />
+            </div>
+            Tạo form đăng ký cho tình nguyện viên
+          </div>
+
+          <div className={styles.questionBuilder}>
+            <div className={styles.addQuestionSection}>
               <Select
                 style={{ width: 200 }}
                 placeholder="Chọn loại câu hỏi"
+                size="large"
                 onChange={(type) => {
                   const newQuestion = {
                     question: '',
@@ -542,66 +600,56 @@ const OrganizationPostPage = () => {
                 <Select.Option value="dropdown">Câu hỏi dropdown</Select.Option>
               </Select>
               <Tooltip title="Thêm câu hỏi mới">
-                <Button type="primary" icon={<PlusOutlined />}>
+                <Button 
+                  className={styles.addQuestionButton}
+                  icon={<PlusOutlined />}
+                  size="large"
+                >
                   Thêm câu hỏi
                 </Button>
               </Tooltip>
-            </Space>
-          </div>
+            </div>
 
-          <List
-            dataSource={questions}
-            renderItem={(question, index) => (
-              <List.Item
-                actions={[
-                  <Button 
-                    type="text" 
-                    danger 
-                    icon={<Trash2 size={16} />}
-                    onClick={() => {
-                      const newQuestions = [...questions];
-                      newQuestions.splice(index, 1);
-                      setQuestions(newQuestions);
-                    }}
-                  />
-                ]}
-              >
-                <div style={{ width: '100%' }}>
-                  <Form.Item
-                    label="Câu hỏi"
-                    required
-                    style={{ marginBottom: 8 }}
-                  >
-                    <Input
-                      value={question.question}
-                      onChange={(e) => {
+            <List
+              dataSource={questions}
+              renderItem={(question, index) => (
+                <div className={styles.questionItem}>
+                  <div className={styles.questionHeader}>
+                    <Form.Item
+                      label="Câu hỏi"
+                      required
+                      style={{ marginBottom: 8, flex: 1 }}
+                    >
+                      <Input
+                        value={question.question}
+                        onChange={(e) => {
+                          const newQuestions = [...questions];
+                          newQuestions[index].question = e.target.value;
+                          setQuestions(newQuestions);
+                        }}
+                        placeholder="Nhập câu hỏi"
+                        className={styles.formInput}
+                        size="large"
+                      />
+                    </Form.Item>
+                    <Button 
+                      className={styles.deleteButton}
+                      icon={<Trash2 size={16} />}
+                      onClick={() => {
                         const newQuestions = [...questions];
-                        newQuestions[index].question = e.target.value;
+                        newQuestions.splice(index, 1);
                         setQuestions(newQuestions);
                       }}
-                      placeholder="Nhập câu hỏi"
-                    />
-                  </Form.Item>
+                    >
+                      Xóa
+                    </Button>
+                  </div>
 
                   {question.type !== 'text' && (
                     <Form.Item label="Các lựa chọn" required>
-                      <List
-                        dataSource={question.options}
-                        renderItem={(option, optionIndex) => (
-                          <List.Item
-                            actions={[
-                              <Button
-                                type="text"
-                                danger
-                                icon={<Trash2 size={16} />}
-                                onClick={() => {
-                                  const newQuestions = [...questions];
-                                  newQuestions[index].options.splice(optionIndex, 1);
-                                  setQuestions(newQuestions);
-                                }}
-                              />
-                            ]}
-                          >
+                      <div className={styles.optionsList}>
+                        {question.options.map((option, optionIndex) => (
+                          <div key={optionIndex} className={styles.optionItem}>
                             <Input
                               value={option}
                               onChange={(e) => {
@@ -610,105 +658,133 @@ const OrganizationPostPage = () => {
                                 setQuestions(newQuestions);
                               }}
                               placeholder="Nhập lựa chọn"
+                              suffix={
+                                <Button
+                                  type="text"
+                                  danger
+                                  icon={<Trash2 size={16} />}
+                                  onClick={() => {
+                                    const newQuestions = [...questions];
+                                    newQuestions[index].options.splice(optionIndex, 1);
+                                    setQuestions(newQuestions);
+                                  }}
+                                />
+                              }
                             />
-                          </List.Item>
-                        )}
-                      />
+                          </div>
+                        ))}
+                      </div>
                       <Button
-                        type="dashed"
+                        className={styles.addOptionButton}
                         onClick={() => {
                           const newQuestions = [...questions];
                           newQuestions[index].options.push('');
                           setQuestions(newQuestions);
                         }}
                         icon={<PlusOutlined />}
-                        style={{ marginTop: 8 }}
+                        block
                       >
                         Thêm lựa chọn
                       </Button>
                     </Form.Item>
                   )}
                 </div>
-              </List.Item>
-            )}
-          />
-        </>
+              )}
+            />
+          </div>
+        </div>
       )
     },
     {
       title: 'Hình ảnh & Tài nguyên',
       icon: <Upload size={20} />,
       content: (
-        <>
-          <div className="mb-4">
-            <div className="mb-4">
-              <h4>Hình ảnh sự kiện</h4>
-              <div>
-                <AntUpload
-                  listType="picture-card"
-                  multiple
-                  fileList={eventImageFileList}
-                  beforeUpload={() => false}
-                  onChange={({ fileList }) => setEventImageFileList(fileList)}
-                >
-                  {eventImageFileList.length >= 10 ? null : (
-                    <div>
-                      <Upload size={20} />
-                      <div style={{ marginTop: 8 }}>Tải lên</div>
-                    </div>
-                  )}
-                </AntUpload>
-                <Button 
-                  type="primary" 
-                  onClick={handleEventImageSubmit}
-                  loading={eventImageLoading}
-                  style={{ marginTop: 16 }}
-                  disabled={!eventId}
-                >
-                  Tải lên ảnh sự kiện
-                </Button>
-              </div>
+        <div className={styles.formSection}>
+          <div className={styles.sectionTitle}>
+            <div className={styles.sectionIcon}>
+              <Upload size={16} />
             </div>
-
-            {eventImages.length > 0 && (
-                  <Card className={`mt-4 ${styles.containerSecondary}`}>
-                     <Title level={5} className={styles.textPrimary}>
-                        Giấy tờ đã tải lên
-                     </Title>
-                     <List
-                        dataSource={eventImages}
-                        renderItem={(url) => (
-                           <List.Item>
-                              <Space>
-                                 <FileText size={16} className={styles.textPrimary} />
-                                 <a href={url} target="_blank" rel="noopener noreferrer">
-                                    {url.split('/').pop()}
-                                 </a>
-                              </Space>
-                           </List.Item>
-                        )}
-                     />
-                  </Card>
-               )}
+            Hình ảnh và tài nguyên sự kiện
           </div>
-        </>
+
+          <div className={styles.uploadSection}>
+            <div className={styles.uploadTitle}>Hình ảnh sự kiện</div>
+            <div className={styles.uploadArea}>
+              <AntUpload
+                listType="picture-card"
+                multiple
+                fileList={eventImageFileList}
+                beforeUpload={() => false}
+                onChange={({ fileList }) => setEventImageFileList(fileList)}
+              >
+                {eventImageFileList.length >= 10 ? null : (
+                  <div>
+                    <Upload size={20} />
+                    <div style={{ marginTop: 8 }}>Tải lên</div>
+                  </div>
+                )}
+              </AntUpload>
+            </div>
+            <Button 
+              className={styles.uploadButton}
+              onClick={handleEventImageSubmit}
+              loading={eventImageLoading}
+              disabled={!eventId}
+              icon={eventImageLoading ? <div className={styles.loadingSpinner}>⟳</div> : <Upload size={16} />}
+            >
+              {eventImageLoading ? 'Đang tải lên...' : 'Tải lên ảnh sự kiện'}
+            </Button>
+          </div>
+
+          {eventImages.length > 0 && (
+            <div className={styles.uploadedFiles}>
+              <div className={styles.uploadedFilesTitle}>
+                Hình ảnh đã tải lên
+              </div>
+              <List
+                dataSource={eventImages}
+                renderItem={(url) => (
+                  <div className={styles.fileItem}>
+                    <FileText size={16} className={styles.fileIcon} />
+                    <a 
+                      href={url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className={styles.fileLink}
+                    >
+                      {url.split('/').pop()}
+                    </a>
+                  </div>
+                )}
+              />
+            </div>
+          )}
+        </div>
       )
     }
   ];
 
   return (
-    <div className="p-4">
-      <h2>Đăng Ký Sự Kiện Tình Nguyện</h2>
+    <div className={styles.pageContainer}>
+      <div className={styles.pageHeader}>
+        <h1 className={styles.pageTitle}>Đăng Ký Sự Kiện Tình Nguyện</h1>
+        <p className={styles.pageSubtitle}>
+          Tạo sự kiện tình nguyện ý nghĩa và kết nối với cộng đồng
+        </p>
+      </div>
+
       <CustomToast />
-      <Card>
-        <Steps
-          current={currentStep}
-          items={steps.map(item => ({
-            title: item.title,
-            icon: item.icon
-          }))}
-          style={{ marginBottom: 24 }}
-        />
+      
+      <Card className={styles.mainCard}>
+        <div className={styles.stepsContainer}>
+          <Steps
+            current={currentStep}
+            items={steps.map(item => ({
+              title: item.title,
+              icon: item.icon
+            }))}
+          />
+        </div>
 
         <Form
           form={form}
@@ -717,14 +793,20 @@ const OrganizationPostPage = () => {
           onValuesChange={handleFormValuesChange}
           initialValues={formValues}
         >
-          <div style={{ marginBottom: 24 }}>
-            {steps[currentStep].content}
+          <div className={styles.formContent}>
+            <div className={styles.stepContent}>
+              {steps[currentStep].content}
+            </div>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div className={styles.navigationButtons}>
             {currentStep > 0 && (
-              <Button onClick={handlePrev}>
-                <ArrowLeft size={16} className="me-2" />
+              <Button 
+                onClick={handlePrev}
+                className={styles.prevButton}
+                icon={<ArrowLeft size={16} />}
+                size="large"
+              >
                 Quay lại
               </Button>
             )}
@@ -732,11 +814,12 @@ const OrganizationPostPage = () => {
               <Button 
                 type="primary" 
                 onClick={handleNext} 
-                style={{ backgroundColor: '#2e8b57', borderColor: '#2e8b57' }}
+                className={styles.nextButton}
                 loading={currentStep === steps.length - 2 && loading}
+                icon={currentStep !== steps.length - 2 ? <ArrowRight size={16} /> : <Check size={16} />}
+                size="large"
               >
                 {currentStep === steps.length - 2 ? 'Hoàn tất' : 'Tiếp theo'}
-                {currentStep !== steps.length - 2 && <ArrowRight size={16} className="ms-2" />}
               </Button>
             )}
           </div>

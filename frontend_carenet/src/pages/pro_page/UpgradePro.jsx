@@ -89,7 +89,6 @@ const UpgradePro = () => {
           Bảng Giá Dịch Vụ
         </h1>
 
-        
 
         <Row className="g-4">
           {/* Free Plan */}
