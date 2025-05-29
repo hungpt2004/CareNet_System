@@ -878,4 +878,7 @@ exports.getOrganizationById = asyncHandler(async (req, res) => {
       message: "Lỗi khi lấy thông tin tổ chức: " + error.message,
     });
   }
+
+
+  
 });
