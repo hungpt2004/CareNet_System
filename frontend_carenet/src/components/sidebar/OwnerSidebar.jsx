@@ -28,7 +28,7 @@ import {
   ChevronRight, Crown, Building2, LogOut 
 } from 'lucide-react';
 import useAuthStore from "../../hooks/authStore";
-// import styles from '../../css/OwnerSidebar.module.css';
+import styles from '../../css/OwnerSidebar.module.css';
 import OrganizationService from "../../services/organization-service/organization.service";
 
 const OwnerSidebar = ({ showSidebar, isMobile }) => {

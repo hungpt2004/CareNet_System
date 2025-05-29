@@ -1,98 +1,325 @@
-import React, { useState, useRef } from 'react';
-import { Container, Row, Col, Form, Button, Card, ProgressBar } from 'react-bootstrap';
-import { 
-  Info, MapPin, Upload, Users, Target, 
-  ArrowRight, ArrowLeft, Check 
-} from 'lucide-react';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
-import axiosInstance from '../../utils/AxiosInstance';
-import { CustomFailedToast, CustomSuccessToast, CustomToast } from '../../components/toast/CustomToast';
-import { IoMdPerson } from 'react-icons/io';
-import { PlusOutlined } from '@ant-design/icons';
+import React, { useState, useEffect } from "react";
+import {
+  Info,
+  MapPin,
+  Upload,
+  Users,
+  Target,
+  ArrowRight,
+  ArrowLeft,
+  Check,
+  Calendar,
+  Clock,
+  DollarSign,
+  Gift,
+  Phone,
+  Mail,
+  Plus,
+  Trash2,
+  HelpCircle,
+  FileText,
+} from "lucide-react";
+import {
+  Form,
+  Input,
+  Button,
+  Card,
+  Steps,
+  Select,
+  DatePicker,
+  InputNumber,
+  Upload as AntUpload,
+  message,
+  Space,
+  Divider,
+  List,
+  Tooltip,
+} from "antd";
+import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+import axiosInstance from "../../utils/AxiosInstance";
+import {
+  CustomFailedToast,
+  CustomSuccessToast,
+  CustomToast,
+} from "../../components/toast/CustomToast";
+import { IoMdPerson } from "react-icons/io";
+import { PlusOutlined } from "@ant-design/icons";
 import useAuthStore from "../../hooks/authStore";
-import styles from '../../css/OrganizationPostPage.module.css';
-import Title from 'antd/es/skeleton/Title';
+import styles from "../../css/OrganizationPostPage.module.css";
+import Title from "antd/es/skeleton/Title";
 
-// Hoặc nếu trên Vite, bạn có thể dùng:
+const { TextArea } = Input;
+const { RangePicker } = DatePicker;
+
+// Leaflet icon setup
 let DefaultIcon = L.icon({
-    iconUrl: '/node_modules/leaflet/dist/images/marker-icon.png',
-    shadowUrl: '/node_modules/leaflet/dist/images/marker-shadow.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41]
+  iconUrl: "/node_modules/leaflet/dist/images/marker-icon.png",
+  shadowUrl: "/node_modules/leaflet/dist/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
 });
 L.Marker.prototype.options.icon = DefaultIcon;
-const OrganizationPostPage = () => {
-  const [step, setStep] = useState(1);
-  const [eventData, setEventData] = useState({
-    basicInfo: {
-      title: '',
-      description: '',
-      category: ''
+
+// LocationSelector component
+const LocationSelector = ({ onLocationChange }) => {
+  useMapEvents({
+    click: (e) => {
+      const { lat, lng } = e.latlng;
+      onLocationChange(lat, lng);
     },
-    location: {
-      latitude: 10.7756, // Tọa độ mặc định Việt Nam
-      longitude: 106.7137,
-      address: ''
-    },
-    images: [],
-    participation: {
-      volunteerTarget: 0,
-      donationTarget: 0
-    },
-    requiredItems: [],
-    contact: {
-      name: '',
-      phone: '',
-      email: ''
-    }
   });
 
-  const LocationSelector = () => {
-    useMapEvents({
-      click: (e) => {
-        const { lat, lng } = e.latlng;
-        setEventData(prev => ({
-          ...prev,
-          location: {
-            ...prev.location,
-            latitude: lat,
-            longitude: lng
-          }
-        }));
+  return null;
+};
+
+const OrganizationPostPage = () => {
+  const [form] = Form.useForm();
+  const [imageForm] = Form.useForm();
+  const [currentStep, setCurrentStep] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [eventImageLoading, setEventImageLoading] = useState(false);
+  const [questions, setQuestions] = useState([]);
+  const [staffList, setStaffList] = useState([]);
+  const [customCategories, setCustomCategories] = useState([]);
+  const [customSkills, setCustomSkills] = useState([]);
+  const [eventId, setEventId] = useState(null);
+  const [location, setLocation] = useState({
+    street: "",
+    ward: "",
+    district: "",
+    province: "",
+    latitude: 10.7756,
+    longitude: 106.7137,
+  });
+  const currentUser = useAuthStore((state) => state.currentUser);
+  const [selectedStaff, setSelectedStaff] = useState(null);
+  const [eventImages, setEventImages] = useState([]);
+  const [eventImageFileList, setEventImageFileList] = useState([]);
+  const [formValues, setFormValues] = useState({
+    title: "",
+    description: "",
+    category: "",
+    skills: [],
+    staffId: "",
+    timeRange: null,
+    location: {
+      street: "",
+      ward: "",
+      district: "",
+      province: "",
+    },
+    maxParticipants: 1,
+    donationTarget: 0,
+    contact: {
+      name: currentUser?.fullname || "",
+      phone: currentUser?.phone || "",
+      email: currentUser?.email || "",
+      checker: "",
+    },
+    questions: [],
+  });
+
+  // Hiện tại console ở đây
+  console.log(JSON.stringify(formValues, null, 2));
+  console.log(JSON.stringify(questions, null, 2));
+
+  // Update form values when currentUser changes
+  useEffect(() => {
+    if (currentUser) {
+      setFormValues((prev) => ({
+        ...prev,
+        contact: {
+          ...prev.contact,
+          name: currentUser.fullname,
+          phone: currentUser.phone,
+          email: currentUser.email,
+        },
+      }));
+    }
+  }, [currentUser]);
+
+  // Update form values when staff is selected
+  useEffect(() => {
+    if (selectedStaff) {
+      form.setFieldsValue({
+        staffId: selectedStaff._id,
+        contact: {
+          ...formValues.contact,
+          checker: selectedStaff.email,
+        },
+      });
+    }
+  }, [selectedStaff, form]);
+
+  // Update form values when questions change
+  useEffect(() => {
+    setFormValues((prev) => ({
+      ...prev,
+      formData: {
+        questions: questions.map((q) => ({
+          question: q.question,
+          type: q.type,
+          options: q.type === "text" ? [] : q.options || [],
+        })),
+      },
+    }));
+  }, [questions]);
+
+  const handleFormValuesChange = (changedValues, allValues) => {
+    console.log("Form values changed:", allValues);
+    setFormValues((prev) => ({
+      ...prev,
+      ...allValues,
+    }));
+
+    if (changedValues.location) {
+      setLocation((prev) => ({
+        ...prev,
+        ...changedValues.location,
+      }));
+    }
+  };
+
+  // Fetch staff list when component mounts
+  useEffect(() => {
+    fetchStaffList();
+  }, []);
+
+  const fetchStaffList = async () => {
+    try {
+      const response = await axiosInstance.get("/organization/get-owned-staff");
+      if (response.data.status === "success") {
+        setStaffList(response.data.staff);
+      }
+    } catch (error) {
+      console.error("Error fetching staff:", error);
+      message.error("Không thể tải danh sách nhân viên");
+    }
+  };
+
+  const handleLocationChange = (lat, lng) => {
+    setLocation((prev) => ({
+      ...prev,
+      latitude: lat,
+      longitude: lng,
+    }));
+  };
+
+  // Handle staff selection change
+  const handleStaffChange = (staffId) => {
+    const staff = staffList.find((s) => s._id === staffId);
+    setSelectedStaff(staff);
+    setFormValues((prev) => ({
+      ...prev,
+      staffId: staffId,
+      contact: {
+        ...prev.contact,
+        checker: staff?.email || "",
+      },
+    }));
+  };
+
+  const handleNext = () => {
+    form.validateFields().then(() => {
+      if (currentStep === steps.length - 2) {
+        // Nếu đang ở bước form đăng ký (bước cuối trước upload ảnh)
+        handleSubmit();
+      } else {
+        setCurrentStep(currentStep + 1);
       }
     });
-
-    return eventData.location.latitude ? (
-      <Marker 
-        position={[
-          eventData.location.latitude, 
-          eventData.location.longitude
-        ]} 
-      />
-    ) : null;
   };
 
-  const handleImageUpload = (e) => {
-    const files = Array.from(e.target.files);
-    const imageUrls = files.map(file => URL.createObjectURL(file));
-    setEventData(prev => ({
-      ...prev,
-      images: [...prev.images, ...imageUrls]
-    }));
+  const handlePrev = () => {
+    setCurrentStep(currentStep - 1);
   };
 
-  const handleAddRequiredItem = () => {
-    setEventData(prev => ({
-      ...prev,
-      requiredItems: [...prev.requiredItems, '']
-    }));
+  const handleEventImageSubmit = async () => {
+    try {
+      setEventImageLoading(true);
+      const formData = new FormData();
+
+      if (eventImageFileList && eventImageFileList.length > 0) {
+        eventImageFileList.forEach((file) => {
+          if (file.originFileObj) {
+            formData.append("images", file.originFileObj);
+          }
+        });
+      }
+
+      if (!eventId) {
+        CustomFailedToast("Vui lòng tạo sự kiện trước khi upload ảnh!");
+        return;
+      }
+
+      formData.append("eventId", eventId);
+
+      const response = await axiosInstance.post(
+        "/images/upload-event-images",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (response.data.status === "success") {
+        CustomSuccessToast("Tải lên ảnh sự kiện thành công!");
+        setEventImages(response.data.images.map((img) => img.url));
+        setEventImageFileList([]);
+        imageForm.resetFields();
+      }
+    } catch (error) {
+      console.error("Error uploading event images:", error);
+      CustomFailedToast("Tải lên ảnh sự kiện thất bại!");
+    } finally {
+      setEventImageLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const fetchValue = async () => {
+      const currentValue = await form.getFieldsValue();
+      console.log(`Data in form ${JSON.stringify(currentValue, null, 2)}`);
+    };
+
+    fetchValue();
+  }, [form]);
+
+  const handleSubmit = async () => {
+    try {
+      setLoading(true);
+
+      const values = await form.validateFields();
+      console.log("Form values before submit:", formValues);
+      console.log("Questions before submit:", questions);
+
+      const response = await axiosInstance.post(
+        "/organization/create-events",
+        formValues
+      );
+
+      console.log(JSON.stringify(response.data, null, 2));
+
+      if (response.data.status === "success" && response.data.event) {
+        CustomSuccessToast("Tạo sự kiện thành công!");
+        setEventId(response.data.event._id);
+        setCurrentStep(currentStep + 1); // Chuyển sang bước upload ảnh
+      }
+    } catch (error) {
+      console.error("Error creating event:", error);
+      CustomFailedToast(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const steps = [
     {
-      title: 'Thông tin cơ bản',
+      title: "Thông tin cơ bản",
       icon: <Info size={20} />,
       content: (
         <div className={styles.formSection}>
@@ -102,15 +329,15 @@ const OrganizationPostPage = () => {
             </div>
             Thông tin cơ bản về sự kiện
           </div>
-          
+
           <Form.Item
             name="title"
             label={<div className={styles.formLabel}>Tên sự kiện</div>}
-            rules={[{ required: true, message: 'Vui lòng nhập tên sự kiện!' }]}
+            rules={[{ required: true, message: "Vui lòng nhập tên sự kiện!" }]}
             className={styles.formItem}
           >
-            <Input 
-              placeholder="Nhập tên sự kiện" 
+            <Input
+              placeholder="Nhập tên sự kiện"
               className={styles.formInput}
               size="large"
             />
@@ -119,12 +346,12 @@ const OrganizationPostPage = () => {
           <Form.Item
             name="description"
             label={<div className={styles.formLabel}>Mô tả</div>}
-            rules={[{ required: true, message: 'Vui lòng nhập mô tả!' }]}
+            rules={[{ required: true, message: "Vui lòng nhập mô tả!" }]}
             className={styles.formItem}
           >
-            <TextArea 
-              rows={4} 
-              placeholder="Mô tả chi tiết về sự kiện" 
+            <TextArea
+              rows={4}
+              placeholder="Mô tả chi tiết về sự kiện"
               className={styles.formTextarea}
             />
           </Form.Item>
@@ -132,7 +359,9 @@ const OrganizationPostPage = () => {
           <Form.Item
             name="category"
             label={<div className={styles.formLabel}>Danh mục</div>}
-            rules={[{ required: true, message: 'Vui lòng chọn hoặc tạo danh mục!' }]}
+            rules={[
+              { required: true, message: "Vui lòng chọn hoặc tạo danh mục!" },
+            ]}
             className={styles.formItem}
           >
             <Select
@@ -140,12 +369,16 @@ const OrganizationPostPage = () => {
               className={styles.formSelect}
               size="large"
               options={[
-                { value: 'Giáo dục', label: 'Giáo dục' },
-                { value: 'Y tế', label: 'Y tế' },
-                { value: 'Môi trường', label: 'Môi trường' },
-                { value: 'Cộng đồng', label: 'Cộng đồng' },
-                { value: 'Trẻ em', label: 'Trẻ em' },
-                ...customCategories.map(cat => ({ value: cat, label: cat, key: cat }))
+                { value: "Giáo dục", label: "Giáo dục" },
+                { value: "Y tế", label: "Y tế" },
+                { value: "Môi trường", label: "Môi trường" },
+                { value: "Cộng đồng", label: "Cộng đồng" },
+                { value: "Trẻ em", label: "Trẻ em" },
+                ...customCategories.map((cat) => ({
+                  value: cat,
+                  label: cat,
+                  key: cat,
+                })),
               ]}
               onSelect={(value) => {
                 if (!customCategories.includes(value)) {
@@ -158,7 +391,9 @@ const OrganizationPostPage = () => {
           <Form.Item
             name="skills"
             label={<div className={styles.formLabel}>Kỹ năng yêu cầu</div>}
-            rules={[{ required: true, message: 'Vui lòng chọn hoặc tạo kỹ năng!' }]}
+            rules={[
+              { required: true, message: "Vui lòng chọn hoặc tạo kỹ năng!" },
+            ]}
             className={styles.formItem}
           >
             <Select
@@ -166,14 +401,17 @@ const OrganizationPostPage = () => {
               placeholder="Nhập kỹ năng cần thiết"
               className={styles.formSelect}
               size="large"
-              tokenSeparators={[',']}
+              tokenSeparators={[","]}
               options={[
-                { value: 'Giao tiếp', label: 'Giao tiếp' },
-                { value: 'Lãnh đạo', label: 'Lãnh đạo' },
-                { value: 'Làm việc nhóm', label: 'Làm việc nhóm' },
-                { value: 'Giảng dạy', label: 'Giảng dạy' },
-                { value: 'Y tế', label: 'Y tế' },
-                ...customSkills.map(skill => ({ value: skill, label: skill }))
+                { value: "Giao tiếp", label: "Giao tiếp" },
+                { value: "Lãnh đạo", label: "Lãnh đạo" },
+                { value: "Làm việc nhóm", label: "Làm việc nhóm" },
+                { value: "Giảng dạy", label: "Giảng dạy" },
+                { value: "Y tế", label: "Y tế" },
+                ...customSkills.map((skill) => ({
+                  value: skill,
+                  label: skill,
+                })),
               ]}
               onSelect={(value) => {
                 if (!customSkills.includes(value)) {
@@ -186,7 +424,9 @@ const OrganizationPostPage = () => {
           <Form.Item
             name="staffId"
             label={<div className={styles.formLabel}>Nhân viên phụ trách</div>}
-            rules={[{ required: true, message: 'Vui lòng chọn nhân viên phụ trách!' }]}
+            rules={[
+              { required: true, message: "Vui lòng chọn nhân viên phụ trách!" },
+            ]}
             className={styles.formItem}
           >
             <Select
@@ -195,7 +435,7 @@ const OrganizationPostPage = () => {
               size="large"
               onChange={handleStaffChange}
             >
-              {staffList.map(staff => (
+              {staffList.map((staff) => (
                 <Select.Option key={staff._id} value={staff._id}>
                   {staff.fullname} - {staff.email}
                 </Select.Option>
@@ -203,10 +443,10 @@ const OrganizationPostPage = () => {
             </Select>
           </Form.Item>
         </div>
-      )
+      ),
     },
     {
-      title: 'Thời gian & Địa điểm',
+      title: "Thời gian & Địa điểm",
       icon: <Calendar size={20} />,
       content: (
         <div className={styles.formSection}>
@@ -220,22 +460,22 @@ const OrganizationPostPage = () => {
           <Form.Item
             name="timeRange"
             label={<div className={styles.formLabel}>Thời gian diễn ra</div>}
-            rules={[{ required: true, message: 'Vui lòng chọn thời gian!' }]}
+            rules={[{ required: true, message: "Vui lòng chọn thời gian!" }]}
             className={styles.formItem}
           >
-            <RangePicker 
-              showTime 
+            <RangePicker
+              showTime
               format="YYYY-MM-DD HH:mm"
               size="large"
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
             />
           </Form.Item>
 
           <Form.Item label={<div className={styles.formLabel}>Địa điểm</div>}>
             <div className={styles.mapContainer}>
-              <MapContainer 
-                center={[location.latitude, location.longitude]} 
-                zoom={13} 
+              <MapContainer
+                center={[location.latitude, location.longitude]}
+                zoom={13}
                 className={styles.mapWrapper}
               >
                 <TileLayer
@@ -251,44 +491,50 @@ const OrganizationPostPage = () => {
 
             <div className={styles.locationInputs}>
               <Form.Item
-                name={['location', 'street']}
-                rules={[{ required: true, message: 'Vui lòng nhập địa chỉ!' }]}
+                name={["location", "street"]}
+                rules={[{ required: true, message: "Vui lòng nhập địa chỉ!" }]}
               >
-                <Input 
-                  placeholder="Số nhà, tên đường" 
+                <Input
+                  placeholder="Số nhà, tên đường"
                   className={styles.locationInput}
                   size="large"
                 />
               </Form.Item>
 
               <Form.Item
-                name={['location', 'ward']}
-                rules={[{ required: true, message: 'Vui lòng nhập phường/xã!' }]}
+                name={["location", "ward"]}
+                rules={[
+                  { required: true, message: "Vui lòng nhập phường/xã!" },
+                ]}
               >
-                <Input 
-                  placeholder="Phường/Xã" 
+                <Input
+                  placeholder="Phường/Xã"
                   className={styles.locationInput}
                   size="large"
                 />
               </Form.Item>
 
               <Form.Item
-                name={['location', 'district']}
-                rules={[{ required: true, message: 'Vui lòng nhập quận/huyện!' }]}
+                name={["location", "district"]}
+                rules={[
+                  { required: true, message: "Vui lòng nhập quận/huyện!" },
+                ]}
               >
-                <Input 
-                  placeholder="Quận/Huyện" 
+                <Input
+                  placeholder="Quận/Huyện"
                   className={styles.locationInput}
                   size="large"
                 />
               </Form.Item>
 
               <Form.Item
-                name={['location', 'province']}
-                rules={[{ required: true, message: 'Vui lòng nhập tỉnh/thành phố!' }]}
+                name={["location", "province"]}
+                rules={[
+                  { required: true, message: "Vui lòng nhập tỉnh/thành phố!" },
+                ]}
               >
-                <Input 
-                  placeholder="Tỉnh/Thành phố" 
+                <Input
+                  placeholder="Tỉnh/Thành phố"
                   className={styles.locationInput}
                   size="large"
                 />
@@ -296,55 +542,54 @@ const OrganizationPostPage = () => {
             </div>
           </Form.Item>
         </div>
-      )
+      ),
     },
     {
-      title: 'Thông tin tham gia',
+      title: "Thông tin tham gia",
       icon: <Users size={20} />,
       content: (
         <>
           <Form.Item
             name="maxParticipants"
             label="Số lượng tình nguyện viên tối đa"
-            rules={[{ required: true, message: 'Vui lòng nhập số lượng!' }]}
+            rules={[{ required: true, message: "Vui lòng nhập số lượng!" }]}
           >
-            <InputNumber min={1} style={{ width: '100%' }} />
+            <InputNumber min={1} style={{ width: "100%" }} />
           </Form.Item>
 
-          <Form.Item
-            name="donationTarget"
-            label="Mục tiêu quyên góp (VNĐ)"
-          >
-            <InputNumber 
-              min={0} 
-              formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-              parser={value => value.replace(/\$\s?|(,*)/g, '')}
-              style={{ width: '100%' }}
+          <Form.Item name="donationTarget" label="Mục tiêu quyên góp (VNĐ)">
+            <InputNumber
+              min={0}
+              formatter={(value) =>
+                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+              }
+              parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+              style={{ width: "100%" }}
             />
           </Form.Item>
         </>
-      )
+      ),
     },
     {
-      title: 'Thông tin liên hệ',
+      title: "Thông tin liên hệ",
       icon: <Phone size={20} />,
       content: (
         <>
           <Form.Item
-            name={['contact', 'name']}
+            name={["contact", "name"]}
             label="Tên người liên hệ"
             initialValue={currentUser?.fullname}
-            rules={[{ required: true, message: 'Vui lòng nhập tên!' }]}
+            rules={[{ required: true, message: "Vui lòng nhập tên!" }]}
           >
             <Input prefix={<Info size={16} />} disabled />
           </Form.Item>
 
           <Form.Item
-            name={['contact', 'phone']}
+            name={["contact", "phone"]}
             label="Số điện thoại"
             initialValue={currentUser?.phone}
             rules={[
-              { required: true, message: 'Vui lòng nhập số điện thoại!' },
+              { required: true, message: "Vui lòng nhập số điện thoại!" },
               // { pattern: /^[0-9]{10}$/, message: 'Số điện thoại không hợp lệ!' }
             ]}
           >
@@ -352,32 +597,32 @@ const OrganizationPostPage = () => {
           </Form.Item>
 
           <Form.Item
-            name={['contact', 'email']}
+            name={["contact", "email"]}
             label="Email"
             initialValue={currentUser?.email}
             rules={[
-              { required: true, message: 'Vui lòng nhập email!' },
-              { type: 'email', message: 'Email không hợp lệ!' }
+              { required: true, message: "Vui lòng nhập email!" },
+              { type: "email", message: "Email không hợp lệ!" },
             ]}
           >
             <Input prefix={<Mail size={16} />} disabled />
           </Form.Item>
 
           <Form.Item
-            name={['contact', 'checker']}
+            name={["contact", "checker"]}
             label="Người phụ trách"
             initialValue={selectedStaff?.email}
             rules={[
-              { required: true, message: 'Vui lòng chọn người phụ trách!' }
+              { required: true, message: "Vui lòng chọn người phụ trách!" },
             ]}
           >
             <Input prefix={<IoMdPerson size={16} />} disabled />
           </Form.Item>
         </>
-      )
+      ),
     },
     {
-      title: 'Form đăng ký',
+      title: "Form đăng ký",
       icon: <HelpCircle size={20} />,
       content: (
         <div className={styles.formSection}>
@@ -396,9 +641,9 @@ const OrganizationPostPage = () => {
                 size="large"
                 onChange={(type) => {
                   const newQuestion = {
-                    question: '',
+                    question: "",
                     type,
-                    options: type !== 'text' ? [''] : []
+                    options: type !== "text" ? [""] : [],
                   };
                   setQuestions([...questions, newQuestion]);
                 }}
@@ -409,7 +654,7 @@ const OrganizationPostPage = () => {
                 <Select.Option value="dropdown">Câu hỏi dropdown</Select.Option>
               </Select>
               <Tooltip title="Thêm câu hỏi mới">
-                <Button 
+                <Button
                   className={styles.addQuestionButton}
                   icon={<PlusOutlined />}
                   size="large"
@@ -441,7 +686,7 @@ const OrganizationPostPage = () => {
                         size="large"
                       />
                     </Form.Item>
-                    <Button 
+                    <Button
                       className={styles.deleteButton}
                       icon={<Trash2 size={16} />}
                       onClick={() => {
@@ -454,7 +699,7 @@ const OrganizationPostPage = () => {
                     </Button>
                   </div>
 
-                  {question.type !== 'text' && (
+                  {question.type !== "text" && (
                     <Form.Item label="Các lựa chọn" required>
                       <div className={styles.optionsList}>
                         {question.options.map((option, optionIndex) => (
@@ -463,7 +708,8 @@ const OrganizationPostPage = () => {
                               value={option}
                               onChange={(e) => {
                                 const newQuestions = [...questions];
-                                newQuestions[index].options[optionIndex] = e.target.value;
+                                newQuestions[index].options[optionIndex] =
+                                  e.target.value;
                                 setQuestions(newQuestions);
                               }}
                               placeholder="Nhập lựa chọn"
@@ -474,7 +720,10 @@ const OrganizationPostPage = () => {
                                   icon={<Trash2 size={16} />}
                                   onClick={() => {
                                     const newQuestions = [...questions];
-                                    newQuestions[index].options.splice(optionIndex, 1);
+                                    newQuestions[index].options.splice(
+                                      optionIndex,
+                                      1
+                                    );
                                     setQuestions(newQuestions);
                                   }}
                                 />
@@ -487,7 +736,7 @@ const OrganizationPostPage = () => {
                         className={styles.addOptionButton}
                         onClick={() => {
                           const newQuestions = [...questions];
-                          newQuestions[index].options.push('');
+                          newQuestions[index].options.push("");
                           setQuestions(newQuestions);
                         }}
                         icon={<PlusOutlined />}
@@ -502,10 +751,10 @@ const OrganizationPostPage = () => {
             />
           </div>
         </div>
-      )
+      ),
     },
     {
-      title: 'Hình ảnh & Tài nguyên',
+      title: "Hình ảnh & Tài nguyên",
       icon: <Upload size={20} />,
       content: (
         <div className={styles.formSection}>
@@ -534,14 +783,20 @@ const OrganizationPostPage = () => {
                 )}
               </AntUpload>
             </div>
-            <Button 
+            <Button
               className={styles.uploadButton}
               onClick={handleEventImageSubmit}
               loading={eventImageLoading}
               disabled={!eventId}
-              icon={eventImageLoading ? <div className={styles.loadingSpinner}>⟳</div> : <Upload size={16} />}
+              icon={
+                eventImageLoading ? (
+                  <div className={styles.loadingSpinner}>⟳</div>
+                ) : (
+                  <Upload size={16} />
+                )
+              }
             >
-              {eventImageLoading ? 'Đang tải lên...' : 'Tải lên ảnh sự kiện'}
+              {eventImageLoading ? "Đang tải lên..." : "Tải lên ảnh sự kiện"}
             </Button>
           </div>
 
@@ -555,13 +810,13 @@ const OrganizationPostPage = () => {
                 renderItem={(url) => (
                   <div className={styles.fileItem}>
                     <FileText size={16} className={styles.fileIcon} />
-                    <a 
-                      href={url} 
-                      target="_blank" 
+                    <a
+                      href={url}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className={styles.fileLink}
                     >
-                      {url.split('/').pop()}
+                      {url.split("/").pop()}
                     </a>
                   </div>
                 )}
@@ -569,26 +824,9 @@ const OrganizationPostPage = () => {
             </div>
           )}
         </div>
-      )
-    }
+      ),
+    },
   ];
-
-  const handleNext = () => {
-    if (step < steps.length) {
-      setStep(step + 1);
-    }
-  };
-
-  const handlePrevious = () => {
-    if (step > 1) {
-      setStep(step - 1);
-    }
-  };
-
-  const handleSubmit = () => {
-    console.log('Toàn bộ dữ liệu sự kiện:', eventData);
-    // Xử lý submit form
-  };
 
   return (
     <div className={styles.pageContainer}>
@@ -600,14 +838,14 @@ const OrganizationPostPage = () => {
       </div>
 
       <CustomToast />
-      
+
       <Card className={styles.mainCard}>
         <div className={styles.stepsContainer}>
           <Steps
             current={currentStep}
-            items={steps.map(item => ({
+            items={steps.map((item) => ({
               title: item.title,
-              icon: item.icon
+              icon: item.icon,
             }))}
           />
         </div>
@@ -627,7 +865,7 @@ const OrganizationPostPage = () => {
 
           <div className={styles.navigationButtons}>
             {currentStep > 0 && (
-              <Button 
+              <Button
                 onClick={handlePrev}
                 className={styles.prevButton}
                 icon={<ArrowLeft size={16} />}
@@ -637,15 +875,21 @@ const OrganizationPostPage = () => {
               </Button>
             )}
             {currentStep < steps.length - 1 && (
-              <Button 
-                type="primary" 
-                onClick={handleNext} 
+              <Button
+                type="primary"
+                onClick={handleNext}
                 className={styles.nextButton}
                 loading={currentStep === steps.length - 2 && loading}
-                icon={currentStep !== steps.length - 2 ? <ArrowRight size={16} /> : <Check size={16} />}
+                icon={
+                  currentStep !== steps.length - 2 ? (
+                    <ArrowRight size={16} />
+                  ) : (
+                    <Check size={16} />
+                  )
+                }
                 size="large"
               >
-                {currentStep === steps.length - 2 ? 'Hoàn tất' : 'Tiếp theo'}
+                {currentStep === steps.length - 2 ? "Hoàn tất" : "Tiếp theo"}
               </Button>
             )}
           </div>
