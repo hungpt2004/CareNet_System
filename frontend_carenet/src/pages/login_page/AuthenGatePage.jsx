@@ -19,6 +19,7 @@ import { FacebookFilled, GoogleOutlined } from "@ant-design/icons"
 import { Eye, EyeOff, Mail, Lock, User, Calendar, Phone } from "lucide-react"
 import { CustomSuccessToast, CustomFailedToast, CustomToast } from "../../components/toast/CustomToast"
 import useAuthStore from "../../hooks/authStore"
+import styles from '../../css/AuthenGate.module.css'
 
 // Custom theme configuration
 const theme = {
@@ -32,17 +33,11 @@ const theme = {
 }
 
 // Social login component
-const SocialLoginButton = ({ icon, title, color, onClick }) => (
+const SocialLoginButton = ({ icon, title, color, onClick, type }) => (
   <Button
     icon={icon}
     size="large"
-    style={{
-      width: "100%",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      color: color,
-    }}
+    className={`${styles.socialButton} ${type === 'facebook' ? styles.facebookButton : styles.googleButton}`}
     onClick={onClick}
   >
     {title}
@@ -161,438 +156,423 @@ function AuthenGatePage() {
     <>
       <CustomToast/>
       <ConfigProvider theme={theme}>
-      {contextHolder}
-      <Layout
-        style={{
-          minHeight: "100vh",
-          background: "transparent",
-          position: "relative",
-        }}
-      >
-        {/* Background image with overlay */}
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            backgroundImage: "url(/volunteer_img/login.jpg)",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-            zIndex: -2,
-          }}
-        />
-
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(0, 0, 0, 0.6)",
-            zIndex: -1,
-          }}
-        />
-
-        {/* Main content */}
-        <Layout.Content
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            padding: "24px",
-          }}
-        >
-          <div
-            style={{
-              textAlign: "center",
-              maxWidth: "600px",
-              width: "100%",
-            }}
-          >
-            <Typography.Title
-              level={1}
-              style={{
-                color: "white",
-                marginBottom: "16px",
-                fontSize: "3.5rem",
-                fontWeight: "bold",
-              }}
-            >
-              CareNet
-            </Typography.Title>
-
-            <Typography.Paragraph
-              style={{
-                color: "white",
-                fontSize: "1.2rem",
-                marginBottom: "32px",
-              }}
-            >
-              Nền tảng kết nối tình nguyện viên với các tổ chức xã hội trên khắp Việt Nam
-            </Typography.Paragraph>
-
-            <Space size="middle">
-              <Button
-                type="primary"
-                size="large"
-                onClick={handleLoginModalShow}
-                style={{
-                  height: "48px",
-                  paddingLeft: "24px",
-                  paddingRight: "24px",
-                  fontWeight: "bold",
-                }}
-              >
-                Đăng nhập
-              </Button>
-
-              <Button
-                ghost
-                size="large"
-                onClick={handleRegisterModalShow}
-                style={{
-                  height: "48px",
-                  paddingLeft: "24px",
-                  paddingRight: "24px",
-                  borderColor: "white",
-                  color: "white",
-                  fontWeight: "bold",
-                }}
-              >
-                Đăng ký
-              </Button>
-
-              <Button
-                size="large"
-                onClick={() => navigate("/")}
-                style={{
-                  height: "48px",
-                  paddingLeft: "24px",
-                  paddingRight: "24px",
-                  fontWeight: "bold",
-                }}
-              >
-                Xem trước
-              </Button>
-            </Space>
+        {contextHolder}
+        <Layout className={styles.pageContainer}>
+          {/* Background with particles */}
+          <div className={styles.backgroundImage} />
+          <div className={styles.backgroundOverlay} />
+          
+          {/* Floating particles */}
+          <div className={styles.particles}>
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className={styles.particle} />
+            ))}
           </div>
-        </Layout.Content>
 
-        {/* Login Modal */}
-        <Modal
-          open={showLoginModal}
-          onCancel={handleLoginModalClose}
-          footer={null}
-          width={520}
-          centered
-          style={{ borderRadius: "16px" }}
-        >
-          <div style={{ padding: "16px 8px" }}>
-            <div style={{ textAlign: "center", marginBottom: "24px" }}>
-              <Typography.Title level={2} style={{ color: theme.token.colorPrimary, marginBottom: "8px" }}>
-                Chào mừng trở lại
+          {/* Main content */}
+          <Layout.Content className={styles.mainContent}>
+            <div className={styles.heroSection}>
+              <Typography.Title level={1} className={styles.heroTitle}>
+                CareNet
               </Typography.Title>
-              <Typography.Paragraph type="secondary">Đăng nhập để tiếp tục sử dụng CareNet</Typography.Paragraph>
-            </div>
 
-            {loginError && <Alert message={loginError} type="error" showIcon style={{ marginBottom: "24px" }} />}
+              <Typography.Paragraph className={styles.heroSubtitle}>
+                Nền tảng kết nối tình nguyện viên với các tổ chức xã hội trên khắp Việt Nam
+              </Typography.Paragraph>
 
-            <Form form={loginForm} layout="vertical" onFinish={handleLoginSubmit} initialValues={{ remember: false }}>
-              {/* Email Field */}
-              <Form.Item
-                name="email"
-                label="Email"
-                rules={[
-                  { required: true, message: "Vui lòng nhập email của bạn!" },
-                  { type: "email", message: "Email không hợp lệ!" },
-                ]}
-              >
-                <Input
-                  prefix={<Mail size={18} className="site-form-item-icon" />}
-                  placeholder="Nhập email của bạn"
+              <div className={styles.actionButtons}>
+                <Button
+                  type="primary"
                   size="large"
-                />
-              </Form.Item>
-
-              {/* Password Field */}
-              <Form.Item
-                name="password"
-                label={
-                  <div style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
-                    <span>Mật khẩu</span>
-                    <a href="/forgot-password" style={{ color: theme.token.colorPrimary }}>
-                      Quên mật khẩu?
-                    </a>
-                  </div>
-                }
-                rules={[
-                  { required: true, message: "Vui lòng nhập mật khẩu của bạn!" },
-                  { min: 6, message: "Mật khẩu phải có ít nhất 6 ký tự!" },
-                ]}
-              >
-                <Input.Password
-                  prefix={<Lock size={18} className="site-form-item-icon" />}
-                  placeholder="Nhập mật khẩu của bạn"
-                  size="large"
-                  iconRender={(visible) => (visible ? <Eye size={18} /> : <EyeOff size={18} />)}
-                />
-              </Form.Item>
-
-              {/* Remember Me Checkbox */}
-              <Form.Item name="rememberMe" valuePropName="checked">
-                <Checkbox>Ghi nhớ đăng nhập</Checkbox>
-              </Form.Item>
-
-              {/* Login Button */}
-              <Form.Item>
-                <Button type="primary" htmlType="submit" size="large" block loading={authLoading}>
+                  onClick={handleLoginModalShow}
+                  className={styles.primaryButton}
+                >
                   Đăng nhập
                 </Button>
-              </Form.Item>
 
-              {/* Divider */}
-              <Divider plain>HOẶC ĐĂNG NHẬP VỚI</Divider>
-
-              {/* Social Login Buttons */}
-              <div style={{ display: "flex", gap: "16px", marginBottom: "24px" }}>
-                <SocialLoginButton
-                  icon={<FacebookFilled />}
-                  title="Facebook"
-                  color="#1877F2"
-                  onClick={() => console.log("Facebook login")}
-                />
-                <SocialLoginButton
-                  icon={<GoogleOutlined />}
-                  title="Google"
-                  color="#DB4437"
-                  onClick={() => console.log("Google login")}
-                />
-              </div>
-
-              {/* Sign Up Link */}
-              <div style={{ textAlign: "center" }}>
-                <Typography.Paragraph style={{ marginBottom: 0 }}>
-                  Chưa có tài khoản?{" "}
-                  <a
-                    href="#"
-                    style={{ color: theme.token.colorPrimary, fontWeight: "bold" }}
-                    onClick={(e) => {
-                      e.preventDefault()
-                      handleLoginModalClose()
-                      handleRegisterModalShow()
-                    }}
-                  >
-                    Đăng ký ngay
-                  </a>
-                </Typography.Paragraph>
-              </div>
-            </Form>
-          </div>
-        </Modal>
-
-        {/* Register Modal */}
-        <Modal
-          open={showRegisterModal}
-          onCancel={handleRegisterModalClose}
-          footer={null}
-          width={520}
-          centered
-          style={{ borderRadius: "16px" }}
-        >
-          <div style={{ padding: "16px 8px" }}>
-            <div style={{ textAlign: "center", marginBottom: "24px" }}>
-              <Typography.Title level={2} style={{ color: theme.token.colorPrimary, marginBottom: "8px" }}>
-                Tham gia cùng CareNet
-              </Typography.Title>
-              <Typography.Paragraph type="secondary">
-                Tạo tài khoản để bắt đầu hành trình tình nguyện của bạn
-              </Typography.Paragraph>
-            </div>
-
-            <Form form={registerForm} layout="vertical" onFinish={handleRegisterSubmit}>
-              {/* Full Name Field */}
-              <Form.Item
-                name="fullname"
-                label={
-                  <>
-                    Họ và tên <span style={{ color: "#ff4d4f" }}>*</span>
-                  </>
-                }
-                rules={[{ required: true, message: "Vui lòng nhập họ và tên của bạn!" }]}
-              >
-                <Input
-                  prefix={<User size={18} className="site-form-item-icon" />}
-                  placeholder="Nhập họ và tên của bạn"
+                <Button
                   size="large"
-                />
-              </Form.Item>
-
-              {/* Email Field */}
-              <Form.Item
-                name="email"
-                label={
-                  <>
-                    Email <span style={{ color: "#ff4d4f" }}>*</span>
-                  </>
-                }
-                rules={[
-                  { required: true, message: "Vui lòng nhập email của bạn!" },
-                  { type: "email", message: "Email không hợp lệ!" },
-                ]}
-              >
-                <Input
-                  prefix={<Mail size={18} className="site-form-item-icon" />}
-                  placeholder="Nhập email của bạn"
-                  size="large"
-                />
-              </Form.Item>
-
-              {/* Password Field */}
-              <Form.Item
-                name="password"
-                label={
-                  <>
-                    Mật khẩu <span style={{ color: "#ff4d4f" }}>*</span>
-                  </>
-                }
-                rules={[
-                  { required: true, message: "Vui lòng nhập mật khẩu của bạn!" },
-                  { min: 8, message: "Mật khẩu phải có ít nhất 8 ký tự!" },
-                ]}
-                extra="Mật khẩu phải có ít nhất 8 ký tự"
-              >
-                <Input.Password
-                  prefix={<Lock size={18} className="site-form-item-icon" />}
-                  placeholder="Nhập mật khẩu của bạn"
-                  size="large"
-                  iconRender={(visible) => (visible ? <Eye size={18} /> : <EyeOff size={18} />)}
-                />
-              </Form.Item>
-
-              {/* Confirm Password Field */}
-              <Form.Item
-                name="confirmPassword"
-                label={
-                  <>
-                    Xác nhận mật khẩu <span style={{ color: "#ff4d4f" }}>*</span>
-                  </>
-                }
-                dependencies={["password"]}
-                rules={[
-                  { required: true, message: "Vui lòng xác nhận mật khẩu của bạn!" },
-                  ({ getFieldValue }) => ({
-                    validator(_, value) {
-                      if (!value || getFieldValue("password") === value) {
-                        return Promise.resolve()
-                      }
-                      return Promise.reject(new Error("Mật khẩu không khớp!"))
-                    },
-                  }),
-                ]}
-              >
-                <Input.Password
-                  prefix={<Lock size={18} className="site-form-item-icon" />}
-                  placeholder="Nhập lại mật khẩu của bạn"
-                  size="large"
-                  iconRender={(visible) => (visible ? <Eye size={18} /> : <EyeOff size={18} />)}
-                />
-              </Form.Item>
-
-              {/* Birth Date Field */}
-              <Form.Item name="dob" label="Ngày sinh">
-                <DatePicker
-                  style={{ width: "100%" }}
-                  placeholder="Chọn ngày sinh"
-                  format="DD/MM/YYYY"
-                  size="large"
-                  suffixIcon={<Calendar size={18} />}
-                />
-              </Form.Item>
-
-              {/* Phone Field */}
-              <Form.Item name="phone" label="Số điện thoại">
-                <Input
-                  prefix={<Phone size={18} className="site-form-item-icon" />}
-                  placeholder="Nhập số điện thoại của bạn"
-                  size="large"
-                />
-              </Form.Item>
-
-              {/* Terms Checkbox */}
-              <Form.Item
-                name="agreeTerms"
-                valuePropName="checked"
-                rules={[
-                  {
-                    validator: (_, value) =>
-                      value ? Promise.resolve() : Promise.reject(new Error("Bạn phải đồng ý với điều khoản dịch vụ!")),
-                  },
-                ]}
-              >
-                <Checkbox>
-                  Tôi đồng ý với{" "}
-                  <a href="#terms" style={{ color: theme.token.colorPrimary }}>
-                    Điều khoản dịch vụ
-                  </a>{" "}
-                  và{" "}
-                  <a href="#privacy" style={{ color: theme.token.colorPrimary }}>
-                    Chính sách bảo mật
-                  </a>
-                </Checkbox>
-              </Form.Item>
-
-              {/* Register Button */}
-              <Form.Item>
-                <Button type="primary" htmlType="submit" size="large" block loading={authLoading}>
+                  onClick={handleRegisterModalShow}
+                  className={styles.ghostButton}
+                >
                   Đăng ký
                 </Button>
-              </Form.Item>
 
-              {/* Divider */}
-              <Divider plain>HOẶC ĐĂNG KÝ VỚI</Divider>
-
-              {/* Social Register Buttons */}
-              <div style={{ display: "flex", gap: "16px", marginBottom: "24px" }}>
-                <SocialLoginButton
-                  icon={<FacebookFilled />}
-                  title="Facebook"
-                  color="#1877F2"
-                  onClick={() => console.log("Facebook login")}
-                />
-                <SocialLoginButton
-                  icon={<GoogleOutlined />}
-                  title="Google"
-                  color="#DB4437"
-                  onClick={() => console.log("Google login")}
-                />
+                <Button
+                  size="large"
+                  onClick={() => navigate("/")}
+                  className={styles.secondaryButton}
+                >
+                  Xem trước
+                </Button>
               </div>
+            </div>
+          </Layout.Content>
 
-              {/* Login Link */}
-              <div style={{ textAlign: "center" }}>
-                <Typography.Paragraph style={{ marginBottom: 0 }}>
-                  Đã có tài khoản?{" "}
-                  <a
-                    href="#"
-                    style={{ color: theme.token.colorPrimary, fontWeight: "bold" }}
-                    onClick={(e) => {
-                      e.preventDefault()
-                      handleRegisterModalClose()
-                      handleLoginModalShow()
-                    }}
-                  >
-                    Đăng nhập
-                  </a>
+          {/* Login Modal */}
+          <Modal
+            open={showLoginModal}
+            onCancel={handleLoginModalClose}
+            footer={null}
+            width={520}
+            centered
+            className={styles.modal}
+          >
+            <div className={styles.modalContent}>
+              <div className={styles.modalHeader}>
+                <Typography.Title level={2} className={styles.modalTitle}>
+                  Chào mừng trở lại
+                </Typography.Title>
+                <Typography.Paragraph className={styles.modalSubtitle}>
+                  Đăng nhập để tiếp tục sử dụng CareNet
                 </Typography.Paragraph>
               </div>
-            </Form>
-          </div>
-        </Modal>
-      </Layout>
-    </ConfigProvider>
+
+              {loginError && (
+                <Alert 
+                  message={loginError} 
+                  type="error" 
+                  showIcon 
+                  className={styles.errorAlert}
+                />
+              )}
+
+              <Form 
+                form={loginForm} 
+                layout="vertical" 
+                onFinish={handleLoginSubmit} 
+                initialValues={{ remember: false }}
+              >
+                {/* Email Field */}
+                <Form.Item
+                  name="email"
+                  label={<span className={styles.formLabel}>Email</span>}
+                  rules={[
+                    { required: true, message: "Vui lòng nhập email của bạn!" },
+                    { type: "email", message: "Email không hợp lệ!" },
+                  ]}
+                  className={styles.formItem}
+                >
+                  <Input
+                    prefix={<Mail size={18} />}
+                    placeholder="Nhập email của bạn"
+                    size="large"
+                    className={styles.formInput}
+                  />
+                </Form.Item>
+
+                {/* Password Field */}
+                <Form.Item
+                  name="password"
+                  label={
+                    <div className={styles.passwordLabel}>
+                      <span className={styles.formLabel}>Mật khẩu</span>
+                      <a href="/forgot-password" className={styles.forgotPassword}>
+                        Quên mật khẩu?
+                      </a>
+                    </div>
+                  }
+                  rules={[
+                    { required: true, message: "Vui lòng nhập mật khẩu của bạn!" },
+                    { min: 6, message: "Mật khẩu phải có ít nhất 6 ký tự!" },
+                  ]}
+                  className={styles.formItem}
+                >
+                  <Input.Password
+                    prefix={<Lock size={18} />}
+                    placeholder="Nhập mật khẩu của bạn"
+                    size="large"
+                    className={styles.formInput}
+                    iconRender={(visible) => (visible ? <Eye size={18} /> : <EyeOff size={18} />)}
+                  />
+                </Form.Item>
+
+                {/* Remember Me Checkbox */}
+                <Form.Item name="rememberMe" valuePropName="checked" className={styles.rememberMe}>
+                  <Checkbox>Ghi nhớ đăng nhập</Checkbox>
+                </Form.Item>
+
+                {/* Login Button */}
+                <Form.Item>
+                  <Button 
+                    type="primary" 
+                    htmlType="submit" 
+                    size="large" 
+                    block 
+                    loading={authLoading}
+                    className={styles.submitButton}
+                  >
+                    Đăng nhập
+                  </Button>
+                </Form.Item>
+
+                {/* Divider */}
+                <Divider plain className={styles.divider}>HOẶC ĐĂNG NHẬP VỚI</Divider>
+
+                {/* Social Login Buttons */}
+                <div className={styles.socialButtons}>
+                  <SocialLoginButton
+                    icon={<FacebookFilled />}
+                    title="Facebook"
+                    type="facebook"
+                    onClick={() => console.log("Facebook login")}
+                  />
+                  <SocialLoginButton
+                    icon={<GoogleOutlined />}
+                    title="Google"
+                    type="google"
+                    onClick={() => console.log("Google login")}
+                  />
+                </div>
+
+                {/* Sign Up Link */}
+                <div className={styles.switchLink}>
+                  <Typography.Paragraph className={styles.switchText}>
+                    Chưa có tài khoản?{" "}
+                    <a
+                      href="#"
+                      className={styles.switchButton}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        handleLoginModalClose()
+                        handleRegisterModalShow()
+                      }}
+                    >
+                      Đăng ký ngay
+                    </a>
+                  </Typography.Paragraph>
+                </div>
+              </Form>
+            </div>
+          </Modal>
+
+          {/* Register Modal */}
+          <Modal
+            open={showRegisterModal}
+            onCancel={handleRegisterModalClose}
+            footer={null}
+            width={520}
+            centered
+            className={styles.modal}
+          >
+            <div className={styles.modalContent}>
+              <div className={styles.modalHeader}>
+                <Typography.Title level={2} className={styles.modalTitle}>
+                  Tham gia cùng CareNet
+                </Typography.Title>
+                <Typography.Paragraph className={styles.modalSubtitle}>
+                  Tạo tài khoản để bắt đầu hành trình tình nguyện của bạn
+                </Typography.Paragraph>
+              </div>
+
+              <Form form={registerForm} layout="vertical" onFinish={handleRegisterSubmit}>
+                {/* Full Name Field */}
+                <Form.Item
+                  name="fullname"
+                  label={
+                    <span className={styles.formLabel}>
+                      Họ và tên <span className={styles.requiredStar}>*</span>
+                    </span>
+                  }
+                  rules={[{ required: true, message: "Vui lòng nhập họ và tên của bạn!" }]}
+                  className={styles.formItem}
+                >
+                  <Input
+                    prefix={<User size={18} />}
+                    placeholder="Nhập họ và tên của bạn"
+                    size="large"
+                    className={styles.formInput}
+                  />
+                </Form.Item>
+
+                {/* Email Field */}
+                <Form.Item
+                  name="email"
+                  label={
+                    <span className={styles.formLabel}>
+                      Email <span className={styles.requiredStar}>*</span>
+                    </span>
+                  }
+                  rules={[
+                    { required: true, message: "Vui lòng nhập email của bạn!" },
+                    { type: "email", message: "Email không hợp lệ!" },
+                  ]}
+                  className={styles.formItem}
+                >
+                  <Input
+                    prefix={<Mail size={18} />}
+                    placeholder="Nhập email của bạn"
+                    size="large"
+                    className={styles.formInput}
+                  />
+                </Form.Item>
+
+                {/* Password Field */}
+                <Form.Item
+                  name="password"
+                  label={
+                    <span className={styles.formLabel}>
+                      Mật khẩu <span className={styles.requiredStar}>*</span>
+                    </span>
+                  }
+                  rules={[
+                    { required: true, message: "Vui lòng nhập mật khẩu của bạn!" },
+                    { min: 8, message: "Mật khẩu phải có ít nhất 8 ký tự!" },
+                  ]}
+                  extra={<span className={styles.formExtra}>Mật khẩu phải có ít nhất 8 ký tự</span>}
+                  className={styles.formItem}
+                >
+                  <Input.Password
+                    prefix={<Lock size={18} />}
+                    placeholder="Nhập mật khẩu của bạn"
+                    size="large"
+                    className={styles.formInput}
+                    iconRender={(visible) => (visible ? <Eye size={18} /> : <EyeOff size={18} />)}
+                  />
+                </Form.Item>
+
+                {/* Confirm Password Field */}
+                <Form.Item
+                  name="confirmPassword"
+                  label={
+                    <span className={styles.formLabel}>
+                      Xác nhận mật khẩu <span className={styles.requiredStar}>*</span>
+                    </span>
+                  }
+                  dependencies={["password"]}
+                  rules={[
+                    { required: true, message: "Vui lòng xác nhận mật khẩu của bạn!" },
+                    ({ getFieldValue }) => ({
+                      validator(_, value) {
+                        if (!value || getFieldValue("password") === value) {
+                          return Promise.resolve()
+                        }
+                        return Promise.reject(new Error("Mật khẩu không khớp!"))
+                      },
+                    }),
+                  ]}
+                  className={styles.formItem}
+                >
+                  <Input.Password
+                    prefix={<Lock size={18} />}
+                    placeholder="Nhập lại mật khẩu của bạn"
+                    size="large"
+                    className={styles.formInput}
+                    iconRender={(visible) => (visible ? <Eye size={18} /> : <EyeOff size={18} />)}
+                  />
+                </Form.Item>
+
+                {/* Birth Date Field */}
+                <Form.Item 
+                  name="dob" 
+                  label={<span className={styles.formLabel}>Ngày sinh</span>}
+                  className={styles.formItem}
+                >
+                  <DatePicker
+                    style={{ width: "100%" }}
+                    placeholder="Chọn ngày sinh"
+                    format="DD/MM/YYYY"
+                    size="large"
+                    suffixIcon={<Calendar size={18} />}
+                    className={styles.formInput}
+                  />
+                </Form.Item>
+
+                {/* Phone Field */}
+                <Form.Item 
+                  name="phone" 
+                  label={<span className={styles.formLabel}>Số điện thoại</span>}
+                  className={styles.formItem}
+                >
+                  <Input
+                    prefix={<Phone size={18} />}
+                    placeholder="Nhập số điện thoại của bạn"
+                    size="large"
+                    className={styles.formInput}
+                  />
+                </Form.Item>
+
+                {/* Terms Checkbox */}
+                <Form.Item
+                  name="agreeTerms"
+                  valuePropName="checked"
+                  rules={[
+                    {
+                      validator: (_, value) =>
+                        value ? Promise.resolve() : Promise.reject(new Error("Bạn phải đồng ý với điều khoản dịch vụ!")),
+                    },
+                  ]}
+                  className={styles.termsCheckbox}
+                >
+                  <Checkbox>
+                    <span className={styles.termsText}>
+                      Tôi đồng ý với{" "}
+                      <a href="#terms" className={styles.termsLink}>
+                        Điều khoản dịch vụ
+                      </a>{" "}
+                      và{" "}
+                      <a href="#privacy" className={styles.termsLink}>
+                        Chính sách bảo mật
+                      </a>
+                    </span>
+                  </Checkbox>
+                </Form.Item>
+
+                {/* Register Button */}
+                <Form.Item>
+                  <Button 
+                    type="primary" 
+                    htmlType="submit" 
+                    size="large" 
+                    block 
+                    loading={authLoading}
+                    className={styles.submitButton}
+                  >
+                    Đăng ký
+                  </Button>
+                </Form.Item>
+
+                {/* Divider */}
+                <Divider plain className={styles.divider}>HOẶC ĐĂNG KÝ VỚI</Divider>
+
+                {/* Social Register Buttons */}
+                <div className={styles.socialButtons}>
+                  <SocialLoginButton
+                    icon={<FacebookFilled />}
+                    title="Facebook"
+                    type="facebook"
+                    onClick={() => console.log("Facebook login")}
+                  />
+                  <SocialLoginButton
+                    icon={<GoogleOutlined />}
+                    title="Google"
+                    type="google"
+                    onClick={() => console.log("Google login")}
+                  />
+                </div>
+
+                {/* Login Link */}
+                <div className={styles.switchLink}>
+                  <Typography.Paragraph className={styles.switchText}>
+                    Đã có tài khoản?{" "}
+                    <a
+                      href="#"
+                      className={styles.switchButton}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        handleRegisterModalClose()
+                        handleLoginModalShow()
+                      }}
+                    >
+                      Đăng nhập
+                    </a>
+                  </Typography.Paragraph>
+                </div>
+              </Form>
+            </div>
+          </Modal>
+        </Layout>
+      </ConfigProvider>
     </>
   )
 }

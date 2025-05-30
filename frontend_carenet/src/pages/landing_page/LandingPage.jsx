@@ -85,7 +85,7 @@ function LandingPage() {
         <div
           className="position-absolute top-0 start-0 w-100 h-100"
           style={{
-            backgroundImage: "url('/volunteer_img/background.jpg')",
+            backgroundImage: "url('/volunteer_img/sub_banner.png')",
             backgroundSize: "cover",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
@@ -278,7 +278,7 @@ function LandingPage() {
                 transition={{ duration: 0.5, delay: 0.2 }}
               >
                 <img
-                  src="/volunteer_img/banner.jpg"
+                  src="/volunteer_img/sub_banner.png"
                   alt="Volunteers collaborating"
                   className="img-fluid rounded-5 shadow"
                 />

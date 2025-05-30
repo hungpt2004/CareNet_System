@@ -32,7 +32,7 @@
  
  /* CSS cho section với ảnh nền */
 .home-section {
-   background: url('/volunteer_img/banner.jpg') no-repeat center center; /* Đường dẫn tới ảnh */
+   background: url('/volunteer_img/my_design.png') no-repeat center center; /* Đường dẫn tới ảnh */
    background-size: cover; /* Phủ kín toàn bộ section */
    background-attachment: fixed; /* Giữ ảnh cố định khi scroll */
    background-position: center;

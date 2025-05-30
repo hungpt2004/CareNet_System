@@ -188,6 +188,7 @@ const OrganizationUserRequests = () => {
           await fetchEventRegistrations(selectedEventId)
         }
 
+        await fetchEventRegistrations(selectedEventId)
         CustomSuccessToast("Duyệt yêu cầu thành công")
       }
     } catch (error) {

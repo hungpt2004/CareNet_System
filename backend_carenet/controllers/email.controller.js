@@ -15,7 +15,7 @@ exports.sendVerificationLink = async (
  ) => {
    try {
      await emailTransporter.sendMail({
-       from: `Dịch vụ hỗ trợ Carenet" <${process.env.EMAIL_USERNAME}>`,
+       from: `Hệ thống Carenet`,
        to: email,
        subject: "Xác thực tài khoản",
        html: VERIFICATION_EMAIL_TEMPLATE
@@ -39,7 +39,7 @@ exports.sendSuccessRegisterEvent = async (
 ) => {  
    try {
       await emailTransporter.sendMail({
-         from: process.env.EMAIL_USERNAME,
+         from: 'Hệ thống Carenet',
          to: email,
          subject: "Xác nhận ghi danh sự kiện",
          html: SUCCESS_REGISTER_TEMPLATE
@@ -67,7 +67,7 @@ exports.sendApproveRequest = async (
 ) => {
    try {
       await emailTransporter.sendMail({
-         from: process.env.EMAIL_USERNAME,
+         from: 'Hệ thống Carenet',
          to: email,
          subject: "Xác nhận tham gia sự kiện",
          html: APPROVE_REGISTER_TEMPLATE
@@ -96,7 +96,7 @@ exports.sendThankYouMail = async (
 ) => {
    try {
       await emailTransporter.sendMail({
-         from: process.env.EMAIL_USERNAME,
+         from: 'Hệ thống Carenet',
          to: email,
          subject: "Cảm ơn bạn đã tham gia sự kiện",
          html: THANK_YOU_TEMPLATE
@@ -126,7 +126,7 @@ exports.sendRejectRequest = async (
 ) => {
    try { 
       await emailTransporter.sendMail({
-         from: process.env.EMAIL_USERNAME,
+         from: 'Hệ thống Carenet',
          to: email,
          subject: "Thông báo từ chối tham gia sự kiện",
          html: REJECT_REGISTER_TEMPLATE
@@ -136,6 +136,7 @@ exports.sendRejectRequest = async (
          .replace("{eventEndAt}", formatDateVN(eventEndAt))
          .replace("{eventLocation}", eventLocation)
          .replace("{rejectionReason}", rejectionReason)
+         .replace("{eventsLink}", eventsLink)
       })
    } catch (error) {
       console.log(error)

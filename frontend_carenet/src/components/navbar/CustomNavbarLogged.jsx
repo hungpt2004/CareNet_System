@@ -149,7 +149,7 @@ const CustomNavbarLogged = () => {
       <Container fluid>
         <Navbar.Brand href="#home" className="fw-bold">
           <Row>
-            <Col><h1 style={{ letterSpacing: '10px'}} className={`fw-bold ${styles.textPrimary}`}>CARENET</h1></Col>
+            <Col><h1 style={{ letterSpacing: '5px', marginLeft:'20px', fontWeight: 'bold', fontSize: '40px'}} className={`fw-bold ${styles.textPrimary}`}>CARENET</h1></Col>
           </Row>
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -218,15 +218,15 @@ const CustomNavbarLogged = () => {
                   onClick={toggleDropdown}
                   style={{
                     cursor: 'pointer',
-                    width: '40px',
-                    height: '40px',
+                    width: '50px',
+                    height: '50px',
                     borderRadius: '50%',
                     overflow: 'hidden',
                     border: '2px solid #5DB996'
                   }}
                 >
                   <Image
-                    src={currentUser?.avatar}
+                    src={currentUser?.avatar || '/avatar_img/anhthe.jpg'}
                     width="100%"
                     height="100%"
                     style={{ objectFit: 'cover' }}
