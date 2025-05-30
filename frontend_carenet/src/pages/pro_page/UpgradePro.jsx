@@ -24,21 +24,21 @@ const UpgradePro = () => {
   ];
 
   const proFeatures = [
-    "Tất cả tính năng của gói Free",
-    "Đăng tuyển không giới hạn",
-    "Tìm kiếm ứng viên nâng cao",
-    "Gửi email hàng loạt cho ứng viên",
-    "Ưu tiên duyệt sự kiện",
-    "Báo cáo và thống kê chi tiết"
+    "Everything in the Free plan, plus",
+    "Post event limited in month",
+    "Wonderful feature two",
+    "Priceless feature three",
+    "Splended feature four",
+    "Delightful feature five",
   ];
 
   const enterpriseFeatures = [
-    "Tất cả tính năng của gói Pro",
-    "Tùy chỉnh thương hiệu",
-    "Quản lý đa chi nhánh",
-    "API tích hợp hệ thống",
-    "Hỗ trợ 24/7",
-    "Giải pháp tùy chỉnh theo yêu cầu"
+    "Everything in the Pro plan, plus",
+    "Amazing feature one",
+    "Wonderful feature two",
+    "Priceless feature three",
+    "Splended feature four",
+    "Delightful feature five",
   ];
 
   const handleUpgrade = async () => {

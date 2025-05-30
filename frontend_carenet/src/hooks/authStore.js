@@ -3,8 +3,6 @@ import axios from "axios";
 
 const BASE_URL = import.meta.env.VITE_SERVER_URL;
 
-console.log("BASE_URL:", BASE_URL);
-
 const useAuthStore = create((set) => ({
   currentUser: (() => {
     const userData = localStorage.getItem("user");
@@ -65,6 +63,10 @@ const useAuthStore = create((set) => ({
       set({ loading: false });
     }
   },
+  updateUser: (updatedUser) => {
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+    set({ currentUser: updatedUser });
+  },
 
   updateUser: (updatedUser) => {
     localStorage.setItem("user", JSON.stringify(updatedUser));
@@ -80,5 +82,7 @@ const useAuthStore = create((set) => ({
   clearError: () => set({ error: null }),
   clearSuccess: () => set({ successMessage: null }),
 }));
+
+  
 
 export default useAuthStore

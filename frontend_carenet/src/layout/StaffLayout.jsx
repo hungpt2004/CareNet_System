@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
-import StaffSidebar from '../components/sidebar/StaffSidebar';
+import React, { useState } from "react";
+import { Outlet } from "react-router-dom";
+import StaffSidebar from "../components/sidebar/StaffSidebar";
 
 const StaffLayout = () => {
   const [showSidebar, setShowSidebar] = useState(true);
@@ -11,22 +11,20 @@ const StaffLayout = () => {
       <header className="header">
         <div className="header-content">
           <div className="d-flex align-items-center">
-            <button 
+            <button
               className="toggle-sidebar-btn"
               onClick={() => setShowSidebar(!showSidebar)}
             >
               <span className="menu-icon"></span>
             </button>
-            <div className="header-title">
-              CareNet Staff
-            </div>
+            <div className="header-title">CareNet Staff</div>
           </div>
         </div>
       </header>
 
       <StaffSidebar showSidebar={showSidebar} isMobile={isMobile} />
 
-      <main className={`main-content ${showSidebar ? 'with-sidebar' : ''}`}>
+      <main className={`main-content ${showSidebar ? "with-sidebar" : ""}`}>
         <div className="content-wrapper">
           <Outlet />
         </div>
@@ -121,4 +119,4 @@ const StaffLayout = () => {
   );
 };
 
-export default StaffLayout; 
+export default StaffLayout;

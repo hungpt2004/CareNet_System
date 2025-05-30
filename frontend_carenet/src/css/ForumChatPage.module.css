@@ -1,179 +1,179 @@
 .container {
-  width: 100%;
-  min-height: 100vh;
-  padding: 32px 0;
-}
-.feed {
-  max-width: 800px;
-  margin: 32px auto 0 auto;
-  height: 70vh;           /* Chiều cao cố định cho vùng bài viết */
-  overflow-y: auto;       /* Cho phép cuộn dọc */
-  padding-right: 8px;     /* Để tránh che mất content bởi thanh cuộn */
-  scroll-behavior: smooth;
-  background: transparent;
-}
-.postCreator {
-  max-width: 800px;
-  margin: 0 auto 24px auto;
-  border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(24,119,242,0.08);
-  border: none;
-  background: #fff;
-}
-.creatorHeader {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 8px;
-}
-.privacyBtn {
-  border: none;
-  background: #f0f2f5;
-  color: #333;
-  border-radius: 20px;
-  margin-left: auto;
-}
-.postInput {
-  margin-bottom: 8px;
-  border-radius: 12px;
-  font-size: 16px;
-}
-.previewImage {
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.previewImage img {
-  max-width: 120px;
-  max-height: 80px;
-  border-radius: 8px;
-  object-fit: cover;
-  border: 1px solid #eee;
-}
-.actionIcons {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: 8px;
-}
-.iconButton {
-  background: #f0f2f5;
-  border: none;
-  border-radius: 20px;
-  padding: 0 16px;
-  height: 32px;
-  color: #1877f2;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.iconButton:hover {
-  background: #e4e6ea;
-}
-.postButton {
-  border-radius: 20px;
-  margin-left: auto;
-  font-weight: 600;
-  background: linear-gradient(45deg, #166fe5, #3ea5f5);
-  border: none;
-  box-shadow: 0 2px 8px rgba(24,119,242,0.12);
-}
-.postCard {
-  margin-bottom: 24px;
-  border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(24,119,242,0.08);
-  border: none;
-  background: #fff;
-  animation: slideIn 0.5s ease-out;
-}
-@keyframes slideIn {
-  from { opacity: 0; transform: translateY(20px);}
-  to { opacity: 1; transform: translateY(0);}
-}
-.authorInfo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 4px;
-}
-.authorDetails {
-  flex: 1;
-}
-.authorName {
-  font-weight: 600;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-.timestamp {
-  font-size: 13px;
-  color: #888;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-.postContent {
-  font-size: 16px;
-  margin: 8px 0 8px 0;
-  white-space: pre-line;
-}
-.postImage {
-  width: 100%;
-  max-height: 320px;
-  object-fit: cover;
-  border-radius: 12px;
-  margin-bottom: 8px;
-  margin-top: 4px;
-  border: 1px solid #eee;
-  transition: transform 0.2s;
-}
-.postImage:hover {
-  transform: scale(1.02);
-}
-.statsBar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 14px;
-  color: #555;
-  margin: 8px 0;
-  border-bottom: 1px solid #f0f2f5;
-  padding-bottom: 4px;
-}
-.actionBar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 4px;
-}
-.actionButton {
-  background: none;
-  border: none;
-  color: #65676b;
-  font-weight: 500;
-  font-size: 15px;
-  border-radius: 8px;
-  padding: 6px 16px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: background 0.2s, color 0.2s;
-}
-.actionButton:hover {
-  background: #f0f2f5;
-  color: #1877f2;
-}
-.liked {
-  color: #1877f2;
-}
-.commentBox {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  margin-top: 12px;
-  padding-top: 8px;
-  border-top: 1px solid #f0f2f5;
-}
+    width: 100%;
+    min-height: 100vh;
+    padding: 32px 0;
+  }
+  .feed {
+    max-width: 800px;
+    margin: 32px auto 0 auto;
+    height: 70vh;           /* Chiều cao cố định cho vùng bài viết */
+    overflow-y: auto;       /* Cho phép cuộn dọc */
+    padding-right: 8px;     /* Để tránh che mất content bởi thanh cuộn */
+    scroll-behavior: smooth;
+    background: transparent;
+  }
+  .postCreator {
+    max-width: 800px;
+    margin: 0 auto 24px auto;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(24,119,242,0.08);
+    border: none;
+    background: #fff;
+  }
+  .creatorHeader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .privacyBtn {
+    border: none;
+    background: #f0f2f5;
+    color: #333;
+    border-radius: 20px;
+    margin-left: auto;
+  }
+  .postInput {
+    margin-bottom: 8px;
+    border-radius: 12px;
+    font-size: 16px;
+  }
+  .previewImage {
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .previewImage img {
+    max-width: 120px;
+    max-height: 80px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid #eee;
+  }
+  .actionIcons {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+  }
+  .iconButton {
+    background: #f0f2f5;
+    border: none;
+    border-radius: 20px;
+    padding: 0 16px;
+    height: 32px;
+    color: #1877f2;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .iconButton:hover {
+    background: #e4e6ea;
+  }
+  .postButton {
+    border-radius: 20px;
+    margin-left: auto;
+    font-weight: 600;
+    background: linear-gradient(45deg, #166fe5, #3ea5f5);
+    border: none;
+    box-shadow: 0 2px 8px rgba(24,119,242,0.12);
+  }
+  .postCard {
+    margin-bottom: 24px;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(24,119,242,0.08);
+    border: none;
+    background: #fff;
+    animation: slideIn 0.5s ease-out;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(20px);}
+    to { opacity: 1; transform: translateY(0);}
+  }
+  .authorInfo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 4px;
+  }
+  .authorDetails {
+    flex: 1;
+  }
+  .authorName {
+    font-weight: 600;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .timestamp {
+    font-size: 13px;
+    color: #888;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .postContent {
+    font-size: 16px;
+    margin: 8px 0 8px 0;
+    white-space: pre-line;
+  }
+  .postImage {
+    width: 100%;
+    max-height: 320px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    margin-top: 4px;
+    border: 1px solid #eee;
+    transition: transform 0.2s;
+  }
+  .postImage:hover {
+    transform: scale(1.02);
+  }
+  .statsBar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #555;
+    margin: 8px 0;
+    border-bottom: 1px solid #f0f2f5;
+    padding-bottom: 4px;
+  }
+  .actionBar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .actionButton {
+    background: none;
+    border: none;
+    color: #65676b;
+    font-weight: 500;
+    font-size: 15px;
+    border-radius: 8px;
+    padding: 6px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s, color 0.2s;
+  }
+  .actionButton:hover {
+    background: #f0f2f5;
+    color: #1877f2;
+  }
+  .liked {
+    color: #1877f2;
+  }
+  .commentBox {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 8px;
+    border-top: 1px solid #f0f2f5;
+  }

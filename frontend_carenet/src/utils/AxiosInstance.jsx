@@ -26,38 +26,16 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   (error) => {
-    if (error.response) {
-      const { status, data } = error.response;
-      
-      // Chỉ xóa localStorage khi token hết hạn hoặc không hợp lệ
-      if (status === 401 && data?.message?.includes('token')) {
-        console.log("Token expired or invalid:", data);
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        window.location.href = "/login";
-        return Promise.reject(error);
-      }
+    if (
+      error.response &&
+      (error.response.status === 401 || error.response.status === 403)
+    ) {
+      // Clear token and user data
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
 
-      // Xử lý lỗi 403 (Forbidden)
-      if (status === 403) {
-        console.log("Access forbidden:", data);
-        return Promise.reject(error);
-      }
-
-      // Xử lý các lỗi khác
-      console.log("API Error:", {
-        status: status,
-        data: data,
-        message: data?.message || "Có lỗi xảy ra"
-      });
-    } else if (error.request) {
-      // Lỗi không nhận được response từ server
-      console.log("Network Error:", error.request);
-    } else {
-      // Lỗi khi setting up request
-      console.log("Request Error:", error.message);
+      window.location.href = "/";
     }
-
     return Promise.reject(error);
   }
 );

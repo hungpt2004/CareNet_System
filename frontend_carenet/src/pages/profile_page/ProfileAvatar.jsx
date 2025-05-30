@@ -1,11 +1,19 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import { Container, Row, Col, Card, Button } from "react-bootstrap";
-import { motion } from "framer-motion";
-// import CustomNavbar from "../../components/navbar/CustomNavbar";
+import React, { useState, useRef, useEffect } from "react";
+import { Container, Row, Col, Card, Button, Spinner } from "react-bootstrap";
+import { motion, AnimatePresence } from "framer-motion";
+import { Modal } from "antd";
+import "antd/dist/reset.css";
 import { useNavigate } from "react-router-dom";
-import useAuthStore from "../../hooks/authStore";
+import axiosInstance from "../../utils/AxiosInstance";
+import {
+  CustomFailedToast,
+  CustomSuccessToast,
+  CustomToast,
+} from "../../components/toast/CustomToast";
+import defaultAvatar from "../../assets/defaultAvatar.png";
+import { AiOutlineUser, AiOutlinePicture, AiOutlineHistory, AiOutlineHeart, AiOutlineStar, AiOutlineIdcard, AiOutlineLogout } from "react-icons/ai";
 const ProfileAvatar = () => {
   // CSS styles defined directly in the component
   const styles = {
@@ -15,6 +23,7 @@ const ProfileAvatar = () => {
     accountContainer: {
       minHeight: "100vh",
       padding: "2rem 0",
+      maxWidth: "1100px", // Limit max width
     },
     sidebarCard: {
       borderRadius: "10px",
@@ -125,9 +134,23 @@ const ProfileAvatar = () => {
     hiddenInput: {
       display: "none",
     },
+    modalAvatar: {
+      width: "100%",
+      maxWidth: "400px",
+      height: "auto",
+      borderRadius: "50%",
+      border: "6px solid #0E606E",
+      boxShadow: "0 8px 24px rgba(0, 0, 0, 0.2)",
+      margin: "0 auto",
+      display: "block",
+    },
+    modalContent: {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      padding: "20px",
+    },
   };
-
-  const currentUser = useAuthStore((state) => state.curretnUser);
 
   // Add CSS to document
   React.useEffect(() => {
@@ -174,6 +197,32 @@ const ProfileAvatar = () => {
         background-color: #0a4c57 !important;
         border-color: #0a4c57 !important;
       }
+      
+      /* Ant Design Modal Customization */
+      .ant-modal-content {
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      
+      .ant-modal-header {
+        background-color: #0E606E;
+        border-bottom: none;
+        padding: 16px 24px;
+      }
+      
+      .ant-modal-title {
+        color: white;
+        font-weight: bold;
+        font-size: 18px;
+      }
+      
+      .ant-modal-close-x {
+        color: white;
+      }
+      
+      .ant-modal-footer {
+        border-top: none;
+      }
     `;
     document.head.appendChild(style);
 
@@ -182,12 +231,33 @@ const ProfileAvatar = () => {
     };
   }, []);
 
+  // Xử lí hiện data (Cần phải có)
+  useEffect(() => {
+    getCurrentUserForProfileAvatar();
+  }, []);
+
   const fileInputRef = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [user, setUser] = useState(null);
+  const [avatarUrl, setAvatarUrl] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleFileUpload = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setSelectedFile(URL.createObjectURL(e.target.files[0]));
+    const file = e.target.files[0];
+    if (file) {
+      // Always revoke previous preview URL to avoid memory leaks and stale previews
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+      setSelectedFile(file); // Set the actual file
+      setPreviewUrl(URL.createObjectURL(file)); // Create a URL for previewing the image
+      // Reset the file input value so the same file can be selected again after cancel
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   };
 
@@ -195,25 +265,92 @@ const ProfileAvatar = () => {
     fileInputRef.current.click();
   };
 
-  const handleViewAvatar = () => {
-    // Open avatar in new tab or modal
-    if (selectedFile) {
-      window.open(selectedFile, "_blank");
+  //Xử lí load lại trang, không cần logout để câp nhật avatar (cần phải có)
+  const getCurrentUserForProfileAvatar = async () => {
+    const userFromStorage = localStorage.getItem("user");
+    if (userFromStorage) {
+      const user = JSON.parse(userFromStorage);
+      setUser(user); // Cập nhật state với thông tin từ localStorage
+      setAvatarUrl(user.avatarUrl); // Cập nhật avatar từ localStorage
     } else {
-      window.open(
-        "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-suTKYwhiuAHDzMequZcZHjaRpCeWdp.png",
-        "_blank"
-      );
+      // Nếu không có thông tin trong localStorage, gọi API để lấy thông tin người dùng
+      try {
+        const res = await axiosInstance.get("/profile/get-current-user-for-profile-avatar");
+        if (res.data && res.data.user) {
+          setUser(res.data.user);
+          setAvatarUrl(res.data.user.avatarUrl);
+        }
+      } catch (error) {
+        console.log("Error fetching current user:", error);
+      }
     }
   };
 
-  const navigate = useNavigate();
+  const handleViewAvatarModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleCloseAvatarModal = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleCancelUpload = () => {
+    // Only reset if a file is actually selected (i.e., user is in the process of uploading)
+    if (selectedFile || previewUrl) {
+      setSelectedFile(null);
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+      setPreviewUrl(null);
+      CustomFailedToast("Hủy avatar tải lên thành công.");
+    }
+    // Always close the modal if open
+    setIsModalVisible(false);
+  };
+
+  // Xử lí upload avatar
+  const uploadAvatar = async () => {
+    if (!selectedFile) {
+      CustomFailedToast("Please select a file before uploading.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("avatar", selectedFile); // Append the selected file
+    setLoading(true);
+    try {
+      const res = await axiosInstance.put("/profile/upload-avatar", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      if (res.data && res.data.user && res.data.image) {
+        console.log(
+          `After upload user: ${JSON.stringify(res.data.user, null, 2)}`
+        );
+        setUser(res.data.user); // Update user state with new data
+        setAvatarUrl(res.data.image); // Update avatarUrl
+
+        // Cập nhật lại localStorage với thông tin người dùng mới
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+        setLoading(false);
+        CustomSuccessToast(res.data.message);
+      }
+    } catch (err) {
+      console.error("Error uploading avatar:", err);
+      setLoading(false);
+      CustomFailedToast("Failed to upload avatar.");
+    }
+  };
+
+  console.log(`Before upload user: ${JSON.stringify(user, null, 2)}`);
+  console.log(`Avatar URL: ${avatarUrl}`);
 
   return (
     <>
+      <CustomToast />
       <Container
         className="d-flex justify-content-center align-items-center"
-        style={{ ...styles.accountContainer, maxWidth: "1100px" }} // Limit max width
+        style={styles.accountContainer}
       >
         <Row className="w-100">
           <Col md={4}>
@@ -226,15 +363,14 @@ const ProfileAvatar = () => {
                 <Card.Body className="p-0">
                   <div style={styles.userProfile}>
                     <img
-                      src={`${currentUser.avatar}`}
-                      // src="https://img.freepik.com/premium-vector/avatar-profile-icon-flat-style-female-user-profile-vector-illustration-isolated-background-women-profile-sign-business-concept_157943-38866.jpg?semt=ais_hybrid"
+                      src={avatarUrl || defaultAvatar}
                       alt="User Avatar"
                       className="avatar-img"
                       style={styles.avatar}
                     />
                     <div style={styles.userInfo}>
                       <h5 style={styles.userName}>Hung Pham Trong</h5>
-                      <p style={styles.accountType}>Normal Account</p>
+                      <p style={styles.accountType}>Tài Khoản Cá Nhân</p>
                     </div>
                   </div>
                   <div style={styles.menuItems}>
@@ -243,52 +379,52 @@ const ProfileAvatar = () => {
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-information")}
                     >
-                      <span>Information</span>
+                      <AiOutlineUser style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
+                      <span>Thông Tin</span>
                     </div>
                     <div
                       className="menu-item active"
                       style={{ ...styles.menuItem, ...styles.menuItemActive }}
                       onClick={() => navigate("/profile-avatar")}
                     >
-                      <span>Update Avatar</span>
+                      <AiOutlinePicture style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
+                      <span>Cập Nhật Avatar</span>
                     </div>
                     <div
                       className="menu-item"
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-history")}
                     >
-                      <span>History Effort</span>
+                      <AiOutlineHistory style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
+                      <span>Lịch Sử Nỗ Lực</span>
                     </div>
                     <div
                       className="menu-item"
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-favourite")}
                     >
-                      <span>Favourite</span>
+                      <AiOutlineHeart style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
+                      <span>Yêu Thích</span>
                     </div>
                     <div
                       className="menu-item"
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-score")}
                     >
-                      <span>Score</span>
+                      <AiOutlineStar style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
+                      <span>Số Điểm</span>
                     </div>
                     <div
                       className="menu-item"
                       style={styles.menuItem}
                       onClick={() => navigate("/profile-certificate")}
                     >
-                      <span>Certificate</span>
+                      <AiOutlineIdcard style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
+                      <span>Chứng Chỉ</span>
                     </div>
-                     <div
-                    className="menu-item"
-                    style={styles.menuItem}
-                    onClick={() => navigate("/profile-certificate-purchases")}
-                  >
-                    <span>CertificatePurchases</span>
-                  </div>
                     <div className="menu-item" style={styles.menuItem}>
-                      <span>Log Out</span>
+                      <AiOutlineLogout style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
+                      <span>Đăng Xuất</span>
                     </div>
                   </div>
                 </Card.Body>
@@ -303,14 +439,15 @@ const ProfileAvatar = () => {
             >
               <Card style={styles.infoCard}>
                 <Card.Header style={styles.infoHeader}>
-                  <h4 className="mb-0">UPLOAD AVATAR</h4>
+                  <h4 className="mb-0">
+                    <AiOutlinePicture style={{ marginRight: 10, fontSize: 24, verticalAlign: 'middle' }} />
+                    CẬP NHẬT AVATAR
+                  </h4>
                 </Card.Header>
                 <Card.Body style={styles.infoCardBody}>
+                  {/* Icon inside the box removed as requested */}
                   <img
-                    src={
-                      selectedFile ||
-                      "https://cdn-icons-png.flaticon.com/512/6596/6596121.png"
-                    }
+                    src={previewUrl || avatarUrl || defaultAvatar}
                     alt="User Avatar"
                     style={styles.largeAvatar}
                   />
@@ -318,9 +455,9 @@ const ProfileAvatar = () => {
                   <Button
                     variant="dark"
                     style={styles.actionButton}
-                    onClick={handleViewAvatar}
+                    onClick={handleViewAvatarModal}
                   >
-                    View Avatar
+                    Xem Avatar
                   </Button>
 
                   <Button
@@ -328,7 +465,7 @@ const ProfileAvatar = () => {
                     style={styles.actionButton}
                     onClick={handleUploadClick}
                   >
-                    Upload File Image
+                    Tải Lên Avatar
                   </Button>
 
                   <input
@@ -340,20 +477,29 @@ const ProfileAvatar = () => {
                   />
 
                   <div style={styles.fileInfo}>
-                    <p className="mb-0">Maximum file size is 1 MB</p>
-                    <p style={styles.fileFormat}>Format: JPEG, PNG</p>
+                    <p className="mb-0">Kích thước tối đa: 1 MB</p>
+                    <p style={styles.fileFormat}>Định dạng: JPEG, PNG</p>
                   </div>
 
                   <div style={styles.buttonContainer}>
-                    <Button variant="light" style={styles.cancelBtn}>
-                      Cancel
+                    <Button
+                      variant="light"
+                      style={styles.cancelBtn}
+                      onClick={handleCancelUpload}
+                    >
+                      Hủy
                     </Button>
                     <Button
                       variant="primary"
                       className="save-btn"
                       style={styles.saveBtn}
+                      onClick={uploadAvatar}
                     >
-                      Save
+                      {loading ? (
+                        <Spinner animation="border" size="sm" /> // Hiển thị loading spinner khi đang tải
+                      ) : (
+                        "Lưu" // Hiển thị chữ 'Lưu' khi không có loading
+                      )}
                     </Button>
                   </div>
                 </Card.Body>
@@ -361,6 +507,37 @@ const ProfileAvatar = () => {
             </motion.div>
           </Col>
         </Row>
+
+        {/* Ant Design Modal for Avatar View */}
+        <Modal
+          title=""
+          open={isModalVisible}
+          onCancel={handleCloseAvatarModal}
+          footer={null}
+          width={500}
+          centered
+        >
+          <div style={styles.modalContent}>
+            <AnimatePresence>
+              {isModalVisible && (
+                <motion.img
+                  src={previewUrl || avatarUrl || defaultAvatar}
+                  alt="User Avatar"
+                  style={styles.modalAvatar}
+                  initial={{ scale: 0.5, opacity: 0, rotate: -10 }}
+                  animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                  exit={{ scale: 0.5, opacity: 0, rotate: 10 }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 260,
+                    damping: 20,
+                    duration: 0.5,
+                  }}
+                />
+              )}
+            </AnimatePresence>
+          </div>
+        </Modal>
       </Container>
     </>
   );

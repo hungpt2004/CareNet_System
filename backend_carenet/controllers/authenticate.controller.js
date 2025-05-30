@@ -20,19 +20,12 @@ const createVerifyToken = async (payload) =>
 exports.signUpWithUsernamePassword = asyncHandler(async (req, res, next) => {
   const { fullname, email, password, phone, dob } = req.body;
 
+  console.log(req.body)
+
   if (!fullname || !email || !password || !phone || !dob) {
     return res.status(500).json({
       status: "fail",
       message: "Vui lòng nhập đầy đủ họ tên, email, mật khẩu, ngày sinh và số điện thoại.",
-    });
-  }
-
-  // Validate dob format
-  const dobDate = new Date(dob);
-  if (isNaN(dobDate.getTime())) {
-    return res.status(500).json({
-      status: "fail",
-      message: "Định dạng ngày sinh không hợp lệ",
     });
   }
 
@@ -55,7 +48,7 @@ exports.signUpWithUsernamePassword = asyncHandler(async (req, res, next) => {
       email: email,
       password: hashedPassword,
       phone: phone,
-      dob: dobDate,
+      dob: dob,
       isVerified: false,
     });
 
@@ -93,8 +86,6 @@ exports.signUpWithUsernamePassword = asyncHandler(async (req, res, next) => {
 exports.signInWithUsernamePassword = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
 
-  console.log(`Bạn đang nhập email - password: ${email} - ${password}`);
-
   if (!email || !password) {
     // Trả về status và message ở front-end thì lấy ra bằng error.response.data.status và .message
     return res.status(500).json({
@@ -113,7 +104,6 @@ exports.signInWithUsernamePassword = asyncHandler(async (req, res, next) => {
        });
     }
 
-    // Tạo access token
     const accessToken = await createJsonToken({ user });
 
     return res.status(200).json({
@@ -122,7 +112,6 @@ exports.signInWithUsernamePassword = asyncHandler(async (req, res, next) => {
       user,
       accessToken,
     });
-
   } catch (error) {
     return res.status(500).json({
       status: "fail",
@@ -157,7 +146,7 @@ exports.verifyAccountByLink = asyncHandler(async (req, res, next) => {
    //  return res.status(200).send("Đã verify thành công");
 
     // Sau khi xác thực xong thì redirect về trang login
-     return res.redirect(`${process.env.CLIENT_URL}/login`);
+     return res.redirect(`${process.env.CLIENT_URL}/login`); // hoặc bất kỳ route nào bạn muốn
   } catch (err) {
     return next(new AppError("Token đã hết hạn hoặc không hợp lệ", 401));
   }

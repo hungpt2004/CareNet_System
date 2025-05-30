@@ -1,7 +1,8 @@
 // uploadMiddleware.js
-const multer = require('multer');
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
-const { cloudinary } = require('../services/uploadCloundinary');
+const multer = require("multer");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const { cloudinary } = require("../services/uploadCloundinary");
+
 
 /**
  * Tạo middleware upload cho một loại ảnh cụ thể
@@ -30,10 +31,10 @@ const createUploadMiddleware = (options = {}) => {
     },
     fileFilter: (req, file, cb) => {
       // Kiểm tra loại file
-      if (file.mimetype.startsWith('image/') || file.mimetype === 'application/pdf') {
+      if (file.mimetype.startsWith('image/')) {
         cb(null, true);
       } else {
-        cb(new Error('Chỉ chấp nhận file ảnh hoặc PDF'), false);
+        cb(new Error('Chỉ chấp nhận file ảnh'), false);
       }
     }
   });
@@ -59,45 +60,9 @@ const eventImageUpload = createUploadMiddleware({
   maxFileSize: 10 * 1024 * 1024 // 10MB
 }).array('images', 10);
 
-// Middleware upload giấy tờ tổ chức
-// Được phép upload 5 file (ảnh hoặc PDF)
-const organizationDocumentUpload = createUploadMiddleware({
-  folder: 'organization_documents',
-  allowedFormats: ['jpg', 'jpeg', 'png', 'pdf'],
-  transformation: [{ quality: 'auto:best' }],
-  maxFileSize: 5 * 1024 * 1024 // 5MB
-}).array('documents', 10);
-
-// Middleware upload certifcateQR
-// Được phép upload 1 file (ảnh hoặc PDF)
-const certificateQRupload = createUploadMiddleware({
-  folder: 'certificate',
-  allowedFormats: ['jpg', 'jpeg', 'png', 'pdf'],
-  transformation: [{ quality: 'auto:best' }],
-  maxFileSize: 5 * 1024 * 1024 // 5MB
-});
-
-
-// Add debug logs
-const debugOrganizationDocumentUpload = (req, res, next) => {
-  console.log('Debug - Starting organization document upload middleware');
-  console.log('Debug - Request headers:', req.headers);
-  console.log('Debug - Request body:', req.body);
-  
-  organizationDocumentUpload(req, res, (err) => {
-    if (err) {
-      console.error('Debug - Upload error:', err);
-      return res.status(400).json({
-        status: 'error',
-        message: 'Upload failed',
-        error: err.message
-      });
-    }
-    console.log('Debug - Upload successful');
-    console.log('Debug - Files:', req.files);
-    next();
-  });
-};
+// 1. Hàm upload ảnh lưu vào schema
+// 2. Tạo thông tin schema sau 
+// 2 route khác nhau, 2 lần submit
 
 // Dữ liệu trả về từ cloudinary ví dụ
 /*
@@ -115,9 +80,19 @@ const debugOrganizationDocumentUpload = (req, res, next) => {
 // Middleware đã giúp upload nên không cần xử lý trong controller
 // Chỉ cần lấy địa chỉ file lưu vào database => req.file.path (url)
 
+// Middleware upload CCCD images
+const cccdUpload = createUploadMiddleware({
+  folder: 'cccd',
+  allowedFormats: ['jpg', 'jpeg', 'png'],
+  transformation: [
+    { width: 800, height: 500, crop: 'fit' },
+    { quality: 'auto:best' }
+  ],
+  maxFileSize: 3 * 1024 * 1024 // 3MB
+});
+
 module.exports = {
   avatarUpload,
   eventImageUpload,
-  organizationDocumentUpload: debugOrganizationDocumentUpload,
-  createUploadMiddleware
+  cccdUpload,
 };

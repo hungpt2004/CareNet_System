@@ -62,23 +62,6 @@ const CustomNavbarLogged = () => {
       setNotifications(prev => [newNotification, ...prev]);
     });
 
-    // Lắng nghe sự kiện requestRejected
-    socketRef.current.on('requestRejected', (data) => {
-      console.log('Received requestRejected event:', data);
-      const newNotification = {
-        id: Date.now(),
-        message: data.message,
-        time: 'Vừa xong',
-        eventId: data.eventId,
-        eventTitle: data.eventTitle,
-        startAt: data.startAt,
-        endAt: data.endAt,
-        location: data.location
-      };
-
-      setNotifications(prev => [newNotification, ...prev]);
-    });
-
     return () => {
       if (currentUser?._id) {
         console.log('Leaving user room:', currentUser._id);
@@ -116,6 +99,7 @@ const CustomNavbarLogged = () => {
     };
   }, []);
 
+
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
   };
@@ -149,7 +133,14 @@ const CustomNavbarLogged = () => {
       <Container fluid>
         <Navbar.Brand href="#home" className="fw-bold">
           <Row>
-            <Col><h1 style={{ letterSpacing: '5px', marginLeft:'20px', fontWeight: 'bold', fontSize: '40px'}} className={`fw-bold ${styles.textPrimary}`}>CARENET</h1></Col>
+            <Col><Image
+              src="/volunteer_img/Carenet.png"
+              alt="User"
+              className="rounded-circle me-2"
+              width="60"
+              height="60"
+            /></Col>
+            <Col><h1 style={{ letterSpacing: '10px'}} className={`fw-bold ${styles.textPrimary}`}>CARENET</h1></Col>
           </Row>
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -157,10 +148,9 @@ const CustomNavbarLogged = () => {
           <Nav className="ms-auto">
             <Nav.Link href="/" className="fw-bold hover-underline mx-3">TRANG CHỦ</Nav.Link>
             <Nav.Link href="#features" className="fw-bold hover-underline mx-3">THÀNH TỰU</Nav.Link>
-            <Nav.Link href="/forum-chat" className="fw-bold hover-underline mx-3">DIỄN ĐÀN</Nav.Link>
+            <Nav.Link href="#how-it-works" className="fw-bold hover-underline mx-3">VẬN HÀNH</Nav.Link>
             <Nav.Link href="#testimonials" className="fw-bold hover-underline mx-3">CHIA SẺ</Nav.Link>
             <Nav.Link href="#contact" className="fw-bold hover-underline mx-3">LIÊN HỆ</Nav.Link>
-            <Nav.Link href="/organization-register" className="fw-bold hover-underline mx-3">ĐĂNG KÍ TỔ CHỨC</Nav.Link>
           </Nav>
 
           {isLoggedIn ? (
@@ -218,15 +208,15 @@ const CustomNavbarLogged = () => {
                   onClick={toggleDropdown}
                   style={{
                     cursor: 'pointer',
-                    width: '50px',
-                    height: '50px',
+                    width: '40px',
+                    height: '40px',
                     borderRadius: '50%',
                     overflow: 'hidden',
                     border: '2px solid #5DB996'
                   }}
                 >
                   <Image
-                    src={currentUser?.avatar || '/avatar_img/anhthe.jpg'}
+                    src={currentUser?.avatar}
                     width="100%"
                     height="100%"
                     style={{ objectFit: 'cover' }}
@@ -251,8 +241,7 @@ const CustomNavbarLogged = () => {
                       <Nav.Link href="/support" className="px-4 py-2">CSKH</Nav.Link>
                       <Nav.Link href="/my-events" className="px-4 py-2">Quản Lý Ghi Danh</Nav.Link>
                       <Nav.Link href="/feedback-page" className="px-4 py-2">Quản Lý Đánh Giá</Nav.Link>
-                      <Nav.Link href="/chat" className="px-4 py-2">Tin nhắn</Nav.Link>
-                      <Nav.Link href="/owner-dashboard" className="px-4 py-2">Tài khoản Organization</Nav.Link>
+                      <Nav.Link href="/owner-post" className="px-4 py-2">Tài khoản Organization</Nav.Link>
                       <Nav.Link href="/dashboard" className="px-4 py-2">Tài khoản Admin</Nav.Link>
                       <Nav.Link onClick={handleLogout} className="px-4 py-2 text-danger">Đăng xuất</Nav.Link>
                     </Nav>

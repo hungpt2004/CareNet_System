@@ -1,10 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import { Table, Tag, Space, Button, Card, Modal, Descriptions, Avatar, Typography, message } from 'antd';
-import { User, Mail, Phone, MapPin, Calendar, Eye, Award, BookOpen, X } from 'lucide-react';
-import styles from '../../css/AppColors.module.css';
-import { formatDateVN } from '../../utils/FormatDateVN';
-import axios from 'axios';
-import axiosInstance from '../../utils/AxiosInstance';
+import React, { useState, useEffect } from "react";
+import {
+  Table,
+  Tag,
+  Space,
+  Button,
+  Card,
+  Modal,
+  Descriptions,
+  Avatar,
+  Typography,
+  message,
+} from "antd";
+import {
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  Eye,
+  Award,
+  BookOpen,
+  X,
+} from "lucide-react";
+import styles from "../../css/AppColors.module.css";
+import { formatDateVN } from "../../utils/FormatDateVN";
+import axios from "axios";
+import axiosInstance from "../../utils/AxiosInstance";
 
 const { Title } = Typography;
 
@@ -21,16 +42,16 @@ const OrganizationStaffManagement = () => {
   const fetchStaffData = async () => {
     try {
       setLoading(true);
-      const response = await axiosInstance.get('/organization/get-owned-staff');
-      
-      if (response.data.status === 'success' && response.data.staff) {
+      const response = await axiosInstance.get("/organization/get-owned-staff");
+
+      if (response.data.status === "success" && response.data.staff) {
         setStaffData(response.data.staff);
       } else {
-        message.error('Failed to fetch staff data');
+        message.error("Failed to fetch staff data");
       }
     } catch (error) {
-      console.error('Error fetching staff data:', error);
-      message.error('Failed to fetch staff data');
+      console.error("Error fetching staff data:", error);
+      message.error("Failed to fetch staff data");
     } finally {
       setTimeout(() => {
         setLoading(false);
@@ -50,9 +71,9 @@ const OrganizationStaffManagement = () => {
 
   const columns = [
     {
-      title: 'Thông tin',
-      dataIndex: 'fullname',
-      key: 'userInfo',
+      title: "Thông tin",
+      dataIndex: "fullname",
+      key: "userInfo",
       render: (text, record) => (
         <Space>
           <Avatar src={record.avatar} size={40} />
@@ -64,9 +85,9 @@ const OrganizationStaffManagement = () => {
       ),
     },
     {
-      title: 'Số điện thoại',
-      dataIndex: 'phone',
-      key: 'phone',
+      title: "Số điện thoại",
+      dataIndex: "phone",
+      key: "phone",
       render: (phone) => (
         <Space>
           <Phone size={16} />
@@ -75,48 +96,48 @@ const OrganizationStaffManagement = () => {
       ),
     },
     {
-      title: 'Vai trò',
-      dataIndex: 'role',
-      key: 'role',
+      title: "Vai trò",
+      dataIndex: "role",
+      key: "role",
       render: (role) => {
-        let color = 'blue';
-        let text = 'Tình nguyện viên';
-        
-        switch(role) {
-          case 'admin':
-            color = 'red';
-            text = 'Admin';
+        let color = "blue";
+        let text = "Tình nguyện viên";
+
+        switch (role) {
+          case "admin":
+            color = "red";
+            text = "Admin";
             break;
-          case 'organization':
-            color = 'green';
-            text = 'Tổ chức';
+          case "organization":
+            color = "green";
+            text = "Tổ chức";
             break;
-          case 'staff':
-            color = 'purple';
-            text = 'Nhân viên';
+          case "staff":
+            color = "purple";
+            text = "Nhân viên";
             break;
           default:
-            color = 'blue';
-            text = 'Tình nguyện viên';
+            color = "blue";
+            text = "Tình nguyện viên";
         }
-        
+
         return <Tag color={color}>{text}</Tag>;
       },
     },
     {
-      title: 'Trạng thái',
-      dataIndex: 'status',
-      key: 'status',
+      title: "Trạng thái",
+      dataIndex: "status",
+      key: "status",
       render: (status) => {
-        let color = status === 'ready' ? 'green' : 'red';
-        let text = status === 'ready' ? 'Sẵn sàng' : 'Bận';
+        let color = status === "ready" ? "green" : "red";
+        let text = status === "ready" ? "Sẵn sàng" : "Bận";
         return <Tag color={color}>{text}</Tag>;
       },
     },
     {
-      title: 'Điểm uy tín',
-      dataIndex: 'reputationPoints',
-      key: 'reputationPoints',
+      title: "Điểm uy tín",
+      dataIndex: "reputationPoints",
+      key: "reputationPoints",
       render: (points) => (
         <Space>
           <Award size={16} />
@@ -125,20 +146,20 @@ const OrganizationStaffManagement = () => {
       ),
     },
     {
-      title: 'Thao tác',
-      key: 'action',
+      title: "Thao tác",
+      key: "action",
       render: (_, record) => (
         <Space size="middle">
-          <Button 
-            type="primary" 
+          <Button
+            type="primary"
             icon={<Eye size={16} />}
             onClick={() => showUserDetail(record)}
           >
             Xem chi tiết
           </Button>
-          <Button 
+          <Button
             type="primary"
-            danger 
+            danger
             icon={<X size={16} />}
             onClick={() => showUserDetail(record)}
           >
@@ -153,7 +174,9 @@ const OrganizationStaffManagement = () => {
     <div className="p-6">
       <div>
         <div className="mb-4">
-          <h3 className={`${styles.textPrimary} display-4`}>Quản lý nhân viên</h3>
+          <h3 className={`${styles.textPrimary} display-4`}>
+            Quản lý nhân viên
+          </h3>
         </div>
         <Table
           columns={columns}
@@ -180,7 +203,7 @@ const OrganizationStaffManagement = () => {
         footer={[
           <Button key="close" onClick={handleCloseModal}>
             Đóng
-          </Button>
+          </Button>,
         ]}
         width={800}
       >
@@ -208,7 +231,8 @@ const OrganizationStaffManagement = () => {
               <Space>
                 <MapPin size={16} />
                 <span>
-                  {selectedUser.address && `${selectedUser.address.province}, ${selectedUser.address.country}`}
+                  {selectedUser.address &&
+                    `${selectedUser.address.province}, ${selectedUser.address.country}`}
                 </span>
               </Space>
             </Descriptions.Item>
@@ -220,34 +244,34 @@ const OrganizationStaffManagement = () => {
             </Descriptions.Item>
             <Descriptions.Item label="Vai trò">
               {(() => {
-                let color = 'blue';
-                let text = 'Tình nguyện viên';
-                
-                switch(selectedUser.role) {
-                  case 'admin':
-                    color = 'red';
-                    text = 'Admin';
+                let color = "blue";
+                let text = "Tình nguyện viên";
+
+                switch (selectedUser.role) {
+                  case "admin":
+                    color = "red";
+                    text = "Admin";
                     break;
-                  case 'organization':
-                    color = 'green';
-                    text = 'Tổ chức';
+                  case "organization":
+                    color = "green";
+                    text = "Tổ chức";
                     break;
-                  case 'staff':
-                    color = 'purple';
-                    text = 'Nhân viên';
+                  case "staff":
+                    color = "purple";
+                    text = "Nhân viên";
                     break;
                   default:
-                    color = 'blue';
-                    text = 'Tình nguyện viên';
+                    color = "blue";
+                    text = "Tình nguyện viên";
                 }
-                
+
                 return <Tag color={color}>{text}</Tag>;
               })()}
             </Descriptions.Item>
             <Descriptions.Item label="Trạng thái">
               {(() => {
-                let color = selectedUser.status === 'ready' ? 'green' : 'red';
-                let text = selectedUser.status === 'ready' ? 'Sẵn sàng' : 'Bận';
+                let color = selectedUser.status === "ready" ? "green" : "red";
+                let text = selectedUser.status === "ready" ? "Sẵn sàng" : "Bận";
                 return <Tag color={color}>{text}</Tag>;
               })()}
             </Descriptions.Item>
@@ -273,7 +297,9 @@ const OrganizationStaffManagement = () => {
               <Descriptions.Item label="Sở thích" span={2}>
                 <Space wrap>
                   {selectedUser.hobbies.map((hobby, index) => (
-                    <Tag key={index} color="blue">{hobby}</Tag>
+                    <Tag key={index} color="blue">
+                      {hobby}
+                    </Tag>
                   ))}
                 </Space>
               </Descriptions.Item>

@@ -1,11 +1,8 @@
 const emailTransporter = require("../services/transporterEmail");
-const { 
-   VERIFICATION_EMAIL_TEMPLATE, 
-   SUCCESS_REGISTER_TEMPLATE, 
-   APPROVE_REGISTER_TEMPLATE, 
-   THANK_YOU_TEMPLATE, 
-   REJECT_REGISTER_TEMPLATE 
-} = require("../mail_templates/emailTemplates");
+const User = require("../models/user.model");
+const AppError = require("../utils/appError");
+const asyncHandler = require("../middleware/asyncHandler");
+const { VERIFICATION_EMAIL_TEMPLATE, SUCCESS_REGISTER_TEMPLATE, APPROVE_REGISTER_TEMPLATE } = require("../mail_templates/emailTemplates");
 const { formatDateVN } = require("../utils/formatDateVN");
 require('dotenv').config();
 
@@ -78,7 +75,6 @@ exports.sendApproveRequest = async (
          .replace("{eventLocation}", eventLocation)
          .replace("{currentYear}", new Date().getFullYear())
       });
-      console.log("Đã gửi email duyệt yêu cầu thành công");
    } catch (error) {
       console.log(error)
    }

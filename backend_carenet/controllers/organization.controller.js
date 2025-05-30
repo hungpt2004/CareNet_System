@@ -1,14 +1,10 @@
 const Organization = require("../models/organization.model");
-const OrganizationLevel = require("../models/organizationLevel.model");
 const User = require("../models/user.model");
 const Event = require("../models/event.model");
 const EventRegistration = require("../models/eventRegistration.model");
 const HistoryEvent = require("../models/historyEvent.model");
 const asyncHandler = require("../middleware/asyncHandler");
-const { sendApproveRequest, sendRejectRequest } = require("./email.controller");
-const { getIO } = require("../socket");
-const { generateCertificate } = require("../services/certificate.service");
-const mongoose = require("mongoose");
+const { sendApproveRequest } = require("./email.controller");
 
 exports.getOwnEvent = asyncHandler(async (req, res) => {
   const currentUser = req.user.user;
@@ -43,45 +39,6 @@ exports.getAllOwnerEvent = asyncHandler(async (req, res) => {
     eventData: events
   })
 
-});
-
-exports.getRequestEventById = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  try {
-    const currentEvent = await Event.findById(id);
-    if (!currentEvent) {
-      return res.status(404).json({
-        status: "fail",
-        message: "Không tìm thấy sự kiện",
-      });
-    }
-
-    const currentEventRegistration = await EventRegistration.find(
-      {
-        event: currentEvent._id, status: "pending",
-      }
-    ).populate(
-      "user",
-      "fullname email phone hobbies dob status reputationPoints totalHours activityPoints"
-    );
-
-    if (!currentEventRegistration.length) {
-      return res.status(404).json({
-        status: "fail",
-        message: "Không tìm thấy yêu cầu",
-      });
-    }
-    return res.status(200).json({
-      status: "success",
-      eventData: currentEvent,
-      eventRegistrationData: currentEventRegistration,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      status: "fail",
-      message: "Lỗi khi lấy yêu cầu",
-    });
-  }
 });
 
 exports.getRequestPendingById = asyncHandler(async (req, res) => {
@@ -124,43 +81,70 @@ exports.getRequestPendingById = asyncHandler(async (req, res) => {
   }
 });
 
-exports.approveRequest = asyncHandler(async (req, res) => {
+exports.getRequestEventById = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { fullname, email } = req.body;
-  console.log("Approving request:", { requestId: id, fullname, email });
-
   try {
-    const currentEventRegistration = await EventRegistration.findById(id);
-    if (!currentEventRegistration) {
-      console.log("Request not found:", id);
-      return res.status(404).json({
-        status: "fail",
-        message: "Không tìm thấy yêu cầu",
-      });
-    }
-    console.log("Found event registration:", currentEventRegistration);
-
-    const currentEvent = await Event.findById(currentEventRegistration.event);
+    const currentEvent = await Event.findById(id);
     if (!currentEvent) {
-      console.log("Event not found:", currentEventRegistration.event);
       return res.status(404).json({
         status: "fail",
         message: "Không tìm thấy sự kiện",
       });
     }
-    console.log("Found event:", currentEvent);
+
+    const currentEventRegistration = await EventRegistration.find({
+      event: currentEvent._id,
+    }).populate("user", "fullname email phone hobbies dob status reputationPoints totalHours activityPoints");
+
+    if (!currentEventRegistration.length) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Không tìm thấy yêu cầu",
+      });
+    }
+    return res.status(200).json({
+      status: "success",
+      eventData: currentEvent,
+      eventRegistrationData: currentEventRegistration,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "fail",
+      message: "Lỗi khi lấy yêu cầu",
+    });
+  }
+});
+
+exports.approveRequest = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { fullname, email } = req.body;
+  try {
+    const currentEventRegistration = await EventRegistration.findById(id);
+    if (!currentEventRegistration) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Không tìm thấy yêu cầu",
+      });
+    }
+
+    const currentEvent = await Event.findById(currentEventRegistration.event);
+    if (!currentEvent) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Không tìm thấy sự kiện",
+      });
+    }
 
     const request = await EventRegistration.findByIdAndUpdate(
       id,
       { status: "approved" },
       { new: true }
     );
-    console.log("Updated registration status:", request);
 
     // Tìm và cập nhật HistoryEvent tương ứng
-    const historyEvent = await HistoryEvent.findOne({
-      event: currentEvent._id,
-      user: currentEventRegistration.user,
+    const historyEvent = await HistoryEvent.findOne({ 
+      eventId: currentEvent._id,
+      userId: currentEventRegistration.user
     });
 
     if (historyEvent) {
@@ -169,7 +153,6 @@ exports.approveRequest = asyncHandler(async (req, res) => {
         { status: "approved" },
         { new: true }
       );
-      console.log("Updated history event status:", historyEvent._id);
     }
 
     const fullAddress = `
@@ -179,59 +162,20 @@ exports.approveRequest = asyncHandler(async (req, res) => {
     ${currentEvent.location.province}
     `;
 
-    // Gửi email thông báo
-    console.log("Sending approval email to:", email);
     await sendApproveRequest(
       fullname,
       email,
       currentEvent.title,
       currentEvent.startAt,
       currentEvent.endAt,
-      fullAddress
+      fullAddress,
     );
-
-    // Đưa user về bận
-    await User.findOneAndUpdate(
-      { _id: currentEventRegistration.user },
-      {
-        $set: { status: "busy" },
-      }
-    );
-
-    // Gửi thông báo realtime qua Socket.IO
-    const notificationData = {
-      type: "request_approved",
-      message: `Đơn đăng ký tham gia sự kiện "${currentEvent.title}" đã được duyệt`,
-      eventId: currentEvent._id,
-      eventTitle: currentEvent.title,
-      startAt: currentEvent.startAt,
-      endAt: currentEvent.endAt,
-      location: fullAddress,
-      timestamp: new Date(),
-    };
-    console.log("Emitting Socket.IO notification:", notificationData);
-
-    const io = getIO();
-    if (!io) {
-      console.error("Socket.IO instance not found");
-      return res.status(500).json({
-        status: "fail",
-        message: "Lỗi kết nối thông báo",
-      });
-    }
-
-    io.to(currentEventRegistration.user.toString()).emit(
-      "requestApproved",
-      notificationData
-    );
-    console.log("Socket.IO notification sent successfully");
 
     return res.status(200).json({
       status: "success",
       message: "Duyệt yêu cầu thành công",
     });
   } catch (err) {
-    console.error("Error in approveRequest:", err);
     return res.status(500).json({
       status: "fail",
       message: "Lỗi khi duyệt yêu cầu",
@@ -239,34 +183,19 @@ exports.approveRequest = asyncHandler(async (req, res) => {
   }
 });
 
-exports.approveCancelledRequest = asyncHandler(async (req, res) => {
-  const { organizationId } = req.body;
-
-  try {
-  } catch (error) {
-    return res.status(500).json({
-      status: "fail",
-      message: "Lỗi khi duyệt yêu cầu: " + error.message,
-    });
-  }
-});
-
 exports.rejectRequest = asyncHandler(async (req, res) => {
-  const { id } = req.params; // id của event registration
-  const { cancellationReason } = req.body;
+  const { id } = req.params;
+  const { cancellationReason } = req.body; // Lấy lý do từ chối từ body request
 
   try {
-    // 1. Check history event
-    // 2. Check event registration
-
     const updateData = {
       status: "rejected",
-      ...(cancellationReason && { cancellationReason }),
+      ...(cancellationReason && { cancellationReason }), // Chỉ thêm cancellationReason nếu có
     };
 
     const request = await EventRegistration.findByIdAndUpdate(id, updateData, {
       new: true,
-    }).populate("event");
+    });
 
     if (!request) {
       return res.status(404).json({
@@ -274,66 +203,6 @@ exports.rejectRequest = asyncHandler(async (req, res) => {
         message: "Không tìm thấy yêu cầu",
       });
     }
-
-    // History event
-    await HistoryEvent.findOneAndUpdate(
-      {
-        event: request.event._id,
-        user: request.user._id,
-      },
-      {
-        $set: { status: "rejected" },
-      },
-      {
-        new: true,
-      }
-    );
-
-    // Sô lượng của event
-    await Event.findOneAndUpdate(
-      { _id: request.event._id },
-      {
-        $inc: { currentParticipants: -1 },
-      }
-    );
-
-    // Gửi email thông báo
-    // await sendRejectRequest(
-    //   request.user.fullname,
-    //   request.user.email,
-    //   request.event.title,
-    //   request.event.startAt,
-    //   request.event.endAt,
-    //   request.event.location,
-    //   cancellationReason,
-    //   request.event.link
-    // );
-
-    // Gửi thông báo realtime qua Socket.IO
-    const notificationData = {
-      type: "request_rejected",
-      message: `Đơn đăng ký tham gia sự kiện "${
-        request.event.title
-      }" đã bị từ chối${
-        cancellationReason ? ` với lý do: ${cancellationReason}` : ""
-      }`,
-      eventId: request.event._id,
-      eventTitle: request.event.title,
-      cancellationReason: cancellationReason,
-      timestamp: new Date(),
-    };
-
-    const io = getIO();
-    if (!io) {
-      console.error("Socket.IO instance not found");
-      return res.status(500).json({
-        status: "fail",
-        message: "Lỗi kết nối thông báo",
-      });
-    }
-
-    io.to(request.user.toString()).emit("requestRejected", notificationData);
-    console.log("Socket.IO rejection notification sent successfully");
 
     return res.status(200).json({
       status: "success",
@@ -634,6 +503,7 @@ exports.updateOrganizationStatus = asyncHandler(async (req, res) => {
     });
   }
 });
+
 exports.updateOrganizationLevel = asyncHandler(async (req, res) => {
   try {
     const { organizationId, levelId } = req.body;
@@ -1017,7 +887,7 @@ exports.getEventsByOrganizationId = asyncHandler(async (req, res) => {
 // Đọc file
 // Lấy tên 
 // Tạo mail
-exports.createStaffList = asyncHandler(async (req, res) => {})
+// exports.createStaffList = asyncHandler(async (req, res) => {})
 
 exports.getOrganizationById = asyncHandler(async (req, res) => {
   const currentUser = req.user.user;

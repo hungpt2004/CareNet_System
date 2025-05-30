@@ -5,7 +5,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import 'antd/dist/reset.css';
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
+  // <StrictMode>
     <App />
-  </StrictMode>
+  //  </StrictMode>
 );

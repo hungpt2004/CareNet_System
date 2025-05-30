@@ -13,7 +13,7 @@ import { Footer } from "../../components/footer/Footer"
 import Achievements from "../../components/component_page/achivements/Achivements"
 import Services from "../../components/component_page/services/Services"
 import styles from '../../css/AppColors.module.css'
-import { FaUserPlus, FaClipboardList, FaHandshake, FaUsers, FaComments } from "react-icons/fa";
+import { FaUserPlus, FaClipboardList, FaHandshake, FaUsers } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 
 function LandingPage() {
@@ -23,10 +23,6 @@ function LandingPage() {
   const [isChat, setIsChat] = useState(false);
   const chatContainerRef = useRef(null); // Tham chiếu tới container chat
 
-  // Add new state for floating chat
-  const [isFloatingChatOpen, setIsFloatingChatOpen] = useState(false);
-  const floatingChatRef = useRef(null);
-
   // Hàm cuộn xuống cuối khi có tin nhắn mới
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -34,19 +30,6 @@ function LandingPage() {
     }
   }, [isChat]); // Mỗi khi cửa sổ chat mở hoặc có tin nhắn mới
 
-  // Add useEffect for handling clicks outside the chat window
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (floatingChatRef.current && !floatingChatRef.current.contains(event.target)) {
-        setIsFloatingChatOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
 
   // Initialize hook
   const navigate = useNavigate();
@@ -153,7 +136,7 @@ function LandingPage() {
                             {/* Nội dung chat */}
                             <div className={`${styles.messageContainer}`}>
                               <div className={`${styles.carenetMessage}`}>
-                                <p>Xin chào! Tôi có thể giúp gì cho bạn?</p>
+                                <p>Chào bạn! Bạn cần giúp đỡ gì?</p>
                               </div>
                               <div className={`${styles.userMessage}`}>
                                 <p>Tôi cần hỗ trợ về sản phẩm.</p>
@@ -163,71 +146,9 @@ function LandingPage() {
 
                           {/* Các câu hỏi có sẵn */}
                           <div className="d-flex flex-wrap gap-2 mb-3">
-                            <Button variant="outline-primary" size="sm" className="rounded-pill" onClick={() => {
-                              // Handle quick reply click
-                              const messageArea = document.querySelector('.chat-messages');
-                              if (messageArea) {
-                                const newMessage = document.createElement('div');
-                                newMessage.className = 'mb-3 text-end';
-                                newMessage.innerHTML = `
-                                  <div class="bg-primary text-white rounded p-2 d-inline-block">
-                                    <p class="mb-0">Tôi muốn đăng ký làm tình nguyện viên</p>
-                                  </div>
-                                `;
-                                messageArea.appendChild(newMessage);
-                                messageArea.scrollTop = messageArea.scrollHeight;
-                              }
-                            }}>
-                              Đăng ký làm tình nguyện viên
-                            </Button>
-                            <Button variant="outline-primary" size="sm" className="rounded-pill" onClick={() => {
-                              const messageArea = document.querySelector('.chat-messages');
-                              if (messageArea) {
-                                const newMessage = document.createElement('div');
-                                newMessage.className = 'mb-3 text-end';
-                                newMessage.innerHTML = `
-                                  <div class="bg-primary text-white rounded p-2 d-inline-block">
-                                    <p class="mb-0">Tôi muốn tìm hiểu về các dự án đang diễn ra</p>
-                                  </div>
-                                `;
-                                messageArea.appendChild(newMessage);
-                                messageArea.scrollTop = messageArea.scrollHeight;
-                              }
-                            }}>
-                              Dự án đang diễn ra
-                            </Button>
-                            <Button variant="outline-primary" size="sm" className="rounded-pill" onClick={() => {
-                              const messageArea = document.querySelector('.chat-messages');
-                              if (messageArea) {
-                                const newMessage = document.createElement('div');
-                                newMessage.className = 'mb-3 text-end';
-                                newMessage.innerHTML = `
-                                  <div class="bg-primary text-white rounded p-2 d-inline-block">
-                                    <p class="mb-0">Tôi cần hỗ trợ kỹ thuật</p>
-                                  </div>
-                                `;
-                                messageArea.appendChild(newMessage);
-                                messageArea.scrollTop = messageArea.scrollHeight;
-                              }
-                            }}>
-                              Hỗ trợ kỹ thuật
-                            </Button>
-                            <Button variant="outline-primary" size="sm" className="rounded-pill" onClick={() => {
-                              const messageArea = document.querySelector('.chat-messages');
-                              if (messageArea) {
-                                const newMessage = document.createElement('div');
-                                newMessage.className = 'mb-3 text-end';
-                                newMessage.innerHTML = `
-                                  <div class="bg-primary text-white rounded p-2 d-inline-block">
-                                    <p class="mb-0">Tôi muốn tìm hiểu về CareNet</p>
-                                  </div>
-                                `;
-                                messageArea.appendChild(newMessage);
-                                messageArea.scrollTop = messageArea.scrollHeight;
-                              }
-                            }}>
-                              Tìm hiểu về CareNet
-                            </Button>
+                            <Button variant="dark">Sự kiện đang diễn ra</Button>
+                            <Button variant="dark">Sự kiện gần đây</Button>
+                            <Button variant="dark">Tư vấn về CareNet</Button>
                           </div>
 
                           {/* Input tin nhắn */}
@@ -262,7 +183,7 @@ function LandingPage() {
                           size="sm"
                           role="status"
                           aria-hidden="true"
-                        /> : "Tìm kiếm cùng CareNet"}
+                        /> : "Kết nối CareNet"}
                       </Button>
                     </motion.div>
                   </div>
@@ -409,9 +330,9 @@ function LandingPage() {
 
       {/* How It Works */}
       <section id="how-it-works" className={`py-5 ${styles.containerSecondary}`}>
-        <Container className="border-0" fluid>
+        <Container fluid>
           <div className="text-center mb-5">
-            <h2 className={`${styles.textPrimary} display-5 fw-bold`}>Vận Hành</h2>
+            <h2 className="display-5 fw-bold">Vận Hành</h2>
             <p className="lead text-muted">Quy trình đơn giản, kết quả mạnh mẽ</p>
           </div>
           <Row className="g-4 px-md-5">
@@ -424,7 +345,7 @@ function LandingPage() {
                 className="text-center"
               >
                 <div
-                  className={`${styles.containerPrimary} border-0 rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3`}
+                  className={`${styles.containerPrimary} rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3`}
                   style={{ width: "80px", height: "80px" }}
                 >
                   <FaUserPlus size={40} color="white" />
@@ -496,12 +417,13 @@ function LandingPage() {
       </section>
 
 
-      <h2 className={`${styles.textPrimary} display-5 fw-bold text-center mt-4`}>Dịch vụ CareNet</h2>
+      <h2 className="display-5 fw-bold text-center mt-4">Dịch vụ CareNet</h2>
       <Services />
 
-      <div className={`border-0 mx-5 py-10 ${styles.containerSecondary}`}>
+      {/* <h2 className="display-5 fw-bold text-center">Top Comments</h2>
+      <div className={`container mx-auto py-10 ${styles.containerSecondary}`}>
         <TopCommentsSlider topComments={comments} />
-      </div>
+      </div> */}
 
 
       {/* Testimonials */}
@@ -650,181 +572,6 @@ function LandingPage() {
           </Row>
         </Container>
       </section>
-
-      {/* Floating Chat Button and Window */}
-      <div 
-        ref={floatingChatRef}
-        className="position-fixed"
-        style={{ 
-          bottom: '20px', 
-          right: '20px', 
-          zIndex: 1000 
-        }}
-      >
-        {/* Chat Window */}
-        {isFloatingChatOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.8 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.8 }}
-            transition={{ duration: 0.2 }}
-            className="bg-white rounded-3 shadow-lg mb-3"
-            style={{ 
-              width: '350px',
-              height: '400px',
-              overflow: 'hidden'
-            }}
-          >
-            {/* Chat Header */}
-            <div className="p-3 border-bottom d-flex justify-content-between align-items-center">
-              <h5 className="mb-0">Chat with CareNet</h5>
-              <Button 
-                variant="link" 
-                className="p-0 text-dark"
-                onClick={() => setIsFloatingChatOpen(false)}
-              >
-                <IoMdClose size={24} />
-              </Button>
-            </div>
-
-            {/* Chat Messages */}
-            <div 
-              className="p-3"
-              style={{ 
-                height: 'calc(100% - 130px)',
-                overflowY: 'auto'
-              }}
-            >
-              <div className="mb-3">
-                <div className="bg-light rounded p-2 d-inline-block">
-                  <p className="mb-0">Xin chào! Tôi có thể giúp gì cho bạn?</p>
-                </div>
-              </div>
-              
-              {/* Quick Reply Buttons */}
-              <div className="d-flex flex-wrap gap-2 mb-3">
-                <Button 
-                  variant="outline-primary" 
-                  size="sm"
-                  className="rounded-pill"
-                  onClick={() => {
-                    // Handle quick reply click
-                    const messageArea = document.querySelector('.chat-messages');
-                    if (messageArea) {
-                      const newMessage = document.createElement('div');
-                      newMessage.className = 'mb-3 text-end';
-                      newMessage.innerHTML = `
-                        <div class="bg-primary text-white rounded p-2 d-inline-block">
-                          <p class="mb-0">Tôi muốn đăng ký làm tình nguyện viên</p>
-                        </div>
-                      `;
-                      messageArea.appendChild(newMessage);
-                      messageArea.scrollTop = messageArea.scrollHeight;
-                    }
-                  }}
-                >
-                  Đăng ký làm tình nguyện viên
-                </Button>
-                <Button 
-                  variant="outline-primary" 
-                  size="sm"
-                  className="rounded-pill"
-                  onClick={() => {
-                    const messageArea = document.querySelector('.chat-messages');
-                    if (messageArea) {
-                      const newMessage = document.createElement('div');
-                      newMessage.className = 'mb-3 text-end';
-                      newMessage.innerHTML = `
-                        <div class="bg-primary text-white rounded p-2 d-inline-block">
-                          <p class="mb-0">Tôi muốn tìm hiểu về các dự án đang diễn ra</p>
-                        </div>
-                      `;
-                      messageArea.appendChild(newMessage);
-                      messageArea.scrollTop = messageArea.scrollHeight;
-                    }
-                  }}
-                >
-                  Dự án đang diễn ra
-                </Button>
-                <Button 
-                  variant="outline-primary" 
-                  size="sm"
-                  className="rounded-pill"
-                  onClick={() => {
-                    const messageArea = document.querySelector('.chat-messages');
-                    if (messageArea) {
-                      const newMessage = document.createElement('div');
-                      newMessage.className = 'mb-3 text-end';
-                      newMessage.innerHTML = `
-                        <div class="bg-primary text-white rounded p-2 d-inline-block">
-                          <p class="mb-0">Tôi cần hỗ trợ kỹ thuật</p>
-                        </div>
-                      `;
-                      messageArea.appendChild(newMessage);
-                      messageArea.scrollTop = messageArea.scrollHeight;
-                    }
-                  }}
-                >
-                  Hỗ trợ kỹ thuật
-                </Button>
-                <Button 
-                  variant="outline-primary" 
-                  size="sm"
-                  className="rounded-pill"
-                  onClick={() => {
-                    const messageArea = document.querySelector('.chat-messages');
-                    if (messageArea) {
-                      const newMessage = document.createElement('div');
-                      newMessage.className = 'mb-3 text-end';
-                      newMessage.innerHTML = `
-                        <div class="bg-primary text-white rounded p-2 d-inline-block">
-                          <p class="mb-0">Tôi muốn tìm hiểu về CareNet</p>
-                        </div>
-                      `;
-                      messageArea.appendChild(newMessage);
-                      messageArea.scrollTop = messageArea.scrollHeight;
-                    }
-                  }}
-                >
-                  Tìm hiểu về CareNet
-                </Button>
-              </div>
-            </div>
-
-            {/* Chat Input */}
-            <div className="p-3 border-top">
-              <div className="d-flex gap-2">
-                <Form.Control 
-                  type="text" 
-                  placeholder="Type your message..." 
-                  className="flex-grow-1"
-                />
-                <Button variant="primary">Send</Button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Floating Chat Button */}
-        <motion.div
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-        >
-          <Button
-            variant="primary"
-            className="rounded-circle p-3 shadow-lg"
-            onClick={() => setIsFloatingChatOpen(!isFloatingChatOpen)}
-            style={{ 
-              width: '60px', 
-              height: '60px',
-              backgroundColor: styles.containerPrimary,
-              border: 'none'
-            }}
-          >
-            <FaComments size={24} />
-          </Button>
-        </motion.div>
-      </div>
 
     </div >
   )

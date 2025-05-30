@@ -1,24 +1,60 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Layout, List, Input, Button, Avatar, Select, Empty } from 'antd';
-import { SendOutlined, UserOutlined } from '@ant-design/icons';
-import io from 'socket.io-client';
+import React, { useState, useEffect, useRef } from "react";
+import { Layout, List, Input, Button, Avatar, Select, Empty } from "antd";
+import { SendOutlined, UserOutlined } from "@ant-design/icons";
+import io from "socket.io-client";
 
 const { Sider, Content } = Layout;
 const { Option } = Select;
 
 const mockUsers = {
   admin: [
-    { _id: "admin1", fullname: "Admin One", email: "admin1@example.com", avatar: null, role: "admin" },
-    { _id: "admin2", fullname: "Admin Two", email: "admin2@example.com", avatar: null, role: "admin" },
+    {
+      _id: "admin1",
+      fullname: "Admin One",
+      email: "admin1@example.com",
+      avatar: null,
+      role: "admin",
+    },
+    {
+      _id: "admin2",
+      fullname: "Admin Two",
+      email: "admin2@example.com",
+      avatar: null,
+      role: "admin",
+    },
   ],
   organization: [
-    { _id: "org1", fullname: "CareNet Org", email: "org1@example.com", avatar: null, role: "organization" },
-    { _id: "org2", fullname: "Hope Foundation", email: "org2@example.com", avatar: null, role: "organization" },
+    {
+      _id: "org1",
+      fullname: "CareNet Org",
+      email: "org1@example.com",
+      avatar: null,
+      role: "organization",
+    },
+    {
+      _id: "org2",
+      fullname: "Hope Foundation",
+      email: "org2@example.com",
+      avatar: null,
+      role: "organization",
+    },
   ],
   user: [
-    { _id: "user1", fullname: "User One", email: "user1@example.com", avatar: null, role: "user" },
-    { _id: "user2", fullname: "User Two", email: "user2@example.com", avatar: null, role: "user" },
-  ]
+    {
+      _id: "user1",
+      fullname: "User One",
+      email: "user1@example.com",
+      avatar: null,
+      role: "user",
+    },
+    {
+      _id: "user2",
+      fullname: "User Two",
+      email: "user2@example.com",
+      avatar: null,
+      role: "user",
+    },
+  ],
 };
 
 const mockChats = [
@@ -28,56 +64,97 @@ const mockChats = [
 ];
 
 const mockMessages = [
-  { _id: "msg1", chatId: "chat1", sender: { _id: "user1" }, message: "Xin chào Admin!", createdAt: "2025-05-23T11:30:00Z" },
-  { _id: "msg2", chatId: "chat1", sender: { _id: "admin1" }, message: "Chào bạn!", createdAt: "2025-05-23T11:31:00Z" },
-  { _id: "msg3", chatId: "chat2", sender: { _id: "user1" }, message: "CareNet, bạn khỏe không?", createdAt: "2025-05-23T11:32:00Z" },
-  { _id: "msg4", chatId: "chat2", sender: { _id: "org1" }, message: "Khỏe, cảm ơn bạn!", createdAt: "2025-05-23T11:33:00Z" },
-  { _id: "msg5", chatId: "chat3", sender: { _id: "user1" }, message: "Hey, User Two!", createdAt: "2025-05-23T11:34:00Z" },
-  { _id: "msg6", chatId: "chat3", sender: { _id: "user2" }, message: "Hi, what's up?", createdAt: "2025-05-23T11:35:00Z" },
+  {
+    _id: "msg1",
+    chatId: "chat1",
+    sender: { _id: "user1" },
+    message: "Xin chào Admin!",
+    createdAt: "2025-05-23T11:30:00Z",
+  },
+  {
+    _id: "msg2",
+    chatId: "chat1",
+    sender: { _id: "admin1" },
+    message: "Chào bạn!",
+    createdAt: "2025-05-23T11:31:00Z",
+  },
+  {
+    _id: "msg3",
+    chatId: "chat2",
+    sender: { _id: "user1" },
+    message: "CareNet, bạn khỏe không?",
+    createdAt: "2025-05-23T11:32:00Z",
+  },
+  {
+    _id: "msg4",
+    chatId: "chat2",
+    sender: { _id: "org1" },
+    message: "Khỏe, cảm ơn bạn!",
+    createdAt: "2025-05-23T11:33:00Z",
+  },
+  {
+    _id: "msg5",
+    chatId: "chat3",
+    sender: { _id: "user1" },
+    message: "Hey, User Two!",
+    createdAt: "2025-05-23T11:34:00Z",
+  },
+  {
+    _id: "msg6",
+    chatId: "chat3",
+    sender: { _id: "user2" },
+    message: "Hi, what's up?",
+    createdAt: "2025-05-23T11:35:00Z",
+  },
 ];
 
 const ChatPage = () => {
   const [currentChat, setCurrentChat] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState('');
+  const [newMessage, setNewMessage] = useState("");
   const [users, setUsers] = useState([]);
-  const [selectedRole, setSelectedRole] = useState('user');
-  const [searchText, setSearchText] = useState('');
+  const [selectedRole, setSelectedRole] = useState("user");
+  const [searchText, setSearchText] = useState("");
   const socket = useRef();
   const scrollRef = useRef();
 
   const currentUser = { _id: "user1" };
 
   const styles = {
-    layout: { height: '370px', width: '900px', margin: 'auto', background: '#f5f5f5' },
-    sider: { background: '#fff', padding: '8px', width: 180 },
-    content: { background: '#fff', margin: '8px', padding: '8px' },
+    layout: {
+      height: "370px",
+      width: "900px",
+      margin: "auto",
+      background: "#f5f5f5",
+    },
+    sider: { background: "#fff", padding: "8px", width: 180 },
+    content: { background: "#fff", margin: "8px", padding: "8px" },
     messageList: {
-      height: '300px',
-      overflowY: 'auto',
-      padding: '8px',
-      background: '#f9f9f9',
-      borderRadius: '4px'
+      height: "300px",
+      overflowY: "auto",
+      padding: "8px",
+      background: "#f9f9f9",
+      borderRadius: "4px",
     },
     message: (isSender) => ({
-      display: 'flex',
-      justifyContent: isSender ? 'flex-end' : 'flex-start',
-      marginBottom: 6
+      display: "flex",
+      justifyContent: isSender ? "flex-end" : "flex-start",
+      marginBottom: 6,
     }),
     messageBubble: (isSender) => ({
-      background: isSender ? '#1890ff' : '#f0f2f5',
-      color: isSender ? '#fff' : '#000',
-      padding: '4px 8px',
-      borderRadius: '8px',
-      maxWidth: '80%',
-      fontSize: '12px'
+      background: isSender ? "#1890ff" : "#f0f2f5",
+      color: isSender ? "#fff" : "#000",
+      padding: "4px 8px",
+      borderRadius: "8px",
+      maxWidth: "80%",
+      fontSize: "12px",
     }),
-    input: { display: 'flex', marginTop: 8 }
+    input: { display: "flex", marginTop: 8 },
   };
 
   useEffect(() => {
-    socket.current = io('http://localhost:5000');
-    socket.current.on('newMessage', (message) => {
+    socket.current = io("http://localhost:5000");
+    socket.current.on("newMessage", (message) => {
       setMessages((prev) => [...prev, message]);
     });
     return () => socket.current.disconnect();
@@ -89,12 +166,12 @@ const ChatPage = () => {
 
   useEffect(() => {
     if (currentChat) {
-      setMessages(mockMessages.filter(msg => msg.chatId === currentChat._id));
+      setMessages(mockMessages.filter((msg) => msg.chatId === currentChat._id));
     }
   }, [currentChat]);
 
   useEffect(() => {
-    scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const handleSendMessage = () => {
@@ -104,24 +181,25 @@ const ChatPage = () => {
       chatId: currentChat._id,
       sender: { _id: currentUser._id },
       message: newMessage,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
-    socket.current.emit('sendMessage', messageData);
+    socket.current.emit("sendMessage", messageData);
     setMessages([...messages, messageData]);
-    setNewMessage('');
+    setNewMessage("");
   };
 
   const handleSelectUser = (userId) => {
-    const chat = mockChats.find(c =>
-      c.participants.some(p => p._id === currentUser._id) &&
-      c.participants.some(p => p._id === userId)
+    const chat = mockChats.find(
+      (c) =>
+        c.participants.some((p) => p._id === currentUser._id) &&
+        c.participants.some((p) => p._id === userId)
     );
     if (chat) {
       setCurrentChat(chat);
     } else {
       const newChat = {
         _id: `chat${Date.now()}`,
-        participants: [{ _id: currentUser._id }, { _id: userId }]
+        participants: [{ _id: currentUser._id }, { _id: userId }],
       };
       mockChats.push(newChat);
       setCurrentChat(newChat);
@@ -132,7 +210,7 @@ const ChatPage = () => {
     <Layout style={styles.layout}>
       <Sider style={styles.sider}>
         <Select
-          style={{ width: '100%', marginBottom: 6 }}
+          style={{ width: "100%", marginBottom: 6 }}
           value={selectedRole}
           onChange={setSelectedRole}
           size="small"
@@ -149,17 +227,21 @@ const ChatPage = () => {
           size="small"
         />
         <List
-          dataSource={users.filter(user =>
+          dataSource={users.filter((user) =>
             user.fullname?.toLowerCase().includes(searchText.toLowerCase())
           )}
           renderItem={(user) => (
             <List.Item
               onClick={() => handleSelectUser(user._id)}
-              style={{ cursor: 'pointer', padding: '4px' }}
+              style={{ cursor: "pointer", padding: "4px" }}
             >
               <List.Item.Meta
-                avatar={<Avatar src={user.avatar} icon={<UserOutlined />} size={24} />}
-                title={<span style={{ fontSize: '12px' }}>{user.fullname}</span>}
+                avatar={
+                  <Avatar src={user.avatar} icon={<UserOutlined />} size={24} />
+                }
+                title={
+                  <span style={{ fontSize: "12px" }}>{user.fullname}</span>
+                }
               />
             </List.Item>
           )}
@@ -173,10 +255,16 @@ const ChatPage = () => {
                 {messages.map((message) => (
                   <div
                     key={message._id}
-                    style={styles.message(message.sender._id === currentUser._id)}
+                    style={styles.message(
+                      message.sender._id === currentUser._id
+                    )}
                     ref={scrollRef}
                   >
-                    <div style={styles.messageBubble(message.sender._id === currentUser._id)}>
+                    <div
+                      style={styles.messageBubble(
+                        message.sender._id === currentUser._id
+                      )}
+                    >
                       <div>{message.message}</div>
                       <div style={{ fontSize: 8, opacity: 0.6 }}>
                         {new Date(message.createdAt).toLocaleTimeString()}
@@ -191,7 +279,7 @@ const ChatPage = () => {
                   onChange={(e) => setNewMessage(e.target.value)}
                   onPressEnter={handleSendMessage}
                   placeholder="Tin nhắn..."
-                  style={{ marginRight: 6, fontSize: '12px' }}
+                  style={{ marginRight: 6, fontSize: "12px" }}
                   size="small"
                 />
                 <Button

@@ -1,12 +1,38 @@
-import React, { useState, useEffect } from 'react';
-import { Table, Tag, Space, Button, Card, Typography, message, Spin, Modal, Descriptions, Form, Input, Select, DatePicker, List } from 'antd';
-import { Calendar, MapPin, Users, Clock, Eye, Info, DollarSign, FileText, Edit2 } from 'lucide-react';
-import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
-import dayjs from 'dayjs';
-import axiosInstance from '../../utils/AxiosInstance';
-import styles from '../../css/AppColors.module.css'
-import { formatDateVN } from '../../utils/FormatDateVN';
+import React, { useState, useEffect } from "react";
+import {
+  Table,
+  Tag,
+  Space,
+  Button,
+  Card,
+  Typography,
+  message,
+  Spin,
+  Modal,
+  Descriptions,
+  Form,
+  Input,
+  Select,
+  DatePicker,
+  List,
+} from "antd";
+import {
+  Calendar,
+  MapPin,
+  Users,
+  Clock,
+  Eye,
+  Info,
+  DollarSign,
+  FileText,
+  Edit2,
+} from "lucide-react";
+import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
+import dayjs from "dayjs";
+import axiosInstance from "../../utils/AxiosInstance";
+import styles from "../../css/AppColors.module.css";
+import { formatDateVN } from "../../utils/FormatDateVN";
 
 const { TextArea } = Input;
 const { RangePicker } = DatePicker;
@@ -25,18 +51,18 @@ const OrganizationEvents = () => {
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      console.log('Fetching events...'); // Debug log
-      const response = await axiosInstance.get('/event/get-finished-events');
-      console.log('API Response:', response.data); // Debug log
-      
-      if(response.data.status === "success" && response.data.events){
+      console.log("Fetching events..."); // Debug log
+      const response = await axiosInstance.get("/event/get-finished-events");
+      console.log("API Response:", response.data); // Debug log
+
+      if (response.data.status === "success" && response.data.events) {
         setEvents(response.data.events);
       } else {
-        message.error('Không thể lấy dữ liệu sự kiện');
+        message.error("Không thể lấy dữ liệu sự kiện");
       }
     } catch (error) {
-      console.error('Error fetching events:', error);
-      message.error('Có lỗi xảy ra khi tải dữ liệu');
+      console.error("Error fetching events:", error);
+      message.error("Có lỗi xảy ra khi tải dữ liệu");
     } finally {
       setLoading(false);
     }
@@ -45,7 +71,7 @@ const OrganizationEvents = () => {
   console.log(JSON.stringify(events));
 
   useEffect(() => {
-    console.log('Component mounted'); // Debug log
+    console.log("Component mounted"); // Debug log
     fetchEvents();
   }, []);
 
@@ -69,10 +95,10 @@ const OrganizationEvents = () => {
         street: event.location.street,
         ward: event.location.ward,
         district: event.location.district,
-        province: event.location.province
+        province: event.location.province,
       },
       timeRange: [dayjs(event.startAt), dayjs(event.endAt)],
-      maxParticipants: event.maxParticipants
+      maxParticipants: event.maxParticipants,
     });
     setIsUpdateModalVisible(true);
   };
@@ -81,24 +107,27 @@ const OrganizationEvents = () => {
     try {
       setLoading(true);
       const [startAt, endAt] = values.timeRange;
-      
+
       const updateData = {
         ...values,
         startAt: startAt.toISOString(),
         endAt: endAt.toISOString(),
-        eventId: selectedEvent._id
+        eventId: selectedEvent._id,
       };
 
-      const response = await axiosInstance.put('/organization/update-event', updateData);
+      const response = await axiosInstance.put(
+        "/organization/update-event",
+        updateData
+      );
 
-      if (response.data.status === 'success') {
-        message.success('Cập nhật sự kiện thành công!');
+      if (response.data.status === "success") {
+        message.success("Cập nhật sự kiện thành công!");
         setIsUpdateModalVisible(false);
         fetchEvents(); // Refresh danh sách
       }
     } catch (error) {
-      console.error('Error updating event:', error);
-      message.error('Có lỗi xảy ra khi cập nhật sự kiện');
+      console.error("Error updating event:", error);
+      message.error("Có lỗi xảy ra khi cập nhật sự kiện");
     } finally {
       setLoading(false);
     }
@@ -107,7 +136,7 @@ const OrganizationEvents = () => {
   const showFormEditModal = (event) => {
     setSelectedEvent(event);
     formEditForm.setFieldsValue({
-      questions: event.formData?.questions || []
+      questions: event.formData?.questions || [],
     });
     setIsFormEditModalVisible(true);
   };
@@ -115,21 +144,24 @@ const OrganizationEvents = () => {
   const handleFormEdit = async (values) => {
     try {
       setLoading(true);
-      const response = await axiosInstance.put('/organization/update-event-form', {
-        eventId: selectedEvent._id,
-        formData: {
-          questions: values.questions
+      const response = await axiosInstance.put(
+        "/organization/update-event-form",
+        {
+          eventId: selectedEvent._id,
+          formData: {
+            questions: values.questions,
+          },
         }
-      });
+      );
 
-      if (response.data.status === 'success') {
-        message.success('Cập nhật form đăng ký thành công!');
+      if (response.data.status === "success") {
+        message.success("Cập nhật form đăng ký thành công!");
         setIsFormEditModalVisible(false);
         fetchEvents(); // Refresh danh sách
       }
     } catch (error) {
-      console.error('Error updating form:', error);
-      message.error('Có lỗi xảy ra khi cập nhật form đăng ký');
+      console.error("Error updating form:", error);
+      message.error("Có lỗi xảy ra khi cập nhật form đăng ký");
     } finally {
       setLoading(false);
     }
@@ -137,9 +169,9 @@ const OrganizationEvents = () => {
 
   const columns = [
     {
-      title: 'Tên sự kiện',
-      dataIndex: 'title',
-      key: 'title',
+      title: "Tên sự kiện",
+      dataIndex: "title",
+      key: "title",
       render: (text) => (
         <Space>
           <Calendar size={16} />
@@ -148,9 +180,9 @@ const OrganizationEvents = () => {
       ),
     },
     {
-      title: 'Địa điểm',
-      dataIndex: 'location',
-      key: 'location',
+      title: "Địa điểm",
+      dataIndex: "location",
+      key: "location",
       render: (location) => (
         <Space>
           <MapPin size={16} />
@@ -159,87 +191,88 @@ const OrganizationEvents = () => {
       ),
     },
     {
-      title: 'Thời gian',
-      dataIndex: 'startAt',
-      key: 'time',
+      title: "Thời gian",
+      dataIndex: "startAt",
+      key: "time",
       render: (_, record) => (
         <Space>
           <Clock size={16} />
           <span>
-            {dayjs(record.startAt).format('DD/MM/YYYY HH:mm')} - {dayjs(record.endAt).format('DD/MM/YYYY HH:mm')}
+            {dayjs(record.startAt).format("DD/MM/YYYY HH:mm")} -{" "}
+            {dayjs(record.endAt).format("DD/MM/YYYY HH:mm")}
           </span>
         </Space>
       ),
     },
     {
-      title: 'Trạng thái',
-      dataIndex: 'status',
-      key: 'status',
+      title: "Trạng thái",
+      dataIndex: "status",
+      key: "status",
       render: (status) => {
-        let color = 'blue';
-        let text = 'Đang tuyển';
-        
-        switch(status) {
-          case 'hiring':
-            color = 'blue';
-            text = 'Đang tuyển';
+        let color = "blue";
+        let text = "Đang tuyển";
+
+        switch (status) {
+          case "hiring":
+            color = "blue";
+            text = "Đang tuyển";
             break;
-          case 'processing':
-            color = 'green';
-            text = 'Đang diễn ra';
+          case "processing":
+            color = "green";
+            text = "Đang diễn ra";
             break;
-          case 'completed':
-            color = 'gray';
-            text = 'Đã hoàn thành';
+          case "completed":
+            color = "gray";
+            text = "Đã hoàn thành";
             break;
-          case 'cancelled':
-            color = 'red';
-            text = 'Đã hủy';
+          case "cancelled":
+            color = "red";
+            text = "Đã hủy";
             break;
           default:
-            color = 'blue';
-            text = 'Đang tuyển';
+            color = "blue";
+            text = "Đang tuyển";
         }
-        
+
         return <Tag color={color}>{text}</Tag>;
       },
     },
     {
-      title: 'Trạng thái duyệt',
-      dataIndex: 'adminStatus',
-      key: 'adminStatus',
+      title: "Trạng thái duyệt",
+      dataIndex: "adminStatus",
+      key: "adminStatus",
       render: (adminStatus) => {
-        let color = 'gray';
-        let text = 'Chưa xác định';
-        
-        switch(adminStatus) {
-          case 'pending':
-            color = 'blue';
-            text = 'Đang đợi duyệt';
+        let color = "gray";
+        let text = "Chưa xác định";
+
+        switch (adminStatus) {
+          case "pending":
+            color = "blue";
+            text = "Đang đợi duyệt";
             break;
-          case 'approved':
-            color = 'green';
-            text = 'Đã được duyệt';
+          case "approved":
+            color = "green";
+            text = "Đã được duyệt";
             break;
-          case 'rejected':
-            color = 'red';
-            text = 'Đã bị từ chối';
+          case "rejected":
+            color = "red";
+            text = "Đã bị từ chối";
             break;
           default:
-            color = 'grey';
-            text = 'Không xác định';
+            color = "grey";
+            text = "Không xác định";
         }
-        
+
         return <Tag color={color}>{text}</Tag>;
       },
     },
     {
-      title: 'Thao tác',
-      key: 'action',
+      title: "Thao tác",
+      key: "action",
       render: (_, record) => (
         <Space size="middle">
-          <Button 
-            type="default" 
+          <Button
+            type="default"
             style={{
               backgroundColor: styles.primaryColor,
               borderColor: styles.primaryColor,
@@ -262,7 +295,6 @@ const OrganizationEvents = () => {
 
   return (
     <div className="p-6">
-
       {/* Table danh sách sự kiện */}
       <Card>
         <div className="mb-4">
@@ -320,7 +352,7 @@ const OrganizationEvents = () => {
             }}
           >
             Xem trang chi tiết
-          </Button>
+          </Button>,
         ]}
         width={800}
       >
@@ -344,43 +376,47 @@ const OrganizationEvents = () => {
               <Space>
                 <Clock size={16} />
                 <span>
-                  {formatDateVN(selectedEvent.startAt)} - {formatDateVN(selectedEvent.endAt)}
+                  {formatDateVN(selectedEvent.startAt)} -{" "}
+                  {formatDateVN(selectedEvent.endAt)}
                 </span>
               </Space>
             </Descriptions.Item>
             <Descriptions.Item label="Số người tham gia">
               <Space>
                 <Users size={16} />
-                <span>{selectedEvent.currentParticipants}/{selectedEvent.maxParticipants}</span>
+                <span>
+                  {selectedEvent.currentParticipants}/
+                  {selectedEvent.maxParticipants}
+                </span>
               </Space>
             </Descriptions.Item>
             <Descriptions.Item label="Trạng thái">
               {(() => {
-                let color = 'blue';
-                let text = 'Đang tuyển';
-                
-                switch(selectedEvent.status) {
-                  case 'hiring':
-                    color = 'blue';
-                    text = 'Đang tuyển';
+                let color = "blue";
+                let text = "Đang tuyển";
+
+                switch (selectedEvent.status) {
+                  case "hiring":
+                    color = "blue";
+                    text = "Đang tuyển";
                     break;
-                  case 'processing':
-                    color = 'green';
-                    text = 'Đang diễn ra';
+                  case "processing":
+                    color = "green";
+                    text = "Đang diễn ra";
                     break;
-                  case 'completed':
-                    color = 'gray';
-                    text = 'Đã hoàn thành';
+                  case "completed":
+                    color = "gray";
+                    text = "Đã hoàn thành";
                     break;
-                  case 'cancelled':
-                    color = 'red';
-                    text = 'Đã hủy';
+                  case "cancelled":
+                    color = "red";
+                    text = "Đã hủy";
                     break;
                   default:
-                    color = 'blue';
-                    text = 'Đang tuyển';
+                    color = "blue";
+                    text = "Đang tuyển";
                 }
-                
+
                 return <Tag color={color}>{text}</Tag>;
               })()}
             </Descriptions.Item>
@@ -400,36 +436,43 @@ const OrganizationEvents = () => {
                 </Space>
               </Descriptions.Item>
             )}
-            {selectedEvent.formData?.questions && selectedEvent.formData.questions.length > 0 && (
-              <Descriptions.Item label="Form đăng ký" span={2}>
-                <List
-                  dataSource={selectedEvent.formData.questions}
-                  renderItem={(q, index) => (
-                    <List.Item>
-                      <div>
-                        <div><strong>Câu hỏi {index + 1}:</strong> {q.question}</div>
-                        <div><strong>Loại câu hỏi:</strong> {
-                          q.type === 'text' ? 'Câu hỏi text' :
-                          q.type === 'checkbox' ? 'Câu hỏi checkbox' :
-                          q.type === 'radio' ? 'Câu hỏi radio' :
-                          'Câu hỏi dropdown'
-                        }</div>
-                        {q.options && q.options.length > 0 && (
+            {selectedEvent.formData?.questions &&
+              selectedEvent.formData.questions.length > 0 && (
+                <Descriptions.Item label="Form đăng ký" span={2}>
+                  <List
+                    dataSource={selectedEvent.formData.questions}
+                    renderItem={(q, index) => (
+                      <List.Item>
+                        <div>
                           <div>
-                            <strong>Các lựa chọn:</strong>
-                            <ul>
-                              {q.options.map((option, i) => (
-                                <li key={i}>{option}</li>
-                              ))}
-                            </ul>
+                            <strong>Câu hỏi {index + 1}:</strong> {q.question}
                           </div>
-                        )}
-                      </div>
-                    </List.Item>
-                  )}
-                />
-              </Descriptions.Item>
-            )}
+                          <div>
+                            <strong>Loại câu hỏi:</strong>{" "}
+                            {q.type === "text"
+                              ? "Câu hỏi text"
+                              : q.type === "checkbox"
+                              ? "Câu hỏi checkbox"
+                              : q.type === "radio"
+                              ? "Câu hỏi radio"
+                              : "Câu hỏi dropdown"}
+                          </div>
+                          {q.options && q.options.length > 0 && (
+                            <div>
+                              <strong>Các lựa chọn:</strong>
+                              <ul>
+                                {q.options.map((option, i) => (
+                                  <li key={i}>{option}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                      </List.Item>
+                    )}
+                  />
+                </Descriptions.Item>
+              )}
           </Descriptions>
         )}
       </Modal>
@@ -456,7 +499,7 @@ const OrganizationEvents = () => {
           <Form.Item
             name="title"
             label="Tên sự kiện"
-            rules={[{ required: true, message: 'Vui lòng nhập tên sự kiện!' }]}
+            rules={[{ required: true, message: "Vui lòng nhập tên sự kiện!" }]}
           >
             <Input />
           </Form.Item>
@@ -464,7 +507,7 @@ const OrganizationEvents = () => {
           <Form.Item
             name="description"
             label="Mô tả"
-            rules={[{ required: true, message: 'Vui lòng nhập mô tả!' }]}
+            rules={[{ required: true, message: "Vui lòng nhập mô tả!" }]}
           >
             <TextArea rows={4} />
           </Form.Item>
@@ -472,7 +515,7 @@ const OrganizationEvents = () => {
           <Form.Item
             name="status"
             label="Trạng thái"
-            rules={[{ required: true, message: 'Vui lòng chọn trạng thái!' }]}
+            rules={[{ required: true, message: "Vui lòng chọn trạng thái!" }]}
           >
             <Select>
               <Select.Option value="hiring">Đang tuyển</Select.Option>
@@ -485,43 +528,45 @@ const OrganizationEvents = () => {
           <Form.Item
             name="timeRange"
             label="Thời gian diễn ra"
-            rules={[{ required: true, message: 'Vui lòng chọn thời gian!' }]}
+            rules={[{ required: true, message: "Vui lòng chọn thời gian!" }]}
           >
-            <RangePicker 
-              showTime 
+            <RangePicker
+              showTime
               format="YYYY-MM-DD HH:mm"
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
             />
           </Form.Item>
 
           <Form.Item
-            name={['location', 'street']}
+            name={["location", "street"]}
             label="Địa chỉ"
-            rules={[{ required: true, message: 'Vui lòng nhập địa chỉ!' }]}
+            rules={[{ required: true, message: "Vui lòng nhập địa chỉ!" }]}
           >
             <Input placeholder="Số nhà, tên đường" />
           </Form.Item>
 
           <Form.Item
-            name={['location', 'ward']}
+            name={["location", "ward"]}
             label="Phường/Xã"
-            rules={[{ required: true, message: 'Vui lòng nhập phường/xã!' }]}
+            rules={[{ required: true, message: "Vui lòng nhập phường/xã!" }]}
           >
             <Input />
           </Form.Item>
 
           <Form.Item
-            name={['location', 'district']}
+            name={["location", "district"]}
             label="Quận/Huyện"
-            rules={[{ required: true, message: 'Vui lòng nhập quận/huyện!' }]}
+            rules={[{ required: true, message: "Vui lòng nhập quận/huyện!" }]}
           >
             <Input />
           </Form.Item>
 
           <Form.Item
-            name={['location', 'province']}
+            name={["location", "province"]}
             label="Tỉnh/Thành phố"
-            rules={[{ required: true, message: 'Vui lòng nhập tỉnh/thành phố!' }]}
+            rules={[
+              { required: true, message: "Vui lòng nhập tỉnh/thành phố!" },
+            ]}
           >
             <Input />
           </Form.Item>
@@ -529,49 +574,56 @@ const OrganizationEvents = () => {
           <Form.Item
             name="maxParticipants"
             label="Số lượng tình nguyện viên tối đa"
-            rules={[{ required: true, message: 'Vui lòng nhập số lượng!' }]}
+            rules={[{ required: true, message: "Vui lòng nhập số lượng!" }]}
           >
             <Input type="number" min={1} />
           </Form.Item>
 
-          {selectedEvent?.formData?.questions && selectedEvent.formData.questions.length > 0 && (
-            <Form.Item label="Form đăng ký">
-              <List
-                dataSource={selectedEvent.formData.questions}
-                renderItem={(q, index) => (
-                  <List.Item>
-                    <div style={{ width: '100%' }}>
-                      <div><strong>Câu hỏi {index + 1}:</strong> {q.question}</div>
-                      <div><strong>Loại câu hỏi:</strong> {
-                        q.type === 'text' ? 'Câu hỏi text' :
-                        q.type === 'checkbox' ? 'Câu hỏi checkbox' :
-                        q.type === 'radio' ? 'Câu hỏi radio' :
-                        'Câu hỏi dropdown'
-                      }</div>
-                      {q.options && q.options.length > 0 && (
+          {selectedEvent?.formData?.questions &&
+            selectedEvent.formData.questions.length > 0 && (
+              <Form.Item label="Form đăng ký">
+                <List
+                  dataSource={selectedEvent.formData.questions}
+                  renderItem={(q, index) => (
+                    <List.Item>
+                      <div style={{ width: "100%" }}>
                         <div>
-                          <strong>Các lựa chọn:</strong>
-                          <ul>
-                            {q.options.map((option, i) => (
-                              <li key={i}>{option}</li>
-                            ))}
-                          </ul>
+                          <strong>Câu hỏi {index + 1}:</strong> {q.question}
                         </div>
-                      )}
-                    </div>
-                  </List.Item>
-                )}
-              />
-            </Form.Item>
-          )}
+                        <div>
+                          <strong>Loại câu hỏi:</strong>{" "}
+                          {q.type === "text"
+                            ? "Câu hỏi text"
+                            : q.type === "checkbox"
+                            ? "Câu hỏi checkbox"
+                            : q.type === "radio"
+                            ? "Câu hỏi radio"
+                            : "Câu hỏi dropdown"}
+                        </div>
+                        {q.options && q.options.length > 0 && (
+                          <div>
+                            <strong>Các lựa chọn:</strong>
+                            <ul>
+                              {q.options.map((option, i) => (
+                                <li key={i}>{option}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    </List.Item>
+                  )}
+                />
+              </Form.Item>
+            )}
 
           <Form.Item>
             <Space>
               <Button onClick={() => setIsUpdateModalVisible(false)}>
                 Hủy
               </Button>
-              <Button 
-                type="primary" 
+              <Button
+                type="primary"
                 htmlType="submit"
                 loading={loading}
                 style={{
@@ -599,64 +651,105 @@ const OrganizationEvents = () => {
         footer={null}
         width={800}
       >
-        <Form
-          form={formEditForm}
-          layout="vertical"
-          onFinish={handleFormEdit}
-        >
+        <Form form={formEditForm} layout="vertical" onFinish={handleFormEdit}>
           <Form.List name="questions">
             {(fields, { add, remove }) => (
               <>
                 {fields.map(({ key, name, ...restField }) => (
-                  <div key={key} style={{ marginBottom: 16, padding: 16, border: '1px solid #d9d9d9', borderRadius: 4 }}>
-                    <Space direction="vertical" style={{ width: '100%' }}>
+                  <div
+                    key={key}
+                    style={{
+                      marginBottom: 16,
+                      padding: 16,
+                      border: "1px solid #d9d9d9",
+                      borderRadius: 4,
+                    }}
+                  >
+                    <Space direction="vertical" style={{ width: "100%" }}>
                       <Form.Item
                         {...restField}
-                        name={[name, 'question']}
+                        name={[name, "question"]}
                         label="Câu hỏi"
-                        rules={[{ required: true, message: 'Vui lòng nhập câu hỏi!' }]}
+                        rules={[
+                          { required: true, message: "Vui lòng nhập câu hỏi!" },
+                        ]}
                       >
                         <Input placeholder="Nhập câu hỏi" />
                       </Form.Item>
 
                       <Form.Item
                         {...restField}
-                        name={[name, 'type']}
+                        name={[name, "type"]}
                         label="Loại câu hỏi"
-                        rules={[{ required: true, message: 'Vui lòng chọn loại câu hỏi!' }]}
+                        rules={[
+                          {
+                            required: true,
+                            message: "Vui lòng chọn loại câu hỏi!",
+                          },
+                        ]}
                       >
                         <Select>
-                          <Select.Option value="text">Câu hỏi text</Select.Option>
-                          <Select.Option value="checkbox">Câu hỏi checkbox</Select.Option>
-                          <Select.Option value="radio">Câu hỏi radio</Select.Option>
-                          <Select.Option value="dropdown">Câu hỏi dropdown</Select.Option>
+                          <Select.Option value="text">
+                            Câu hỏi text
+                          </Select.Option>
+                          <Select.Option value="checkbox">
+                            Câu hỏi checkbox
+                          </Select.Option>
+                          <Select.Option value="radio">
+                            Câu hỏi radio
+                          </Select.Option>
+                          <Select.Option value="dropdown">
+                            Câu hỏi dropdown
+                          </Select.Option>
                         </Select>
                       </Form.Item>
 
-                      <Form.List name={[name, 'options']}>
-                        {(optionFields, { add: addOption, remove: removeOption }) => (
+                      <Form.List name={[name, "options"]}>
+                        {(
+                          optionFields,
+                          { add: addOption, remove: removeOption }
+                        ) => (
                           <>
                             {optionFields.map((optionField) => (
                               <Form.Item
                                 {...optionField}
                                 key={optionField.key}
-                                label={optionField.name === 0 ? 'Các lựa chọn' : ''}
+                                label={
+                                  optionField.name === 0 ? "Các lựa chọn" : ""
+                                }
                               >
                                 <Space>
                                   <Form.Item
                                     {...optionField}
                                     name={[optionField.name]}
                                     noStyle
-                                    rules={[{ required: true, message: 'Vui lòng nhập lựa chọn!' }]}
+                                    rules={[
+                                      {
+                                        required: true,
+                                        message: "Vui lòng nhập lựa chọn!",
+                                      },
+                                    ]}
                                   >
-                                    <Input placeholder="Nhập lựa chọn" style={{ width: '300px' }} />
+                                    <Input
+                                      placeholder="Nhập lựa chọn"
+                                      style={{ width: "300px" }}
+                                    />
                                   </Form.Item>
-                                  <MinusCircleOutlined onClick={() => removeOption(optionField.name)} />
+                                  <MinusCircleOutlined
+                                    onClick={() =>
+                                      removeOption(optionField.name)
+                                    }
+                                  />
                                 </Space>
                               </Form.Item>
                             ))}
                             <Form.Item>
-                              <Button type="dashed" onClick={() => addOption()} block icon={<PlusOutlined />}>
+                              <Button
+                                type="dashed"
+                                onClick={() => addOption()}
+                                block
+                                icon={<PlusOutlined />}
+                              >
                                 Thêm lựa chọn
                               </Button>
                             </Form.Item>
@@ -671,7 +764,12 @@ const OrganizationEvents = () => {
                   </div>
                 ))}
                 <Form.Item>
-                  <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                  <Button
+                    type="dashed"
+                    onClick={() => add()}
+                    block
+                    icon={<PlusOutlined />}
+                  >
                     Thêm câu hỏi
                   </Button>
                 </Form.Item>
@@ -684,8 +782,8 @@ const OrganizationEvents = () => {
               <Button onClick={() => setIsFormEditModalVisible(false)}>
                 Hủy
               </Button>
-              <Button 
-                type="primary" 
+              <Button
+                type="primary"
                 htmlType="submit"
                 loading={loading}
                 style={{
@@ -699,7 +797,6 @@ const OrganizationEvents = () => {
           </Form.Item>
         </Form>
       </Modal>
-
     </div>
   );
 };

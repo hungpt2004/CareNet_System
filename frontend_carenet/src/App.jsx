@@ -1,7 +1,7 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import LandingPage from './pages/landing_page/LandingPage'
-import "bootstrap/dist/css/bootstrap.min.css"
-import VolunteerEventSearch from './pages/search_page/SearchPage'
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import LandingPage from "./pages/landing_page/LandingPage";
+import "bootstrap/dist/css/bootstrap.min.css";
+import VolunteerEventSearch from "./pages/search_page/SearchPage";
 import ProfileInformation from "./pages/profile_page/ProfileInformation";
 import ProfileAvatar from "./pages/profile_page/ProfileAvatar";
 import ProfileFavourite from "./pages/profile_page/ProfileFavourite";
@@ -9,9 +9,9 @@ import ProfileHistory from "./pages/profile_page/ProfileHistory";
 import FailedRegister from "./pages/register_event_page/FailedRegister";
 import SuccessRegister from "./pages/register_event_page/SuccesRegister";
 import UpgradePro from "./pages/pro_page/UpgradePro";
-import CustomerLayout from './layout/CustomerLayout';
-import FormRegisterPage from './pages/register_event_page/FormRegisterPage';
-import EventDetail from './pages/detail_page/EventDetailPage';
+import CustomerLayout from "./layout/CustomerLayout";
+import FormRegisterPage from "./pages/register_event_page/FormRegisterPage";
+import EventDetail from "./pages/detail_page/EventDetailPage";
 import ForgotPasswordPage from "./pages/forgotpassword_page/ForgotPasswordPage";
 import FeedbackManagement from "./pages/feedbackmanagerment_page/FeedbackManagement";
 import SupportRequestPage from './pages/support_page/SupportRequestPage';
@@ -69,135 +69,139 @@ const publicRoutes = [
 ]
 
 const privateCustomerRoutes = [
-  { path: '/profile-information', element: <ProfileInformation /> },
-  { path: '/profile-avatar', element: <ProfileAvatar /> },
-  { path: '/profile-history', element: <ProfileHistory /> },
-  { path: '/profile-favourite', element: <ProfileFavourite /> },
-  { path: '/failed-register', element: <FailedRegister /> },
-  { path: '/success-register', element: <SuccessRegister /> },
-  { path: '/form-register/:id', element: <FormRegisterPage /> },
-  { path: '/event-detail/:id', element: <EventDetail /> },
-  { path: '/feedback', element: <FeedbackManagement /> },
-  { path: '/support', element: <SupportRequestPage /> },
-  { path: '/profile-score', element: <ProfileScore /> },
-  { path: '/profile-certificate', element: <ProfileCertificate /> },
-  { path: '/feedback-page', element: <FeedbackPage /> },
-  { path: '/my-events', element: <MyEventsPage /> },
-  { path: '/profile-certificate-purchases', element: <CertificatePurchasePage /> },
-  { path: '/forum-chat', element: <ForumChatPage/> }
+  { path: "/profile-information", element: <ProfileInformation /> },
+  { path: "/profile-avatar", element: <ProfileAvatar /> },
+  { path: "/profile-history", element: <ProfileHistory /> },
+  { path: "/profile-favourite", element: <ProfileFavourite /> },
+  { path: "/failed-register", element: <FailedRegister /> },
+  { path: "/success-register", element: <SuccessRegister /> },
+  { path: "/form-register/:id", element: <FormRegisterPage /> },
+  { path: "/event-detail/:id", element: <EventDetail /> },
+  { path: "/feedback", element: <FeedbackManagement /> },
+  { path: "/support", element: <SupportRequestPage /> },
+  { path: "/profile-score", element: <ProfileScore /> },
+  { path: "/profile-certificate", element: <ProfileCertificate /> },
+  { path: "/feedback-page", element: <FeedbackPage /> },
+  { path: "/my-events", element: <MyEventsPage /> },
+  {
+    path: "/profile-certificate-purchases",
+    element: <CertificatePurchasePage />,
+  },
+  { path: "/forum-chat", element: <ForumChatPage /> },
 ];
 
 const privateAdminRoutes = [
-  { path: '/dashboard', element: <AdminDashboard /> },
-  { path: '/course', element: <AdminCourses /> },
-  { path: '/request-organization', element: <AdminOrganizationsPending /> },
-  { path: '/admin-support', element: <AdminSupportRequests /> },
-  { path: '/admin-organization', element: <AdminOrganizations /> },
-  { path: '/admin-post', element: <AdminVolunteerPosts /> },
-  { path: '/request-event', element: <AdminEventsPending /> },
+  { path: "/dashboard", element: <AdminDashboard /> },
+  { path: "/course", element: <AdminCourses /> },
+  { path: "/request-organization", element: <AdminOrganizationsPending /> },
+  { path: "/admin-support", element: <AdminSupportRequests /> },
+  { path: "/admin-organization", element: <AdminOrganizations /> },
+  { path: "/admin-post", element: <AdminVolunteerPosts /> },
+  { path: "/request-event", element: <AdminEventsPending /> },
 ];
 
 const privateOwnerRoutes = [
-  { path: '/owner-dashboard', element: <OrganizationDashboardPage /> },
-  { path: '/owner-post', element: <OrganizationPostPage /> },
-  { path: '/owner-user', element: <OrganizationUserRequests /> },
-  { path: '/owner-pending', element: <OrganizationUserPending /> },
-  { path: '/owner-attendance', element: <OrganizationEventAttendance /> },
-  { path: '/admin-participant', element: <AdminEventParticipants /> },
-  { path: '/upgrade-pro', element: <UpgradePro /> },
-  { path: '/owner-finished-events', element: <OrganizationEvents /> },
-  { path: '/owner-staff', element: <OrganizationStaffManagement /> },
+  { path: "/owner-dashboard", element: <OrganizationDashboardPage /> },
+  { path: "/owner-post", element: <OrganizationPostPage /> },
+  { path: "/owner-user", element: <OrganizationUserRequests /> },
+  { path: "/owner-pending", element: <OrganizationUserPending /> },
+  { path: "/owner-attendance", element: <OrganizationEventAttendance /> },
+  { path: "/admin-participant", element: <AdminEventParticipants /> },
+  { path: "/upgrade-pro", element: <UpgradePro /> },
+  { path: "/owner-finished-events", element: <OrganizationEvents /> },
+  { path: "/owner-staff", element: <OrganizationStaffManagement /> },
+  // { path: "/owner-feedback", element: <A /> },
 ];
 
 const privateStaffRoutes = [
-  { path: '/staff-attendance', element: <StaffAttendancePage /> },
+  { path: "/staff-attendance", element: <StaffAttendancePage /> },
 ];
 
 function App() {
   return (
-      <Router>
-        <Routes>
-          {/* Customer Routes */}
-          <Route element={<CustomerLayout />}>
-            {privateCustomerRoutes.map(({ path, element }) => (
-              <Route
-                key={path}
-                path={path}
-                element={
-                  <ProtectedRoute allowedRoles={['volunteer']}>
-                    {element}
-                  </ProtectedRoute>
-                }
-              />
-            ))}
-          </Route>
-
-          {/* Staff Routes - Separate layout for staff */}
-          <Route element={<StaffLayout />}>
-            {privateStaffRoutes.map(({ path, element }) => (
-              <Route
-                key={path}
-                path={path}
-                element={
-                  <ProtectedRoute allowedRoles={['staff']}>
-                    {element}
-                  </ProtectedRoute>
-                }
-              />
-            ))}
-          </Route>
-
-          {/* Admin Routes */}
-          <Route element={<AdminLayout />}>
-            {privateAdminRoutes.map(({ path, element }) => (
-              <Route
-                key={path}
-                path={path}
-                element={
-                  <ProtectedRoute allowedRoles={['admin']}>
-                    {element}
-                  </ProtectedRoute>
-                }
-              />
-            ))}
-          </Route>
-
-          {/* Owner Routes */}
-          <Route element={<OwnerLayout />}>
-            {privateOwnerRoutes.map(({ path, element }) => (
-              <Route
-                key={path}
-                path={path}
-                element={
-                  <ProtectedRoute allowedRoles={['organization']}>
-                    {element}
-                  </ProtectedRoute>
-                }
-              />
-            ))}
-          </Route>
-
-          {/* Public Routes */}
-          {publicRoutes.map(({ path, element }) => (
-              <Route key={path} path={path} element={element} />
-          ))}
-
-          {/* Guest Routes */}
-          <Route element={<GuestLayout />}>
-            {guestRoutes.map(({ path, element }) => (
-              <Route key={path} path={path} element={element} />
-            ))}
-          </Route>
+    <Router>
+      <Routes>
+        {/* Customer Routes */}
+        <Route element={<CustomerLayout />}>
+          {privateCustomerRoutes.map(({ path, element }) => (
             <Route
-  path="/admin-organization"
-  element={
-    <ProtectedRoute allowedRoles={['admin']}>
-      <AdminOrganizations />
-    </ProtectedRoute>
-  }
-/>
-        </Routes>
-      </Router>
+              key={path}
+              path={path}
+              element={
+                <ProtectedRoute allowedRoles={["volunteer"]}>
+                  {element}
+                </ProtectedRoute>
+              }
+            />
+          ))}
+        </Route>
+
+        {/* Staff Routes - Separate layout for staff */}
+        <Route element={<StaffLayout />}>
+          {privateStaffRoutes.map(({ path, element }) => (
+            <Route
+              key={path}
+              path={path}
+              element={
+                <ProtectedRoute allowedRoles={["staff"]}>
+                  {element}
+                </ProtectedRoute>
+              }
+            />
+          ))}
+        </Route>
+
+        {/* Admin Routes */}
+        <Route element={<AdminLayout />}>
+          {privateAdminRoutes.map(({ path, element }) => (
+            <Route
+              key={path}
+              path={path}
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  {element}
+                </ProtectedRoute>
+              }
+            />
+          ))}
+        </Route>
+
+        {/* Owner Routes */}
+        <Route element={<OwnerLayout />}>
+          {privateOwnerRoutes.map(({ path, element }) => (
+            <Route
+              key={path}
+              path={path}
+              element={
+                <ProtectedRoute allowedRoles={["organization"]}>
+                  {element}
+                </ProtectedRoute>
+              }
+            />
+          ))}
+        </Route>
+
+        {/* Public Routes */}
+        {publicRoutes.map(({ path, element }) => (
+          <Route key={path} path={path} element={element} />
+        ))}
+
+        {/* Guest Routes */}
+        <Route element={<GuestLayout />}>
+          {guestRoutes.map(({ path, element }) => (
+            <Route key={path} path={path} element={element} />
+          ))}
+        </Route>
+        <Route
+          path="/admin-organization"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminOrganizations />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </Router>
   );
 }
 

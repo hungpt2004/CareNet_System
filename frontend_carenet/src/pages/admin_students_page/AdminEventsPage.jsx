@@ -1,138 +1,165 @@
-import { useState, useEffect } from "react"
-import { Card, Button, Modal, Badge, Form, InputGroup, Row, Col } from "react-bootstrap"
-import { Search, Filter, Calendar, MapPin, Users, Eye, Building2, Clock, CheckCircle2, XCircle } from "lucide-react"
-import { Table, Tag, Space, Image, message } from "antd"
-import axiosInstance from "../../utils/AxiosInstance"
-import { CustomFailedToast, CustomSuccessToast, CustomToast } from "../../components/toast/CustomToast"
-import { formatDateVN } from "../../utils/FormatDateVN"
-import { formatTimeVN } from "../../utils/FormatTimeVN"
+import { useState, useEffect } from "react";
+import {
+  Card,
+  Button,
+  Modal,
+  Badge,
+  Form,
+  InputGroup,
+  Row,
+  Col,
+} from "react-bootstrap";
+import {
+  Search,
+  Filter,
+  Calendar,
+  MapPin,
+  Users,
+  Eye,
+  Building2,
+  Clock,
+  CheckCircle2,
+  XCircle,
+} from "lucide-react";
+import { Table, Tag, Space, Image, message } from "antd";
+import axiosInstance from "../../utils/AxiosInstance";
+import {
+  CustomFailedToast,
+  CustomSuccessToast,
+  CustomToast,
+} from "../../components/toast/CustomToast";
+import { formatDateVN } from "../../utils/FormatDateVN";
+import { formatTimeVN } from "../../utils/FormatTimeVN";
 
 const AdminEventsPending = () => {
-  const [events, setEvents] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all")
-  const [showDetailModal, setShowDetailModal] = useState(false)
-  const [selectedEvent, setSelectedEvent] = useState(null)
-  const [showConfirmModal, setShowConfirmModal] = useState(false)
-  const [confirmAction, setConfirmAction] = useState(null) // 'approve' or 'reject'
-  const [rejectReason, setRejectReason] = useState("")
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [confirmAction, setConfirmAction] = useState(null); // 'approve' or 'reject'
+  const [rejectReason, setRejectReason] = useState("");
 
   // Fetch pending events
   const fetchEvents = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const response = await axiosInstance.get("/admin/get-pending-event")
+      const response = await axiosInstance.get("/admin/get-pending-event");
       if (response.data.status === "success") {
-        setEvents(response.data.events)
+        setEvents(response.data.events);
       }
     } catch (error) {
-      console.error("Error fetching events:", error)
-      CustomFailedToast("Không thể lấy danh sách sự kiện")
+      console.error("Error fetching events:", error);
+      CustomFailedToast("Không thể lấy danh sách sự kiện");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchEvents()
-  }, [])
+    fetchEvents();
+  }, []);
 
   // Handle view event details
   const handleViewDetails = (record) => {
-    setSelectedEvent(record)
-    setShowDetailModal(true)
-  }
+    setSelectedEvent(record);
+    setShowDetailModal(true);
+  };
 
   // Get status badge
   const getStatusBadge = (status) => {
     switch (status) {
       case "hiring":
-        return <Tag color="processing">Đang tuyển</Tag>
+        return <Tag color="processing">Đang tuyển</Tag>;
       case "processing":
-        return <Tag color="success">Đang diễn ra</Tag>
+        return <Tag color="success">Đang diễn ra</Tag>;
       case "completed":
-        return <Tag color="default">Đã hoàn thành</Tag>
+        return <Tag color="default">Đã hoàn thành</Tag>;
       case "cancelled":
-        return <Tag color="error">Đã hủy</Tag>
+        return <Tag color="error">Đã hủy</Tag>;
       default:
-        return <Tag color="default">Không xác định</Tag>
+        return <Tag color="default">Không xác định</Tag>;
     }
-  }
+  };
 
   // Get admin status badge
   const getAdminStatusBadge = (status) => {
     switch (status) {
       case "approved":
-        return <Tag color="success">Đã duyệt</Tag>
+        return <Tag color="success">Đã duyệt</Tag>;
       case "pending":
-        return <Tag color="warning">Chờ duyệt</Tag>
+        return <Tag color="warning">Chờ duyệt</Tag>;
       case "rejected":
-        return <Tag color="error">Đã từ chối</Tag>
+        return <Tag color="error">Đã từ chối</Tag>;
       default:
-        return <Tag color="default">Không xác định</Tag>
+        return <Tag color="default">Không xác định</Tag>;
     }
-  }
+  };
 
   // Handle approve event
   const handleApproveEvent = async (eventId) => {
     try {
-      const response = await axiosInstance.put(`/admin/approve-event-register`, {
-        eventId: eventId
-      })
+      const response = await axiosInstance.put(
+        `/admin/approve-event-register`,
+        {
+          eventId: eventId,
+        }
+      );
       if (response.data.status === "success") {
-        message.success("Đã duyệt sự kiện thành công")
-        CustomSuccessToast("Đã duyệt sự kiện thành công")
-        setShowConfirmModal(false)
-        fetchEvents() // Refresh list
+        message.success("Đã duyệt sự kiện thành công");
+        CustomSuccessToast("Đã duyệt sự kiện thành công");
+        setShowConfirmModal(false);
+        fetchEvents(); // Refresh list
       }
     } catch (error) {
-      console.error("Error approving event:", error)
-      CustomFailedToast("Không thể duyệt sự kiện")
-      message.error("Không thể duyệt sự kiện")
+      console.error("Error approving event:", error);
+      CustomFailedToast("Không thể duyệt sự kiện");
+      message.error("Không thể duyệt sự kiện");
     }
-  }
+  };
 
   // Handle reject event
   const handleRejectEvent = async (eventId) => {
     try {
       const response = await axiosInstance.put(`/admin/reject-event-register`, {
         eventId: eventId,
-        rejectReason: rejectReason
-      })
+        rejectReason: rejectReason,
+      });
       if (response.data.status === "success") {
-        message.success("Đã từ chối sự kiện")
-        CustomSuccessToast("Đã từ chối sự kiện")
-        setShowConfirmModal(false)
-        setRejectReason("")
-        fetchEvents() // Refresh list
+        message.success("Đã từ chối sự kiện");
+        CustomSuccessToast("Đã từ chối sự kiện");
+        setShowConfirmModal(false);
+        setRejectReason("");
+        fetchEvents(); // Refresh list
       }
     } catch (error) {
-      console.error("Error rejecting event:", error)
-      CustomFailedToast("Không thể từ chối sự kiện")
-      message.error("Không thể từ chối sự kiện")
+      console.error("Error rejecting event:", error);
+      CustomFailedToast("Không thể từ chối sự kiện");
+      message.error("Không thể từ chối sự kiện");
     }
-  }
+  };
 
   // Handle confirm action
   const handleConfirmAction = (action, eventId) => {
-    setConfirmAction(action)
-    setSelectedEvent(events.find(event => event._id === eventId))
-    setShowConfirmModal(true)
-  }
+    setConfirmAction(action);
+    setSelectedEvent(events.find((event) => event._id === eventId));
+    setShowConfirmModal(true);
+  };
 
   // Handle submit confirmation
   const handleSubmitConfirmation = () => {
-    if (confirmAction === 'approve') {
-      handleApproveEvent(selectedEvent._id)
-    } else if (confirmAction === 'reject') {
+    if (confirmAction === "approve") {
+      handleApproveEvent(selectedEvent._id);
+    } else if (confirmAction === "reject") {
       if (!rejectReason.trim()) {
-        message.warning("Vui lòng nhập lý do từ chối")
-        return
+        message.warning("Vui lòng nhập lý do từ chối");
+        return;
       }
-      handleRejectEvent(selectedEvent._id)
+      handleRejectEvent(selectedEvent._id);
     }
-  }
+  };
 
   // Table columns configuration
   const columns = [
@@ -215,14 +242,14 @@ const AdminEventsPending = () => {
               <Button
                 variant="outline-danger"
                 size="sm"
-                onClick={() => handleConfirmAction('reject', record._id)}
+                onClick={() => handleConfirmAction("reject", record._id)}
               >
                 Từ chối
               </Button>
               <Button
                 variant="outline-success"
                 size="sm"
-                onClick={() => handleConfirmAction('approve', record._id)}
+                onClick={() => handleConfirmAction("approve", record._id)}
               >
                 Duyệt
               </Button>
@@ -231,12 +258,11 @@ const AdminEventsPending = () => {
         </Space>
       ),
     },
-  ]
+  ];
 
   return (
     <div>
-
-      <CustomToast/>
+      <CustomToast />
 
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="mb-0">Quản lý sự kiện</h2>
@@ -258,9 +284,9 @@ const AdminEventsPending = () => {
               </InputGroup>
             </Col>
             <Col md={6} lg={8} className="d-flex gap-2 mt-3 mt-md-0">
-              <Form.Select 
-                className="w-auto" 
-                value={statusFilter} 
+              <Form.Select
+                className="w-auto"
+                value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
               >
                 <option value="all">Tất cả trạng thái</option>
@@ -301,9 +327,16 @@ const AdminEventsPending = () => {
             <div>
               <div className="text-center mb-4">
                 <Image
-                  src={selectedEvent.images?.[0] || "https://via.placeholder.com/400x200"}
+                  src={
+                    selectedEvent.images?.[0] ||
+                    "https://via.placeholder.com/400x200"
+                  }
                   alt={selectedEvent.title}
-                  style={{ maxHeight: "300px", objectFit: "cover", borderRadius: "8px" }}
+                  style={{
+                    maxHeight: "300px",
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                  }}
                 />
               </div>
 
@@ -313,60 +346,94 @@ const AdminEventsPending = () => {
               <div className="mt-4">
                 <h5>Thông tin sự kiện</h5>
                 <div className="d-flex align-items-center mb-2">
-                  <Calendar size={18} className="me-2" style={{ color: "#5DB996" }} />
+                  <Calendar
+                    size={18}
+                    className="me-2"
+                    style={{ color: "#5DB996" }}
+                  />
                   <div>
-                    <div className="fw-bold">{formatDateVN(selectedEvent.startAt)}</div>
+                    <div className="fw-bold">
+                      {formatDateVN(selectedEvent.startAt)}
+                    </div>
                     <div className="text-muted">
-                      {formatTimeVN(selectedEvent.startAt)} - {formatTimeVN(selectedEvent.endAt)}
+                      {formatTimeVN(selectedEvent.startAt)} -{" "}
+                      {formatTimeVN(selectedEvent.endAt)}
                     </div>
                   </div>
                 </div>
 
                 <div className="d-flex align-items-center mb-2">
-                  <MapPin size={18} className="me-2" style={{ color: "#5DB996" }} />
+                  <MapPin
+                    size={18}
+                    className="me-2"
+                    style={{ color: "#5DB996" }}
+                  />
                   <div>
                     <div className="fw-bold">Địa điểm</div>
-                    <div>{selectedEvent.location?.fullAddress || "Không xác định"}</div>
+                    <div>
+                      {selectedEvent.location?.fullAddress || "Không xác định"}
+                    </div>
                   </div>
                 </div>
 
                 <div className="d-flex align-items-center mb-2">
-                  <Users size={18} className="me-2" style={{ color: "#5DB996" }} />
+                  <Users
+                    size={18}
+                    className="me-2"
+                    style={{ color: "#5DB996" }}
+                  />
                   <div>
                     <div className="fw-bold">Số người tham gia</div>
-                    <div>{selectedEvent.currentParticipants} / {selectedEvent.maxParticipants} người</div>
+                    <div>
+                      {selectedEvent.currentParticipants} /{" "}
+                      {selectedEvent.maxParticipants} người
+                    </div>
                   </div>
                 </div>
 
                 <div className="d-flex align-items-center mb-2">
-                  <Building2 size={18} className="me-2" style={{ color: "#5DB996" }} />
+                  <Building2
+                    size={18}
+                    className="me-2"
+                    style={{ color: "#5DB996" }}
+                  />
                   <div>
                     <div className="fw-bold">Tổ chức</div>
-                    <div>{selectedEvent.organizationId?.name || "Không xác định"}</div>
+                    <div>
+                      {selectedEvent.organizationId?.name || "Không xác định"}
+                    </div>
                   </div>
                 </div>
 
                 <div className="d-flex align-items-center mb-2">
-                  <Clock size={18} className="me-2" style={{ color: "#5DB996" }} />
+                  <Clock
+                    size={18}
+                    className="me-2"
+                    style={{ color: "#5DB996" }}
+                  />
                   <div>
                     <div className="fw-bold">Trạng thái</div>
                     <div>
-                      {getStatusBadge(selectedEvent.status)} {getAdminStatusBadge(selectedEvent.adminStatus)}
+                      {getStatusBadge(selectedEvent.status)}{" "}
+                      {getAdminStatusBadge(selectedEvent.adminStatus)}
                     </div>
                   </div>
                 </div>
               </div>
 
-              {selectedEvent.skillNeeds && selectedEvent.skillNeeds.length > 0 && (
-                <div className="mt-4">
-                  <h5>Kỹ năng cần thiết</h5>
-                  <div className="d-flex flex-wrap gap-2">
-                    {selectedEvent.skillNeeds.map((skill, index) => (
-                      <Tag key={index} color="blue">{skill}</Tag>
-                    ))}
+              {selectedEvent.skillNeeds &&
+                selectedEvent.skillNeeds.length > 0 && (
+                  <div className="mt-4">
+                    <h5>Kỹ năng cần thiết</h5>
+                    <div className="d-flex flex-wrap gap-2">
+                      {selectedEvent.skillNeeds.map((skill, index) => (
+                        <Tag key={index} color="blue">
+                          {skill}
+                        </Tag>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
               {selectedEvent.formData && selectedEvent.formData.questions && (
                 <div className="mt-4">
@@ -405,32 +472,40 @@ const AdminEventsPending = () => {
       <Modal
         show={showConfirmModal}
         onHide={() => {
-          setShowConfirmModal(false)
-          setRejectReason("")
+          setShowConfirmModal(false);
+          setRejectReason("");
         }}
         centered
       >
         <Modal.Header closeButton>
           <Modal.Title>
-            {confirmAction === 'approve' ? 'Xác nhận duyệt sự kiện' : 'Xác nhận từ chối sự kiện'}
+            {confirmAction === "approve"
+              ? "Xác nhận duyệt sự kiện"
+              : "Xác nhận từ chối sự kiện"}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {selectedEvent && (
             <div>
               <p className="mb-3">
-                {confirmAction === 'approve' 
-                  ? 'Bạn có chắc chắn muốn duyệt sự kiện này?' 
-                  : 'Bạn có chắc chắn muốn từ chối sự kiện này?'}
+                {confirmAction === "approve"
+                  ? "Bạn có chắc chắn muốn duyệt sự kiện này?"
+                  : "Bạn có chắc chắn muốn từ chối sự kiện này?"}
               </p>
               <p className="fw-bold mb-2">Thông tin sự kiện:</p>
               <p className="mb-1">Tên: {selectedEvent.title}</p>
-              <p className="mb-1">Tổ chức: {selectedEvent.organizationId?.name}</p>
-              <p className="mb-1">Thời gian: {formatDateVN(selectedEvent.startAt)}</p>
-              
-              {confirmAction === 'reject' && (
+              <p className="mb-1">
+                Tổ chức: {selectedEvent.organizationId?.name}
+              </p>
+              <p className="mb-1">
+                Thời gian: {formatDateVN(selectedEvent.startAt)}
+              </p>
+
+              {confirmAction === "reject" && (
                 <Form.Group className="mt-3">
-                  <Form.Label>Lý do từ chối <span className="text-danger">*</span></Form.Label>
+                  <Form.Label>
+                    Lý do từ chối <span className="text-danger">*</span>
+                  </Form.Label>
                   <Form.Control
                     as="textarea"
                     rows={3}
@@ -444,25 +519,27 @@ const AdminEventsPending = () => {
           )}
         </Modal.Body>
         <Modal.Footer>
-          <Button 
-            variant="secondary" 
+          <Button
+            variant="secondary"
             onClick={() => {
-              setShowConfirmModal(false)
-              setRejectReason("")
+              setShowConfirmModal(false);
+              setRejectReason("");
             }}
           >
             Hủy
           </Button>
           <Button
-            variant={confirmAction === 'approve' ? 'success' : 'danger'}
+            variant={confirmAction === "approve" ? "success" : "danger"}
             onClick={handleSubmitConfirmation}
           >
-            {confirmAction === 'approve' ? 'Xác nhận duyệt' : 'Xác nhận từ chối'}
+            {confirmAction === "approve"
+              ? "Xác nhận duyệt"
+              : "Xác nhận từ chối"}
           </Button>
         </Modal.Footer>
       </Modal>
     </div>
-  )
-}
+  );
+};
 
-export default AdminEventsPending 
+export default AdminEventsPending;

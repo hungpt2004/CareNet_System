@@ -1,10 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import { Table, Card, Select, Button, Modal, Input, message, Space, Typography, Radio, Tooltip } from 'antd';
-import { CheckCircle2, XCircle, Calendar, Building2, AlertCircle } from 'lucide-react';
-import axiosInstance from '../../utils/AxiosInstance';
-import { formatDateVN } from '../../utils/FormatDateVN';
-import useAuthStore from '../../hooks/authStore';
-import { CustomFailedToast, CustomSuccessToast, CustomToast } from '../../components/toast/CustomToast';
+import React, { useState, useEffect } from "react";
+import {
+  Table,
+  Card,
+  Select,
+  Button,
+  Modal,
+  Input,
+  message,
+  Space,
+  Typography,
+  Radio,
+  Tooltip,
+} from "antd";
+import {
+  CheckCircle2,
+  XCircle,
+  Calendar,
+  Building2,
+  AlertCircle,
+} from "lucide-react";
+import axiosInstance from "../../utils/AxiosInstance";
+import { formatDateVN } from "../../utils/FormatDateVN";
+import useAuthStore from "../../hooks/authStore";
+import {
+  CustomFailedToast,
+  CustomSuccessToast,
+  CustomToast,
+} from "../../components/toast/CustomToast";
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -16,13 +38,13 @@ const StaffAttendancePage = () => {
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [attendanceMessage, setAttendanceMessage] = useState('');
-  const [attendanceType, setAttendanceType] = useState(''); // 'attended' or 'absent'
-  const [attitudeRating, setAttitudeRating] = useState('Good'); // Default to "Good"
+  const [attendanceMessage, setAttendanceMessage] = useState("");
+  const [attendanceType, setAttendanceType] = useState(""); // 'attended' or 'absent'
+  const [attitudeRating, setAttitudeRating] = useState("Good"); // Default to "Good"
   const [isCancelModalVisible, setIsCancelModalVisible] = useState(false);
   const [penaltyPoints, setPenaltyPoints] = useState(0);
 
-  const {logout} = useAuthStore();
+  const { logout } = useAuthStore();
 
   // Fetch events when component mounts
   useEffect(() => {
@@ -31,13 +53,13 @@ const StaffAttendancePage = () => {
 
   const fetchEvents = async () => {
     try {
-      const response = await axiosInstance.get('/staff/get-assign-event');
+      const response = await axiosInstance.get("/staff/get-assign-event");
       if (response.data.status === "success" && response.data.eventData) {
         setEvents(response.data.eventData);
       }
     } catch (error) {
-      console.error('Error fetching events:', error);
-      message.error('Không thể tải danh sách sự kiện');
+      console.error("Error fetching events:", error);
+      message.error("Không thể tải danh sách sự kiện");
     }
   };
 
@@ -45,12 +67,12 @@ const StaffAttendancePage = () => {
     setLoading(true);
     try {
       const response = await axiosInstance.get(`/staff/get-volunteer-list`);
-      if (response.data.status === 'success' && response.data.listVolunteers) {
+      if (response.data.status === "success" && response.data.listVolunteers) {
         setRegistrations(response.data.listVolunteers);
       }
     } catch (error) {
-      console.error('Error fetching event registrations:', error);
-      message.error('Không thể tải danh sách đăng ký');
+      console.error("Error fetching event registrations:", error);
+      message.error("Không thể tải danh sách đăng ký");
     } finally {
       setTimeout(() => {
         setLoading(false);
@@ -70,10 +92,10 @@ const StaffAttendancePage = () => {
   const handleAttendance = async (userId, type) => {
     setSelectedUser(userId);
     setAttendanceType(type);
-    setAttitudeRating('Good');
-    setAttendanceMessage('');
-    
-    if (type === 'absent') {
+    setAttitudeRating("Good");
+    setAttendanceMessage("");
+
+    if (type === "absent") {
       setPenaltyPoints(calculatePenaltyPoints()); // Set fixed penalty points
       setIsCancelModalVisible(true);
     } else {
@@ -85,7 +107,6 @@ const StaffAttendancePage = () => {
     if (!selectedEvent || !selectedUser) return;
 
     try {
-      
       console.log(selectedUser, attendanceMessage, attitudeRating);
 
       const response = await axiosInstance.post(`/staff/take-attendance`, {
@@ -96,88 +117,99 @@ const StaffAttendancePage = () => {
         // penaltyPoints: attendanceType === 'absent' ? penaltyPoints : 0
       });
 
-      if (response.data.status === 'success') {
-        CustomSuccessToast(`Điểm danh thành công user: ${selectedUser.fullname}`)
+      if (response.data.status === "success") {
+        CustomSuccessToast(
+          `Điểm danh thành công user: ${selectedUser.fullname}`
+        );
         fetchEventRegistrations(selectedEvent);
-      } else if (response.data.status === 'fail') {
-        CustomFailedToast(`${response.data.message}`)
+      } else if (response.data.status === "fail") {
+        CustomFailedToast(`${response.data.message}`);
       }
     } catch (error) {
-      message.error('Điểm danh thất bại');
+      message.error("Điểm danh thất bại");
       console.log(error);
-      CustomFailedToast(`${error.response.data.message}`)
+      CustomFailedToast(`${error.response.data.message}`);
     }
 
     setIsModalVisible(false);
     setIsCancelModalVisible(false);
-    setAttendanceMessage('');
+    setAttendanceMessage("");
     setSelectedUser(null);
-    setAttitudeRating('Good');
+    setAttitudeRating("Good");
   };
 
   const columns = [
     {
-      title: 'Họ và tên',
-      dataIndex: ['user', 'fullname'],
-      key: 'fullname',
+      title: "Họ và tên",
+      dataIndex: ["user", "fullname"],
+      key: "fullname",
     },
     {
-      title: 'Email',
-      dataIndex: ['user', 'email'],
-      key: 'email',
+      title: "Email",
+      dataIndex: ["user", "email"],
+      key: "email",
     },
     {
-      title: 'Số điện thoại',
-      dataIndex:  ['user', 'phone'],
-      key: 'phone',
+      title: "Số điện thoại",
+      dataIndex: ["user", "phone"],
+      key: "phone",
     },
     {
-      title: 'Ngày sinh',
-      dataIndex: ['user', 'dob'],
-      key: 'birthday',
+      title: "Ngày sinh",
+      dataIndex: ["user", "dob"],
+      key: "birthday",
       render: (dob) => {
-        if (!dob) return '-';
+        if (!dob) return "-";
         const date = new Date(dob);
         return formatDateVN(date);
       },
     },
     {
-      title: 'Giới tính',
-      dataIndex: ['user', 'gender'],
-      key: 'gender',
+      title: "Giới tính",
+      dataIndex: ["user", "gender"],
+      key: "gender",
     },
     {
-      title: 'Trạng thái',
-      dataIndex: 'status',
-      key: 'status',
+      title: "Trạng thái",
+      dataIndex: "status",
+      key: "status",
       render: (status) => (
-        <span style={{
-          color: status === 'approved' ? '#52c41a' :
-            status === 'pending' ? '#faad14' : '#ff4d4f'
-        }}>
-          {status === 'approved' ? 'Đã duyệt' :
-            status === 'pending' ? 'Đang chờ' : 'Từ chối'}
+        <span
+          style={{
+            color:
+              status === "approved"
+                ? "#52c41a"
+                : status === "pending"
+                ? "#faad14"
+                : "#ff4d4f",
+          }}
+        >
+          {status === "approved"
+            ? "Đã duyệt"
+            : status === "pending"
+            ? "Đang chờ"
+            : "Từ chối"}
         </span>
       ),
     },
     {
-      title: 'Thao tác',
-      key: 'action',
+      title: "Thao tác",
+      key: "action",
       render: (_, record) => (
         <Space>
           <Button
             type="primary"
             icon={<CheckCircle2 size={16} />}
-            onClick={() => handleAttendance(record.user._id, 'attended')}
-            disabled={record.status !== 'approved'}
+            onClick={() => handleAttendance(record.user._id, "attended")}
+            disabled={record.status !== "approved"}
           >
             Điểm danh
           </Button>
           <Button
             danger
             icon={<XCircle size={16} />}
-            onClick={() => handleAttendance(record.user._id, 'absent')}
-            disabled={record.status !== 'approved'}
+            onClick={() => handleAttendance(record.user._id, "absent")}
+            disabled={record.status !== "approved"}
           >
             Vắng mặt
           </Button>
@@ -187,17 +219,19 @@ const StaffAttendancePage = () => {
   ];
 
   return (
-    <div style={{ padding: '24px' }}>
-      <CustomToast/>
+    <div style={{ padding: "24px" }}>
+      <CustomToast />
       <Card>
-        <Space direction="vertical" size="large" style={{ width: '100%' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <Space direction="vertical" size="large" style={{ width: "100%" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <Building2 size={24} />
-            <Title level={4} style={{ margin: 0 }}>Quản lý điểm danh</Title>
+            <Title level={4} style={{ margin: 0 }}>
+              Quản lý điểm danh
+            </Title>
           </div>
 
           <Select
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
             placeholder="Chọn sự kiện"
             onChange={handleEventChange}
             value={selectedEvent}
@@ -228,18 +262,18 @@ const StaffAttendancePage = () => {
         onOk={handleModalOk}
         onCancel={() => {
           setIsModalVisible(false);
-          setAttendanceMessage('');
+          setAttendanceMessage("");
           setSelectedUser(null);
-          setAttitudeRating('Good');
+          setAttitudeRating("Good");
         }}
       >
-        <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        <Space direction="vertical" size="large" style={{ width: "100%" }}>
           <div>
             <Text strong>Đánh giá thái độ:</Text>
-            <Radio.Group 
-              value={attitudeRating} 
+            <Radio.Group
+              value={attitudeRating}
               onChange={(e) => setAttitudeRating(e.target.value)}
-              style={{ marginLeft: '8px' }}
+              style={{ marginLeft: "8px" }}
             >
               <Space direction="vertical">
                 <Radio value="Very Good">Rất tốt</Radio>
@@ -266,19 +300,27 @@ const StaffAttendancePage = () => {
         onOk={handleModalOk}
         onCancel={() => {
           setIsCancelModalVisible(false);
-          setAttendanceMessage('');
+          setAttendanceMessage("");
           setSelectedUser(null);
         }}
       >
-        <Space direction="vertical" size="large" style={{ width: '100%' }}>
-          <div style={{gap: '8px', width: '100%', color: '#ff4d4f', textAlign: 'center'}}>
+        <Space direction="vertical" size="large" style={{ width: "100%" }}>
+          <div
+            style={{
+              gap: "8px",
+              width: "100%",
+              color: "#ff4d4f",
+              textAlign: "center",
+            }}
+          >
             <div className="alert alert-warning">
               <h5 className="alert-heading">Lưu ý về điểm reputation!</h5>
               <p>Việc vắng mặt sẽ bị trừ 15 điểm reputation.</p>
             </div>
           </div>
           <Text>
-            Người dùng sẽ bị trừ 15 điểm do vắng mặt. Điều này sẽ ảnh hưởng đến uy tín của họ.
+            Người dùng sẽ bị trừ 15 điểm do vắng mặt. Điều này sẽ ảnh hưởng đến
+            uy tín của họ.
           </Text>
           <TextArea
             rows={4}
