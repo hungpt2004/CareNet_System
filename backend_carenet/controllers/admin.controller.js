@@ -189,7 +189,7 @@ exports.getPendingEvent = asyncHandler(async (req, res) => {
   }
 });
 
-exports.getAllAccount = asyncHandler(async (req, res) => {
+exports.getAllAccounts = asyncHandler(async (req, res) => {
   try {
     
     const organizationList = await Organization.find();

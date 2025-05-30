@@ -9,5 +9,6 @@ AdminRouter.put('/approve-organization-register', authenticateToken, AdminContro
 AdminRouter.put('/reject-organization-register', authenticateToken, AdminController.rejectOrganizationRegister);
 AdminRouter.put('/approve-event-register', authenticateToken, AdminController.approveEventRegister);
 AdminRouter.put('/reject-event-register', authenticateToken, AdminController.rejectEventRegister);
+AdminRouter.get('/accounts', AdminController.getAllAccounts);
 
 module.exports = AdminRouter;
