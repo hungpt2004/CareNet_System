@@ -71,7 +71,6 @@ exports.getVolunteerByEventId = asyncHandler(async (req, res) => {
 
   console.log(listVolunteers.map((volunteer) => volunteer.user));
 
-
   return res.status(200).json({
     status: "success",
     message: "Lấy danh sách đăng ký thành công",
@@ -127,9 +126,11 @@ exports.takeAttendance = asyncHandler(async (req, res) => {
     userId: userId,
   });
 
-  const checkAttendance = await Attendance.findOne(
-    {eventId: currentEvent._id, userId: userId, status: "attended"}
-  )
+  const checkAttendance = await Attendance.findOne({
+    eventId: currentEvent._id,
+    userId: userId,
+    status: "attended",
+  });
 
   if (checkAttendance) {
     return res.status(400).json({
@@ -165,18 +166,17 @@ exports.takeAttendance = asyncHandler(async (req, res) => {
   const eventDurationInHours = eventDurationInMs / (1000 * 60 * 60);
 
   await User.findOneAndUpdate(
-    {_id: userId},
+    { _id: userId },
     {
-      $set:{
-        status: 'ready',
+      $set: {
+        status: "ready",
       },
       $inc: {
         totalHours: eventDurationInHours,
-      }
+        activityPoints: 10,
+      },
     }
-  )
-
-
+  );
 
   return res.status(200).json({
     status: "success",
@@ -185,10 +185,78 @@ exports.takeAttendance = asyncHandler(async (req, res) => {
 });
 
 exports.takeAbsent = asyncHandler(async (req, res) => {
-
   // Check attendance
   // set status -> absent, level rating, message
-  
   // - 15 diem
 
+  const currentUser = req.user.user;
+
+  const { userId, message } = req.body;
+
+  const assignEvent = await Event.findOne({
+    assignChecker: currentUser._id,
+  });
+
+  const checkAttendance = await Attendance.findOne({
+    userId: userId,
+    eventId: assignEvent._id,
+    status: "registered",
+  });
+
+  if (!checkAttendance) {
+    return res.status(400).json({
+      status: "fail",
+      message: "Không tìm thấy đơn điểm danh",
+    });
+  }
+
+  await Attendance.findOneAndUpdate(
+    {
+      userId: userId,
+    },
+    {
+      $set: {
+        status: "absent",
+        message: message || null,
+      },
+    }
+  );
+
+  console.log(
+    `--- Đã update trạng thái điểm danh cho người dùng ${userId} thành 'absent' ---`
+  );
+
+  const memberJoin = await User.findOne({
+    _id: userId,
+  });
+
+  if (!memberJoin) {
+    return res.status(404).json({
+      status: "fail",
+      message: "Không tìm thấy thành viên",
+    });
+  }
+
+  // Update reputation point and status
+  await User.findOneAndUpdate(
+    { _id: userId },
+    {
+      $set: {
+        status: "ready",
+      },
+      $inc: {
+        reputationPoint: -15,
+        activityPoints: -20
+      },
+    }
+  );
+
+  console.log(
+    `--- Đã cập nhật điểm danh cho người dùng ${userId} thành 'absent' và trừ 15 điểm danh tiếng ---`
+  );
+  return res.status(200).json({
+    status: "success",
+    message: "Đã điểm danh vắng mặt thành công",
+    user: memberJoin,
+  });
 });

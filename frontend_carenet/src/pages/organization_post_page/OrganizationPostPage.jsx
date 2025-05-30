@@ -21,6 +21,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import useAuthStore from "../../hooks/authStore";
 import styles from '../../css/OrganizationPostPage.module.css';
 import Title from 'antd/es/skeleton/Title';
+import AIPromptModal from '../../components/ai_modal_prompt/AIPromptModal';
 
 const { TextArea } = Input;
 const { RangePicker } = DatePicker;
@@ -800,6 +801,7 @@ const OrganizationPostPage = () => {
           </div>
 
           <div className={styles.navigationButtons}>
+            <AIPromptModal/>
             {currentStep > 0 && (
               <Button 
                 onClick={handlePrev}

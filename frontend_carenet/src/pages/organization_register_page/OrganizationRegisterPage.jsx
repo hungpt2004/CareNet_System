@@ -12,6 +12,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axiosInstance from '../../utils/AxiosInstance';
 import { CustomFailedToast, CustomSuccessToast, CustomToast } from '../../components/toast/CustomToast';
 import styles from '../../css/AppColors.module.css';
+import AIPromptModal from '../../components/ai_modal_prompt/AIPromptModal';
 
 const { TextArea } = Input;
 const { Title, Text } = Typography;
@@ -29,14 +30,14 @@ const OrganizationRegisterPage = () => {
    // Animation variants for the container
    const containerVariants = {
       hidden: { opacity: 0, y: 50 },
-      visible: { 
-         opacity: 1, 
-         y: 0, 
-         transition: { 
-            duration: 0.5, 
+      visible: {
+         opacity: 1,
+         y: 0,
+         transition: {
+            duration: 0.5,
             ease: 'easeOut',
             when: 'beforeChildren',
-            staggerChildren: 0.1 
+            staggerChildren: 0.1
          }
       }
    };
@@ -44,36 +45,36 @@ const OrganizationRegisterPage = () => {
    // Animation variants for cards
    const cardVariants = {
       hidden: { opacity: 0, x: -50 },
-      visible: { 
-         opacity: 1, 
-         x: 0, 
+      visible: {
+         opacity: 1,
+         x: 0,
          transition: { duration: 0.5, ease: 'easeOut' }
       }
    };
 
    // Enhanced button variants with blur effect
    const buttonVariants = {
-      initial: { 
-         scale: 1, 
-         filter: 'blur(0px)', 
-         boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.1)' 
+      initial: {
+         scale: 1,
+         filter: 'blur(0px)',
+         boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.1)'
       },
-      hover: { 
-         scale: 1, 
+      hover: {
+         scale: 1,
          filter: 'blur(0.5px)', // Subtle blur on hover
          boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
-         transition: { 
-            duration: 0.3, 
-            ease: 'easeOut' 
+         transition: {
+            duration: 0.3,
+            ease: 'easeOut'
          }
       },
-      tap: { 
-         scale: 0.95, 
-         filter: 'blur(0px)', 
+      tap: {
+         scale: 0.95,
+         filter: 'blur(0px)',
          transition: { duration: 0.2 }
       },
-      loading: { 
-         scale: 1, 
+      loading: {
+         scale: 1,
          filter: 'blur(1px)', // Stronger blur during loading
          transition: { duration: 0.4 }
       }
@@ -82,9 +83,9 @@ const OrganizationRegisterPage = () => {
    // Animation variants for form items
    const formItemVariants = {
       hidden: { opacity: 0, y: 20 },
-      visible: { 
-         opacity: 1, 
-         y: 0, 
+      visible: {
+         opacity: 1,
+         y: 0,
          transition: { duration: 0.4, ease: 'easeOut' }
       }
    };
@@ -92,9 +93,9 @@ const OrganizationRegisterPage = () => {
    // Animation variants for list items
    const listItemVariants = {
       hidden: { opacity: 0, y: 10 },
-      visible: { 
-         opacity: 1, 
-         y: 0, 
+      visible: {
+         opacity: 1,
+         y: 0,
          transition: { duration: 0.3, ease: 'easeOut' }
       }
    };
@@ -102,7 +103,7 @@ const OrganizationRegisterPage = () => {
    const handleSubmit = async (values) => {
       try {
          setLoading(true);
-         
+
          const formData = {
             name: values.name,
             description: values.description,
@@ -135,7 +136,7 @@ const OrganizationRegisterPage = () => {
       try {
          setLicenseLoading(true);
          const formData = new FormData();
-         
+
          if (fileList && fileList.length > 0) {
             fileList.forEach((file, index) => {
                if (file.originFileObj) {
@@ -251,7 +252,9 @@ const OrganizationRegisterPage = () => {
                            />
                         </Form.Item>
                      </motion.div>
-
+                     <div className='mb-3 d-flex justify-center align-items-center'>
+                        <AIPromptModal />
+                     </div>
                      <motion.div variants={formItemVariants}>
                         <Form.Item>
                            <motion.div

@@ -2,6 +2,7 @@ const User = require("../models/user.model");
 const EventRegistration = require("../models/eventRegistration.model");
 const Organization = require("../models/organization.model");
 const HistoryEvent = require("../models/historyEvent.model");
+const MonthlyPayment = require("../models/monthlyPayment.model");
 const Event = require("../models/event.model");
 const asyncHandler = require("../middleware/asyncHandler");
 
@@ -208,6 +209,52 @@ exports.getAllAccounts = asyncHandler(async (req, res) => {
     return res.status(500).json({
       status: "fail",
       message: "Lấy danh sách tài khoản thất bại",
+    });
+  }
+});
+
+exports.refundMoney = asyncHandler(async (req, res) => {
+  const {
+    organizationId,
+    month,
+    year,
+  } = req.body;
+
+  try {
+    
+    const currentMonthlyPayments = await MonthlyPayment.findOne({
+      organization: organizationId,
+      month: month,
+      year: year,
+      status: 'NOT PAID',
+    }).populate("organization");
+
+    if (!currentMonthlyPayments) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Không tìm thấy yêu cầu thanh toán từ người dùng",
+      });
+    }
+
+    // Update the monthly payment status to 'PAID'
+    await MonthlyPayment.findByIdAndUpdate(currentMonthlyPayments._id, {
+      $set: { status: 'PAID' },
+    });
+
+    // Gửi hóa đơn hoàn tiên
+
+
+
+    return res.status(200).json({
+      status: "success",
+      message: "Hoàn tiền thành công",
+      currentMonthlyPayments: currentMonthlyPayments,
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      status: "fail",
+      message: "Hoàn tiền thất bại",
     });
   }
 });

@@ -14,6 +14,7 @@ import {
 } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 import styles from '../../css/ForumChatPage.module.css';
+import AIPromptModal from '../../components/ai_modal_prompt/AIPromptModal';
 
 const { TextArea } = Input;
 const { Text } = Typography;
@@ -176,7 +177,7 @@ const ForumChatPage = () => {
             placeholder="Bạn đang nghĩ gì?"
             value={newPost}
             onChange={e => setNewPost(e.target.value)}
-            rows={3}
+            autoSize // ✅ Thêm prop này
             maxLength={500}
           />
           {newImage && (
@@ -195,6 +196,7 @@ const ForumChatPage = () => {
               <Button icon={<PictureOutlined />} className={styles.iconButton}>Ảnh/Video</Button>
             </Upload>
             <Button icon={<SmileOutlined />} className={styles.iconButton}>Cảm xúc</Button>
+            <AIPromptModal />
             <Button
               type="primary"
               className={styles.postButton}

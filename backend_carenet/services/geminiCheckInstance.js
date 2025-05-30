@@ -23,5 +23,41 @@ exports.suggestEventByGemini = asyncHandler(async (content) => {
   
 });
 
-
 exports.chatboxWithGemini = asyncHandler(async(content) => {})
+
+// ✅ BỎ asyncHandler - đây là nguyên nhân gây lỗi
+exports.generateTextByGemini = async (prompt) => {
+  console.log("Đang tạo nội dung bằng Gemini với prompt:", prompt);
+
+  try {
+    // Validate input
+    if (!prompt || typeof prompt !== 'string') {
+      return {
+        status: 'fail',
+        data: null,
+        message: 'Prompt phải là một chuỗi text hợp lệ'
+      };
+    }
+
+    // Gửi prompt đến Gemini
+    const result = await model.generateContent(prompt);
+    const responseText = result.response.text().trim();
+
+    console.log("Nội dung được tạo thành công:", responseText);
+
+    return {
+      status: 'success',
+      data: responseText,
+      message: 'Tạo nội dung thành công'
+    };
+
+  } catch (error) {
+    console.error("Lỗi tạo nội dung bằng Gemini:", error);
+
+    return {
+      status: 'fail',
+      data: null,
+      message: error.message || 'Có lỗi xảy ra khi tạo nội dung'
+    };
+  }
+};

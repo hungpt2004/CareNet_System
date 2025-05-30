@@ -13,7 +13,6 @@ import styles from '../../css/OrganizationDashboardPage.module.css'
 
 const { Title, Text } = Typography
 const { Option } = Select
-const _orgaService = new OrganizationService();
 
 const OrganizationDashboardPage = () => {
   const currentDate = new Date()
@@ -44,11 +43,28 @@ const OrganizationDashboardPage = () => {
     }
   }
 
+  const _orgaService = new OrganizationService();
+
   const fetchCurrentOrganization = async () => {
     const { data } = await _orgaService.fetchCurrentOrganization();
     if (data) {
       setCurrentOrganization(data);
     }
+  }
+
+  const handleCalculateRevenueOneYear = async (year) => {
+    console.log("Calculating revenue for year:", year);
+    try {
+      const { data } = await _orgaService.calculateRevenueIn12Months(year);
+      if (data) {
+        CustomSuccessToast(`Đã tính toán doanh thu cho năm ${year}`);
+        console.log(`Dữ liệu khi tính doanh thu cả tổ chức: ${JSON.stringify(data)}`);
+      }
+    } catch (error) {
+      console.error("Error calculating revenue for one year:", error)
+      CustomFailedToast("Lỗi khi tính toán doanh thu cho năm")
+    }
+
   }
 
   useEffect(() => {
@@ -221,13 +237,24 @@ const OrganizationDashboardPage = () => {
               ))}
             </Select>
           </div>
+          
           <Button
             type="primary"
             icon={<Calculator size={16} />}
             onClick={() => setIsModalVisible(true)}
             className={styles.calculateButton}
           >
-            Tính toán doanh thu
+            Tính doanh thu theo tháng
+          </Button>
+          {/* Button tính doanh thu cả năm */}
+          <Button
+            type="primary"
+            style={{ marginLeft: 8 }}
+            icon={<Calculator size={16} />}
+            onClick={() => handleCalculateRevenueOneYear(selectedYear)}
+            className={styles.calculateButton}
+          >
+            Tính doanh thu cả năm
           </Button>
         </div>
 

@@ -17,6 +17,7 @@ const LevelRouter = require("./routes/level.routes");
 const monthlyPaymentRouter = require('./routes/monthlyPayment.routes');
 
 const certificatePurchaseRoutes = require('./routes/certificatepurchase.routes');
+const AIRouter = require("./routes/ai.routes");
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -41,6 +42,7 @@ app.use('/admin', AdminRouter);
 app.use('/staff', StaffRouter);
 app.use('/level', LevelRouter);
 app.use('/api/monthly-payment', monthlyPaymentRouter);
+app.use('/ai', AIRouter);
 
 app.use('/api/certificate-purchases', certificatePurchaseRoutes);
 module.exports = app;

@@ -15,5 +15,16 @@ export default class OrganizationService {
       }
    }
 
-   
+   // 2. Calculate all revenue in 12 months
+   async calculateRevenueIn12Months(year) {
+      try {
+         const response = await axiosInstance.get(`api/monthly-payment/calculate-full?year=${year}`);
+         if (response.data) {
+            return response.data; 
+         }
+      } catch (error) {
+         console.error("Error calculating revenue in 12 months:", error);
+         throw error;
+      }
+   }
 }

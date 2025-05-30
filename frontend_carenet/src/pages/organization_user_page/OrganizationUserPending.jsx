@@ -30,7 +30,7 @@ import {
   ClockCircleOutlined,
   ExclamationCircleOutlined,
 } from "@ant-design/icons";
-import axiosInstance from "../../utils/axiosInstance";
+import axiosInstance from "../../utils/AxiosInstance";
 import { CustomSuccessToast, CustomToast } from "../../components/toast/CustomToast";
 import CustomSpinner from "../../components/spinner/CustomSpinner";
 import io from 'socket.io-client';
@@ -128,7 +128,7 @@ const OrganizationUserPending = () => {
         fullname: requestToApprove.user?.fullname,
         email: requestToApprove.user?.email,
       });
-      
+
       if (response.data.status === "success") {
         console.log('Request approved successfully:', response.data);
 
@@ -146,11 +146,11 @@ const OrganizationUserPending = () => {
         // Đóng modal chi tiết 
         setDetailVisible(false);
         setSelectedRequest(null);
-        
-        
+
+
         await fetchEventRegistrations(selectedEventId);
         console.log('Event registrations refreshed');
-        
+
         CustomSuccessToast("Duyệt yêu cầu thành công");
       }
     } catch (error) {
@@ -283,6 +283,12 @@ const OrganizationUserPending = () => {
             Đã hủy
           </Tag>
         );
+      case "pendingCancel":
+        return (
+          <Tag color="error" icon={<CloseCircleOutlined />}>
+            Chờ duyệt hủy
+          </Tag>
+        );
       default:
         return <Tag>Không xác định</Tag>;
     }
@@ -326,9 +332,9 @@ const OrganizationUserPending = () => {
   // Render modal content
   const renderModalContent = () => {
     if (!selectedRequest) return null;
-    
+
     const userData = formatUserData(selectedRequest.user);
-    
+
     return (
       <div style={{ padding: "16px 8px" }}>
         <div style={{ textAlign: "center", marginBottom: "24px" }}>
@@ -452,7 +458,7 @@ const OrganizationUserPending = () => {
           </Col>
         </Row>
 
-        {selectedRequest.status === "pending" && (
+        {selectedRequest.status === "pendingCancel" && (
           <div style={{ marginTop: "24px", display: "flex", justifyContent: "center", gap: "16px" }}>
             <Button
               type="primary"

@@ -70,7 +70,7 @@ const UpgradePro = () => {
   }, []);
 
   useEffect(() => {
-    if (currentOrganization?.levelId.name === 'Pro') {
+    if (currentOrganization?.levelId.name === 'pro') {
       setIsPro(true);
       setIsBasic(false);
     } else if (currentOrganization?.levelId.name === 'basic') {  

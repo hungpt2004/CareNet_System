@@ -1,8 +1,10 @@
 const User = require("../models/user.model");
 const HistoryEvent = require("../models/historyEvent.model");
 const EventRegistration = require("../models/eventRegistration.model");
-const Feedback = require('../models/feedback.model');
+const Feedback = require("../models/feedback.model");
+const Report = require("../models/report.model");
 const asyncHandler = require("../middleware/asyncHandler");
+const { checkContent } = require("../services/chatgptCheckInstance");
 
 exports.createHobbies = asyncHandler(async (req, res) => {
   let formData = req.body.formData;
@@ -67,7 +69,7 @@ exports.createHobbies = asyncHandler(async (req, res) => {
 exports.requestCancelEvent = asyncHandler(async (req, res) => {
   const currentUser = req.user.user;
   const { eventId, cancelReason } = req.body;
-  
+
   try {
     const eventRegistration = await EventRegistration.findOne({
       user: currentUser._id,
@@ -79,7 +81,7 @@ exports.requestCancelEvent = asyncHandler(async (req, res) => {
       user: currentUser._id,
     });
 
-    if(!historyEvent) {
+    if (!historyEvent) {
       return res.status(500).json({
         status: "fail",
         message: "Bạn chưa tham gia sự kiện này",
@@ -112,29 +114,57 @@ exports.requestCancelEvent = asyncHandler(async (req, res) => {
 });
 
 exports.getMyFeedback = asyncHandler(async (req, res) => {
-
   const currentUser = req.user.user;
 
-  const feedbacks = await Feedback.find({userId: currentUser._id})
+  const feedbacks = await Feedback.find({ userId: currentUser._id });
 
-  if(!feedbacks) {
+  if (!feedbacks) {
     return res.status(200).json({
-      status: 'true',
-      message: 'Đang không có feedback nào',
-      feedbacks: []
-    })
+      status: "true",
+      message: "Đang không có feedback nào",
+      feedbacks: [],
+    });
   }
 
   return res.status(200).json({
-    status: 'success',
-    message: 'Lấy feedback thành công',
-    feedback: feedbacks
-  })
-
+    status: "success",
+    message: "Lấy feedback thành công",
+    feedback: feedbacks,
+  });
 });
 
 exports.getUserFollowRole = asyncHandler(async (req, res) => {
+  const { role } = req.params;
+});
 
-  const {role} = req.params
+exports.createQuestionRequest = asyncHandler(async (req, res) => {
+  const currentUser = req.user.user;
+  const { problemContent, receiveId } = req.body;
+
+  console.log('Câu hỏi đặt ra là :', problemContent);
+  console.log('Người nhận câu hỏi là :', receiveId);
+
+  if (!problemContent) {
+    return res.status(400).json({
+      status: "fail",
+      message: "Nội dung câu hỏi không được để trống",
+    });
+  }
+
+  const contentCheck = await checkContent(problemContent);
+  if (!contentCheck.isAppropriate) {
+    return res.status(400).json({
+      status: "fail",
+      message: "Nội dung không phù hợp",
+      reason: contentCheck.reason,
+    });
+  }
+
+  const newReport = new Report({
+    senderId: currentUser._id,
+    createdAt: new Date(),
+    content: problemContent,
+    receiveId
+  })
 
 });

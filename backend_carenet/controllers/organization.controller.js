@@ -4,6 +4,7 @@ const User = require("../models/user.model");
 const Event = require("../models/event.model");
 const EventRegistration = require("../models/eventRegistration.model");
 const HistoryEvent = require("../models/historyEvent.model");
+const Attendance = require("../models/attendance.model");
 const asyncHandler = require("../middleware/asyncHandler");
 const { sendApproveRequest, sendRejectRequest } = require("./email.controller");
 const { getIO } = require("../socket");
@@ -47,7 +48,12 @@ exports.getAllOwnerEvent = asyncHandler(async (req, res) => {
 
 exports.getRequestEventById = asyncHandler(async (req, res) => {
   const { id } = req.params;
+
+  console.log(`----- DEBUG PHẦN GET REQUEST THAM GIA ----`);
+  console.log("Request tham gia:", { eventId: id });
+
   try {
+
     const currentEvent = await Event.findById(id);
     if (!currentEvent) {
       return res.status(404).json({
@@ -66,8 +72,10 @@ exports.getRequestEventById = asyncHandler(async (req, res) => {
     );
 
     if (!currentEventRegistration.length) {
-      return res.status(404).json({
-        status: "fail",
+      return res.status(200).json({
+        status: "success",
+        eventData: null,
+        eventRegistrationData: [],
         message: "Không tìm thấy yêu cầu",
       });
     }
@@ -127,7 +135,10 @@ exports.getRequestPendingById = asyncHandler(async (req, res) => {
 exports.approveRequest = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { fullname, email } = req.body;
-  console.log("Approving request:", { requestId: id, fullname, email });
+
+  console.log(`----- DEBUG PHẦN ACCEPT THAM GIA ----`);
+
+  console.log("Request tham gia:", { requestId: id, fullname, email });
 
   try {
     const currentEventRegistration = await EventRegistration.findById(id);
@@ -197,6 +208,17 @@ exports.approveRequest = asyncHandler(async (req, res) => {
         $set: { status: "busy" },
       }
     );
+
+    const newAttendancee = new Attendance({
+      eventId: currentEvent._id,
+      userId: currentEventRegistration.user,
+      status: "registered",
+      registeredAt: new Date(),
+    });
+
+    await newAttendancee.save();
+
+    console.log("Đã tạo attendance mới: ", JSON.stringify(newAttendancee, null, 2));
 
     // Gửi thông báo realtime qua Socket.IO
     const notificationData = {
@@ -634,6 +656,7 @@ exports.updateOrganizationStatus = asyncHandler(async (req, res) => {
     });
   }
 });
+
 exports.updateOrganizationLevel = asyncHandler(async (req, res) => {
   try {
     const { organizationId, levelId } = req.body;

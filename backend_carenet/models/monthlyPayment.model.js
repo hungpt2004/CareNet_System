@@ -11,11 +11,9 @@ const MonthlyPaymentSchema = new mongoose.Schema({
   },
   month: { 
     type: Number, 
-    required: true 
   }, 
   year: { 
     type: Number, 
-    required: true,
     default: new Date().getFullYear()
   }, 
   amount: { 
@@ -25,8 +23,8 @@ const MonthlyPaymentSchema = new mongoose.Schema({
   }, 
   status: { 
     type: String, 
-    enum: ['PENDING', 'PAID'], 
-    default: 'PENDING' 
+    enum: ['NOT PAID', 'PAID', 'NO REVENUE'], 
+    default: 'NOT PAID' 
   }, // Trạng thái thanh toán
   paymentDate: {
     type: Date,
