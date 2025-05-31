@@ -45,7 +45,7 @@ const AdminSidebar = ({ showSidebar, isMobile }) => {
       submenu: [
         { title: "Danh sách tổ chức", path: "/admin-organization" },
         { title: "Quản lý bài đăng", path: "/admin-post" },
-        { title: "Báo cáo tổ chức", path: "/admin-organization-reports" },
+        { title: "Hoàn tiền tổ chức", path: "/organization-refund" },
       ],
     },
     {

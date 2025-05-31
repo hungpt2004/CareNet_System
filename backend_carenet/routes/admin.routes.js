@@ -7,6 +7,7 @@ AdminRouter.get('/get-pending-organization', authenticateToken, AdminController.
 AdminRouter.get('/get-pending-event', authenticateToken, AdminController.getPendingEvent);
 AdminRouter.put('/approve-organization-register', authenticateToken, AdminController.approveOrganizationRegister);
 AdminRouter.put('/reject-organization-register', authenticateToken, AdminController.rejectOrganizationRegister);
+AdminRouter.get('/organizations', AdminController.getSystemOrganization);
 AdminRouter.put('/approve-event-register', authenticateToken, AdminController.approveEventRegister);
 AdminRouter.put('/reject-event-register', authenticateToken, AdminController.rejectEventRegister);
 AdminRouter.get('/accounts', AdminController.getAllAccounts);

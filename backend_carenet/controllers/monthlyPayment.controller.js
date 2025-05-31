@@ -126,168 +126,183 @@ exports.calculateMonthlyRevenue = async (req, res) => {
 
 // Tính doanh thu cả 12 tháng trong năm
 exports.calculateAllMonthsRevenue = asyncHandler(async (req, res) => {
-    const currentUser = req.user.user;
+  const currentUser = req.user.user;
 
-    console.log('---- MONTHLY PAYMENT CONTROLLER -----');
+  console.log("---- MONTHLY PAYMENT CONTROLLER -----");
 
-    try {
-        let { year } = req.query; // Mặc định là năm
+  try {
+    let { year } = req.query; // Mặc định là năm
 
-        // Chuyển sang số nguyên và validate
-        year = parseInt(year);
-        if (!year || isNaN(year) || year < 2020 || year > new Date().getFullYear()) {
-            return res.status(400).json({
-                status: 'fail',
-                message: 'Invalid year. Year must be a valid number between 2020 and current year.'
-            });
-        }
-
-        console.log(`Năm đang tính doanh thu: ${year}`);
-
-        const currentOrganization = await Organization.findById(currentUser.organizationId);
-        const currentEvents = await Event.find({organizationId: currentOrganization._id});
-        const currentEventIds = currentEvents.map(event => event._id);
-
-        // Tìm tất cả chứng chỉ do tổ chức tạo
-        const certificates = await Certificate.find({
-            eventId: { $in: currentEventIds }
-        });
-
-        const certificateIds = certificates.map(cert => cert._id);
-
-        // Tính doanh thu cho từng tháng
-        const monthlyRevenuePromises = Array.from({ length: 12 }, async (_, index) => {
-            const month = index + 1;
-            
-            // Tính ngày đầu và cuối của tháng
-            const startDate = new Date(year, month - 1, 1);
-            const endDate = new Date(year, month, 0);
-            endDate.setHours(23, 59, 59, 999);
-
-            // Tìm tất cả giao dịch đã thanh toán trong tháng
-            const certificatePurchases = await CertificatePurchase.find({
-                certificateId: { $in: certificateIds },
-                paymentStatus: 'paid',
-                paidAt: {
-                    $gte: startDate,
-                    $lte: endDate
-                }
-            }).populate('certificateId');
-
-            // Tính tổng doanh thu tháng
-            const monthlyRevenue = certificatePurchases.reduce((sum, purchase) => sum + purchase.amount, 0);
-
-            console.log(`Doanh thu tháng ${month}/${year}: ${monthlyRevenue}`);
-
-            return {
-                month,
-                monthName: month,
-                revenue: monthlyRevenue,
-                certificateCount: certificatePurchases.length,
-                certificateDetails: certificatePurchases,
-                startDate,
-                endDate
-            };
-        });
-
-        // Chờ tất cả promise hoàn thành
-        const monthlyRevenueResults = await Promise.all(monthlyRevenuePromises);
-
-        // ✅ Cập nhật hoặc tạo bản ghi cho TẤT CẢ các tháng (kể cả revenue = 0)
-        const updatePromises = monthlyRevenueResults.map(async (monthData) => {
-            // ✅ Bỏ điều kiện revenue > 0, xử lý tất cả các tháng
-            return await MonthlyPayment.findOneAndUpdate(
-                {
-                    organization: currentUser.organizationId,
-                    month: monthData.month,
-                    year
-                },
-                {
-                    amount: monthData.revenue, // ✅ Có thể là 0
-                    status: monthData.revenue > 0 ? 'NOT PAID' : 'NO REVENUE', // ✅ Status khác nhau cho revenue = 0
-                },
-                { upsert: true, new: true }
-            );
-        });
-
-
-        const updatedPayments = await Promise.all(updatePromises);
-        // ✅ Không filter null nữa vì tất cả đều được xử lý
-        const validPayments = updatedPayments; 
-
-        // Tính tổng doanh thu cả năm
-        const totalYearlyRevenue = monthlyRevenueResults.reduce((sum, month) => sum + month.revenue, 0);
-        const totalCertificates = monthlyRevenueResults.reduce((sum, month) => sum + month.certificateCount, 0);
-
-        // Tìm tháng có doanh thu cao nhất
-        const highestRevenueMonth = monthlyRevenueResults.reduce((max, month) => 
-            month.revenue > max.revenue ? month : max
-        );
-
-        // Tháng có nhiều certificate bán nhất
-        const mostCertificatesMonth = monthlyRevenueResults.reduce((max, month) => 
-            month.certificateCount > max.certificateCount ? month : max
-        );
-
-        // Emit socket event cho real-time update
-        const io = socketIO.getIO();
-        io.to(currentUser.organizationId.toString()).emit('yearlyRevenueCalculated', {
-            type: 'yearly_revenue_calculated',
-            data: {
-                year,
-                totalYearlyRevenue,
-                totalCertificates,
-                monthlyBreakdown: monthlyRevenueResults,
-                updatedPaymentsCount: validPayments.length
-            },
-            timestamp: new Date()
-        });
-
-        return res.status(200).json({
-            status: 'success',
-            message: `Tính toán doanh thu cả năm ${year} thành công`,
-            data: {
-                year,
-                organizationData: currentOrganization,
-                totalYearlyRevenue,
-                totalCertificates,
-                monthlyBreakdown: monthlyRevenueResults,
-                updatedPayments: validPayments,
-                sub_data: {
-                    monthsWithRevenue: monthlyRevenueResults.filter(m => m.revenue > 0).length,
-                    monthsWithoutRevenue: monthlyRevenueResults.filter(m => m.revenue === 0).length,
-                    averageMonthlyRevenue: totalYearlyRevenue / 12,
-                    highestRevenueMonth: {
-                        month: highestRevenueMonth.month,
-                        monthName: highestRevenueMonth.monthName,
-                        revenue: highestRevenueMonth.revenue,
-                        certificateCount: highestRevenueMonth.certificateCount
-                    },
-                    mostCertificatesMonth: {
-                        month: mostCertificatesMonth.month,
-                        monthName: mostCertificatesMonth.monthName,
-                        revenue: mostCertificatesMonth.revenue,
-                        certificateCount: mostCertificatesMonth.certificateCount
-                    },
-                    averagePricePerCertificate: totalCertificates > 0 ? totalYearlyRevenue / totalCertificates : 0,
-                    // ✅ Thêm thống kê chi tiết
-                    revenueDistribution: {
-                        monthsWithRevenue: monthlyRevenueResults.filter(m => m.revenue > 0),
-                        monthsWithoutRevenue: monthlyRevenueResults.filter(m => m.revenue === 0),
-                        totalMonthsProcessed: 12
-                    }
-                }
-            }
-        });
-
-    } catch (error) {
-        console.error('Calculate all months revenue error:', error);
-        return res.status(500).json({
-            status: 'fail',
-            message: 'Không thể tính toán doanh thu cả năm',
-            error: error.message
-        });
+    // Chuyển sang số nguyên và validate
+    year = parseInt(year);
+    if (
+      !year ||
+      isNaN(year) ||
+      year < 2020 ||
+      year > new Date().getFullYear()
+    ) {
+      return res.status(400).json({
+        status: "fail",
+        message:
+          "Invalid year. Year must be a valid number between 2020 and current year.",
+      });
     }
+
+    console.log(`Năm đang tính doanh thu: ${year}`);
+
+    const currentOrganization = await Organization.findById(
+      currentUser.organizationId
+    );
+    const currentEvents = await Event.find({
+      organizationId: currentOrganization._id,
+    });
+    const currentEventIds = currentEvents.map((event) => event._id);
+
+    // Tìm tất cả chứng chỉ do tổ chức tạo
+    const certificates = await Certificate.find({
+      eventId: { $in: currentEventIds },
+    });
+
+    const certificateIds = certificates.map((cert) => cert._id);
+
+    // Tính doanh thu cho từng tháng
+    const monthlyRevenuePromises = Array.from(
+      { length: 12 },
+      async (_, index) => {
+        const month = index + 1;
+
+        // Tính ngày đầu và cuối của tháng
+        const startDate = new Date(year, month - 1, 1);
+        const endDate = new Date(year, month, 0);
+        endDate.setHours(23, 59, 59, 999);
+
+        // Tìm tất cả giao dịch đã thanh toán trong tháng
+        const certificatePurchases = await CertificatePurchase.find({
+          certificateId: { $in: certificateIds },
+          paymentStatus: "paid",
+          paidAt: {
+            $gte: startDate,
+            $lte: endDate,
+          },
+        }).populate("certificateId");
+
+        // Tính tổng doanh thu tháng
+        const monthlyRevenue = certificatePurchases.reduce(
+          (sum, purchase) => sum + purchase.amount,
+          0
+        );
+
+        console.log(`Doanh thu tháng ${month}/${year}: ${monthlyRevenue}`);
+
+        return {
+          month,
+          monthName: month,
+          revenue: monthlyRevenue,
+          certificateCount: certificatePurchases.length,
+          certificateDetails: certificatePurchases,
+          startDate,
+          endDate,
+        };
+      }
+    );
+
+    // Chờ tất cả promise hoàn thành
+    const monthlyRevenueResults = await Promise.all(monthlyRevenuePromises);
+
+    // ✅ Cập nhật hoặc tạo bản ghi cho TẤT CẢ các tháng (kể cả revenue = 0)
+    const updatePromises = monthlyRevenueResults.map(async (monthData) => {
+      // ✅ Bỏ điều kiện revenue > 0, xử lý tất cả các tháng
+      return await MonthlyPayment.findOneAndUpdate(
+        {
+          organization: currentUser.organizationId,
+          month: monthData.month,
+          year,
+        },
+        {
+          amount: monthData.revenue, // ✅ Có thể là 0
+          status: monthData.revenue > 0 ? "NOT PAID" : "NO REVENUE", // ✅ Status khác nhau cho revenue = 0
+        },
+        { upsert: true, new: true }
+      );
+    });
+
+    const updatedPayments = await Promise.all(updatePromises);
+    // ✅ Không filter null nữa vì tất cả đều được xử lý
+    const validPayments = updatedPayments;
+
+    // Tính tổng doanh thu cả năm
+    const totalYearlyRevenue = monthlyRevenueResults.reduce(
+      (sum, month) => sum + month.revenue,
+      0
+    );
+    const totalCertificates = monthlyRevenueResults.reduce(
+      (sum, month) => sum + month.certificateCount,
+      0
+    );
+
+    // Tìm tháng có doanh thu cao nhất
+    const highestRevenueMonth = monthlyRevenueResults.reduce((max, month) =>
+      month.revenue > max.revenue ? month : max
+    );
+
+    // Tháng có nhiều certificate bán nhất
+    const mostCertificatesMonth = monthlyRevenueResults.reduce((max, month) =>
+      month.certificateCount > max.certificateCount ? month : max
+    );
+
+
+    return res.status(200).json({
+      status: "success",
+      message: `Tính toán doanh thu cả năm ${year} thành công`,
+      data: {
+        year,
+        organizationData: currentOrganization,
+        totalYearlyRevenue,
+        totalCertificates,
+        monthlyBreakdown: monthlyRevenueResults,
+        updatedPayments: validPayments,
+        sub_data: {
+          monthsWithRevenue: monthlyRevenueResults.filter((m) => m.revenue > 0)
+            .length,
+          monthsWithoutRevenue: monthlyRevenueResults.filter(
+            (m) => m.revenue === 0
+          ).length,
+          averageMonthlyRevenue: totalYearlyRevenue / 12,
+          highestRevenueMonth: {
+            month: highestRevenueMonth.month,
+            monthName: highestRevenueMonth.monthName,
+            revenue: highestRevenueMonth.revenue,
+            certificateCount: highestRevenueMonth.certificateCount,
+          },
+          mostCertificatesMonth: {
+            month: mostCertificatesMonth.month,
+            monthName: mostCertificatesMonth.monthName,
+            revenue: mostCertificatesMonth.revenue,
+            certificateCount: mostCertificatesMonth.certificateCount,
+          },
+          averagePricePerCertificate:
+            totalCertificates > 0 ? totalYearlyRevenue / totalCertificates : 0,
+          // ✅ Thêm thống kê chi tiết
+          revenueDistribution: {
+            monthsWithRevenue: monthlyRevenueResults.filter(
+              (m) => m.revenue > 0
+            ),
+            monthsWithoutRevenue: monthlyRevenueResults.filter(
+              (m) => m.revenue === 0
+            ),
+            totalMonthsProcessed: 12,
+          },
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Calculate all months revenue error:", error);
+    return res.status(500).json({
+      status: "fail",
+      message: "Không thể tính toán doanh thu cả năm",
+      error: error.message,
+    });
+  }
 });
 
 // Lấy doanh thu theo tháng hoặc năm
@@ -331,22 +346,6 @@ exports.getRevenue = async (req, res) => {
           $lte: endDate,
         },
       });
-
-      // Emit socket event khi có người mua chứng chỉ
-      const io = socketIO.getIO();
-      io.to(currentUser.organizationId.toString()).emit(
-        "certificatePurchased",
-        {
-          type: "certificate_purchased",
-          data: {
-            monthlyPayment,
-            certificateCount,
-            month: parseInt(month),
-            year: parseInt(year),
-          },
-          timestamp: new Date(),
-        }
-      );
 
       return res.status(200).json({
         status: "success",
@@ -720,102 +719,164 @@ exports.calculateMultiYearRevenue = asyncHandler(async (req, res) => {
   }
 });
 
-// Lấy thống kê chi tiết certificate theo organization
-exports.getCertificateStatistics = asyncHandler(async (req, res) => {
-  const currentUser = req.user.user;
+// Lay so tien phai hoan cho tung to chuc theo nam
+exports.getMonthlyPaymentByOrganizationId = asyncHandler(async (req, res) => {
+  const { organizationId, month, year } = req.query;
+
+  console.log(
+    `Organization ID: ${organizationId}, Month: ${month}, Year: ${year}`
+  );
+
+  if (!organizationId) {
+    return res.status(400).json({
+      status: "fail",
+      message: "Thiếu organizationId",
+    });
+  }
 
   try {
-    const { year, month } = req.query;
+    let query = { organization: organizationId };
 
-    const currentOrganization = await Organization.findById(
-      currentUser.organizationId
-    );
-    const currentEvents = await Event.find({
-      organizationId: currentOrganization._id,
-    });
-    const currentEventIds = currentEvents.map((event) => event._id);
+    // Nếu có cả month và year: lấy 1 bản ghi tháng đó
+    if (month && year) {
+      query.month = parseInt(month);
+      query.year = parseInt(year);
 
-    const certificates = await Certificate.find({
-      eventId: { $in: currentEventIds },
-    }).populate("eventId");
-    const certificateIds = certificates.map((cert) => cert._id);
-
-    let query = {
-      certificateId: { $in: certificateIds },
-      paymentStatus: "paid",
-    };
-
-    // Add date filter if provided
-    if (year) {
-      const yearInt = parseInt(year);
-      if (month) {
-        const monthInt = parseInt(month);
-        const startDate = new Date(yearInt, monthInt - 1, 1);
-        const endDate = new Date(yearInt, monthInt, 0);
-        endDate.setHours(23, 59, 59, 999);
-        query.paidAt = { $gte: startDate, $lte: endDate };
-      } else {
-        const startDate = new Date(yearInt, 0, 1);
-        const endDate = new Date(yearInt, 11, 31, 23, 59, 59, 999);
-        query.paidAt = { $gte: startDate, $lte: endDate };
+      const monthlyPayment = await MonthlyPayment.findOne(query).populate(
+        "organization"
+      );
+      if (!monthlyPayment) {
+        return res.status(404).json({
+          status: "fail",
+          message: `Không tìm thấy dữ liệu thanh toán tháng ${month}/${year} cho tổ chức`,
+        });
       }
+
+      console.log(" ---- MONTHLY PAYMENT CONTROLLER ---- ");
+      console.log(
+        `Hoàn tiền cho tổ chức ${organizationId} tháng ${month}/${year}:`,
+        monthlyPayment
+      );
+
+      return res.status(200).json({
+        status: "success",
+        data: monthlyPayment,
+      });
     }
 
-    const certificatePurchases = await CertificatePurchase.find(query)
-      .populate("certificateId")
-      .populate("userId", "fullName email")
-      .sort({ paidAt: -1 });
-
-    // Group by event
-    const eventStats = {};
-    certificatePurchases.forEach((purchase) => {
-      const eventName = purchase.certificateId.eventName;
-      if (!eventStats[eventName]) {
-        eventStats[eventName] = {
-          eventName,
-          totalRevenue: 0,
-          certificateCount: 0,
-          purchases: [],
-        };
+    // Nếu chỉ có year: lấy tất cả các tháng của năm đó
+    if (year && !month) {
+      query.year = parseInt(year);
+      const monthlyPayments = await MonthlyPayment.find(query)
+        .sort({ month: 1 })
+        .populate("organization");
+      if (!monthlyPayments || monthlyPayments.length === 0) {
+        return res.status(404).json({
+          status: "fail",
+          message: `Không tìm thấy dữ liệu thanh toán năm ${year} cho tổ chức`,
+        });
       }
-      eventStats[eventName].totalRevenue += purchase.amount;
-      eventStats[eventName].certificateCount += 1;
-      eventStats[eventName].purchases.push({
-        purchaseId: purchase._id,
-        amount: purchase.amount,
-        paidAt: purchase.paidAt,
-        userInfo: purchase.userId,
+
+      console.log(" ---- MONTHLY PAYMENT CONTROLLER ---- ");
+      console.log(
+        `Hoàn tiền cho tổ chức ${organizationId} năm ${year}:`,
+        monthlyPayments
+      );
+
+      return res.status(200).json({
+        status: "success",
+        data: monthlyPayments,
       });
+    }
+
+    if (!month && !year) {
+      const monthlyPayments = await MonthlyPayment.find({
+        organization: organizationId,
+      })
+        .sort({ month: 1 })
+        .populate("organization");
+
+      return res.status(200).json({
+        status: "success",
+        data: monthlyPayments,
+      });
+    }
+
+    // Nếu chỉ có month mà không có year: lỗi
+    if (month && !year) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Vui lòng cung cấp năm khi tìm theo tháng",
+      });
+    }
+
+    // Nếu không có gì: lỗi
+    return res.status(400).json({
+      status: "fail",
+      message:
+        "Vui lòng cung cấp organizationId và ít nhất năm hoặc tháng và năm",
+    });
+  } catch (error) {
+    console.error("getMonthlyPaymentByOrganizationId lỗi:", error);
+    return res.status(500).json({
+      status: "fail",
+      message: "Không thể lấy dữ liệu thanh toán",
+      error: error.message,
+    });
+  }
+});
+
+// Hàm trả tiền refund
+exports.refundPayment = asyncHandler(async (req, res) => {
+  const { organizationId, month, year } = req.body;
+
+  console.log(
+    `Refund payment for organization ${organizationId} for month ${month}/${year}`
+  );
+
+  try {
+    // Tìm yêu cầu thanh toán chưa được hoàn
+    const currentMonthlyPayment = await MonthlyPayment.findOne({
+      organization: organizationId,
+      month: month,
+      year: year,
+      status: "NOT PAID",
+    }).populate("organization");
+
+    if (!currentMonthlyPayment) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Không tìm thấy yêu cầu thanh toán từ tổ chức",
+      });
+    }
+
+    // Cập nhật trạng thái thanh toán
+    await MonthlyPayment.findByIdAndUpdate(currentMonthlyPayment._id, {
+      $set: { status: "PAID" },
     });
 
-    const totalRevenue = certificatePurchases.reduce(
-      (sum, purchase) => sum + purchase.amount,
-      0
-    );
+    // Emit socket event cho real-time update
+    const io = socketIO.getIO();
+    io.to(organizationId.toString()).emit("paymentRefunded", {
+      type: "payment_refunded",
+      data: {
+        monthlyPayment: currentMonthlyPayment,
+        month,
+        year,
+      },
+      timestamp: new Date(),
+    });
 
     return res.status(200).json({
       status: "success",
-      message: "Lấy thống kê certificate thành công",
-      data: {
-        organizationId: currentUser.organizationId,
-        organizationName: currentOrganization.name,
-        period: month ? `${month}/${year}` : year || "All time",
-        totalRevenue,
-        totalCertificatesSold: certificatePurchases.length,
-        totalEvents: Object.keys(eventStats).length,
-        averagePricePerCertificate:
-          certificatePurchases.length > 0
-            ? totalRevenue / certificatePurchases.length
-            : 0,
-        eventStatistics: Object.values(eventStats),
-        recentPurchases: certificatePurchases.slice(0, 10), // 10 giao dịch gần nhất
-      },
+      message: "Hoàn tiền thành công",
+      data: currentMonthlyPayment,
     });
   } catch (error) {
-    console.error("Get certificate statistics error:", error);
+    console.error("Refund payment error:", error);
     return res.status(500).json({
       status: "fail",
-      message: "Không thể lấy thống kê certificate",
+      message: "Hoàn tiền thất bại",
       error: error.message,
     });
   }

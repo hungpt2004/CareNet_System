@@ -258,3 +258,24 @@ exports.refundMoney = asyncHandler(async (req, res) => {
     });
   }
 });
+
+exports.getSystemOrganization = asyncHandler(async (req, res) => {
+  try {
+
+    const currentOrganization = await Organization.find({
+      adminStatus: "approved",
+      organizationStatus: "active",
+    });
+
+    return res.status(200).json({
+      status: "success",
+      data: currentOrganization,
+    });
+    
+  } catch (error) {
+    return res.status(500).json({
+      status: "fail",
+      message: "Lấy thông tin tổ chức thất bại",
+    });
+  }
+});

@@ -1,3 +1,4 @@
+import axios from "axios";
 import axiosInstance from "../../utils/AxiosInstance";
 
 export default class OrganizationService {
@@ -27,4 +28,18 @@ export default class OrganizationService {
          throw error;
       }
    }
+
+   // 3. Fetch all organizations
+   async fetchAllOrganizations() {
+      try {
+         const response = await axios.get('http://localhost:5000/admin/organizations');
+         if (response.data) {
+            return response.data; // organizationList
+         }
+      } catch (error) {
+         console.error("Error fetching all organizations:", error);
+         throw error;
+      }
+   }
+
 }

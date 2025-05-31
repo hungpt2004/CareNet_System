@@ -16,11 +16,9 @@ import ForgotPasswordPage from "./pages/forgotpassword_page/ForgotPasswordPage";
 import FeedbackManagement from "./pages/feedbackmanagerment_page/FeedbackManagement";
 import SupportRequestPage from './pages/support_page/SupportRequestPage';
 import AdminLayout from './layout/AdminLayout';
-import AdminCourses from './pages/admin_course_page/AdminCoursesPage';
 import AdminDashboard from './pages/admin_dashboard_page/AdminDashboardPage';
 import AdminOrganizations from './pages/admin_organization_page/admin_organization';
 import AdminVolunteerPosts from './pages/admin_posts_page/AdminPostPage';
-import AdminEventParticipants from './pages/admin_students_page/AdminEventParticipant';
 import OwnerLayout from './layout/OwnerLayout';
 import OrganizationPostPage from './pages/organization_post_page/OrganizationPostPage';
 import ProfileScore from './pages/profile_page/ProfileScore';
@@ -50,6 +48,7 @@ import ForumChatPage from './pages/forum_page/UserForumChatPage';
 import CertificatePurchasePage from './pages/profile_page/CertificatePurchasePage';
 import { PaymentSuccessOrgPage } from './pages/payment_status_page/PaymentSuccessOrgPage';
 import { PaymentCancelOrgPage } from './pages/payment_status_page/PaymentCancelOrgPage';
+import AdminOrganizationRefund from './pages/admin_students_page/AdminRefundPage';
 
 const guestRoutes = [
   { path: '/', element: <LandingPage /> },
@@ -89,7 +88,7 @@ const privateCustomerRoutes = [
 
 const privateAdminRoutes = [
   { path: '/dashboard', element: <AdminDashboard /> },
-  { path: '/course', element: <AdminCourses /> },
+  { path: '/organization-refund', element: <AdminOrganizationRefund /> },
   { path: '/request-organization', element: <AdminOrganizationsPending /> },
   { path: '/admin-support', element: <AdminSupportRequests /> },
   { path: '/admin-organization', element: <AdminOrganizations /> },
@@ -103,7 +102,6 @@ const privateOwnerRoutes = [
   { path: '/owner-user', element: <OrganizationUserRequests /> },
   { path: '/owner-pending', element: <OrganizationUserPending /> },
   { path: '/owner-attendance', element: <OrganizationEventAttendance /> },
-  { path: '/admin-participant', element: <AdminEventParticipants /> },
   { path: '/upgrade-pro', element: <UpgradePro /> },
   { path: '/owner-finished-events', element: <OrganizationEvents /> },
   { path: '/owner-staff', element: <OrganizationStaffManagement /> },

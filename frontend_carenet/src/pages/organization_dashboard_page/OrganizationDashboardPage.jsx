@@ -133,6 +133,14 @@ const OrganizationDashboardPage = () => {
       fetchMonthlyData()
     })
 
+    // Lắng nghe sự kiện hoàn tiền
+    socket.on("paymentRefunded", (data) => {
+      CustomSuccessToast("Tổ chức đã được hoàn tiền thành công!")
+      // Có thể fetch lại dữ liệu nếu muốn
+      fetchRevenueData()
+      fetchMonthlyData()
+    })
+
     return () => {
       if (organizationId) {
         socket.emit("leaveOrganizationRoom", organizationId)
@@ -140,6 +148,7 @@ const OrganizationDashboardPage = () => {
       socket.off("revenueUpdated")
       socket.off("certificatePurchased")
       socket.off("participationApproved")
+      socket.off("paymentRefunded")
       socket.disconnect()
     }
   }, [])
@@ -150,7 +159,7 @@ const OrganizationDashboardPage = () => {
 
   const fetchRevenueData = async () => {
     try {
-      const response = await axiosInstance.get(`/api/monthly-payment`, {
+      const response = await axiosInstance.get(`/api/monthly-payment/get-revenue`, {
         params: {
           year: selectedYear,
         },

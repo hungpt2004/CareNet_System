@@ -10,8 +10,12 @@ router.get('/calculate', authenticateToken, MonthlyPaymentController.calculateMo
 
 router.get('/calculate-full', authenticateToken, MonthlyPaymentController.calculateAllMonthsRevenue);
    
+router.post('/pay-refund', MonthlyPaymentController.refundPayment);
+
+router.get('/get-revenue-table', MonthlyPaymentController.getMonthlyPaymentByOrganizationId)
+
 // Route để lấy doanh thu theo tháng
-router.get('/', authenticateToken, MonthlyPaymentController.getRevenue);
+router.get('/get-revenue', authenticateToken, MonthlyPaymentController.getRevenue);
 
 
 module.exports = router;
