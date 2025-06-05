@@ -257,3 +257,20 @@ exports.getAllProcessingEvent = asyncHandler(async (req, res) => {
     eventData: events,
   });
 });
+exports.getAllEvents = async (req, res) => {
+  try {
+    const events = await Event.find()
+      .populate("organizationId", "name logo") // Populate organization name and logo
+      .lean();
+    res.status(200).json({
+      success: true,
+      data: events,
+    });
+  } catch (error) {
+    console.error("Error fetching events:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while fetching events",
+    });
+  }
+};

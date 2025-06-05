@@ -1,40 +1,88 @@
-import React, { useState } from 'react';
-import { Table, Tag, Space, Button, Card, Modal, Descriptions, Avatar, Typography } from 'antd';
-import { User, Mail, Phone, MapPin, Calendar, Eye, Award, BookOpen } from 'lucide-react';
-import styles from '../../css/AppColors.module.css';
-import { formatDateVN } from '../../utils/FormatDateVN';
+import React, { useState, useEffect } from "react";
+import { Table, Tag, Space, Button, Card, Modal, Descriptions, Avatar, Typography, message, Image } from "antd";
+import { User, Mail, Phone, MapPin, Calendar, Eye, Award, BookOpen, Lock, Unlock, FileImage } from "lucide-react";
+import styles from "../../css/AppColors.module.css";
+import { formatDateVN } from "../../utils/FormatDateVN";
+import axios from "../../utils/AxiosInstance";
 
 const { Title } = Typography;
 
 const UserManagement = () => {
   const [loading, setLoading] = useState(false);
+  const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  // Mock data - sẽ thay thế bằng API call
-  const mockUsers = [
-    {
-      _id: '1',
-      fullname: 'Nguyễn Văn A',
-      email: 'nguyenvana@example.com',
-      phone: '0123456789',
-      avatar: 'https://i.pinimg.com/736x/8a/a9/c5/8aa9c5d8429f561000f1de8e7f6d5a32.jpg',
-      role: 'volunteer',
-      status: 'active',
-      address: {
-        street: '123 Đường ABC',
-        ward: 'Phường XYZ',
-        district: 'Quận 1',
-        province: 'TP.HCM'
-      },
-      dateOfBirth: '1990-01-01',
-      gender: 'male',
-      score: 100,
-      certificates: ['Chứng chỉ tình nguyện', 'Chứng chỉ kỹ năng mềm'],
-      createdAt: '2024-01-01T00:00:00.000Z'
-    },
-    // Thêm mock data khác ở đây
-  ];
+  // Fetch users from API
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      console.log("Fetching users...");
+      console.log("Full URL:", axios.defaults.baseURL + "/volunteer/all-users");
+      const response = await axios.get("/volunteer/all-users");
+
+      console.log("API Response:", response.data);
+      if (!response.data.data) {
+        console.warn("No 'data' field in response, checking alternative:", response.data);
+        if (response.data.users) {
+          setUsers(response.data.users.map(user => ({
+            _id: user._id,
+            fullname: user.fullname || "Chưa có thông tin",
+            email: user.email || "Chưa có email",
+            phone: user.phone || "Chưa có số điện thoại",
+            avatar: user.avatar || "https://i.pinimg.com/736x/8a/a9/c5/8aa9c5d8429f561000f1de8e7f6d5a32.jpg",
+            role: user.role || "volunteer",
+            status: user.status || "ready",
+            address: user.address || {
+              street: "",
+              ward: "",
+              district: "",
+              province: "Da Nang",
+            },
+            dob: user.dob || null,
+            score: user.reputationPoints || 0,
+            certificates: user.certificates || [],
+            cccdImages: user.cccdImages || [], // Ensure cccdImages is included
+            createdAt: user.createdAt || new Date().toISOString(),
+          })));
+        } else {
+          setUsers([]);
+        }
+        return;
+      }
+
+      const formattedUsers = response.data.data.map(user => ({
+        _id: user._id,
+        fullname: user.fullname || "Chưa có thông tin",
+        email: user.email || "Chưa có email",
+        phone: user.phone || "Chưa có số điện thoại",
+        avatar: user.avatar || "https://i.pinimg.com/736x/8a/a9/c5/8aa9c5d8429f561000f1de8e7f6d5a32.jpg",
+        role: user.role || "volunteer",
+        status: user.status || "ready",
+        address: user.address || {
+          street: "",
+          ward: "",
+          district: "",
+          province: "Da Nang",
+        },
+        dob: user.dob || null,
+        score: user.reputationPoints || 0,
+        certificates: user.certificates || [],
+        cccdImages: user.cccdImages || [], // Ensure cccdImages is included
+        createdAt: user.createdAt || new Date().toISOString(),
+      }));
+      setUsers(formattedUsers);
+    } catch (error) {
+      console.error("Error fetching users:", error.response ? error.response.data : error.message);
+      message.error("Lỗi khi tải danh sách người dùng: " + (error.response?.data?.message || error.message));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   const showUserDetail = (user) => {
     setSelectedUser(user);
@@ -46,11 +94,26 @@ const UserManagement = () => {
     setSelectedUser(null);
   };
 
+  const handleToggleStatus = async (userId, currentStatus) => {
+    setLoading(true);
+    try {
+      const response = await axios.put(`/volunteer/update-status/${userId}`, { status: currentStatus === "busy" ? "ready" : "busy" });
+
+      message.success(`Tài khoản đã được ${currentStatus === "busy" ? "mở khóa" : "khóa"}`);
+      fetchUsers();
+    } catch (error) {
+      console.error("Error updating status:", error.response ? error.response.data : error.message);
+      message.error("Lỗi khi cập nhật trạng thái: " + (error.response?.data?.message || error.message));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const columns = [
     {
-      title: 'Thông tin',
-      dataIndex: 'fullname',
-      key: 'userInfo',
+      title: "Thông tin",
+      dataIndex: "fullname",
+      key: "userInfo",
       render: (text, record) => (
         <Space>
           <Avatar src={record.avatar} size={40} />
@@ -62,9 +125,9 @@ const UserManagement = () => {
       ),
     },
     {
-      title: 'Số điện thoại',
-      dataIndex: 'phone',
-      key: 'phone',
+      title: "Số điện thoại",
+      dataIndex: "phone",
+      key: "phone",
       render: (phone) => (
         <Space>
           <Phone size={16} />
@@ -73,44 +136,48 @@ const UserManagement = () => {
       ),
     },
     {
-      title: 'Vai trò',
-      dataIndex: 'role',
-      key: 'role',
+      title: "Vai trò",
+      dataIndex: "role",
+      key: "role",
       render: (role) => {
-        let color = 'blue';
-        let text = 'Tình nguyện viên';
-        
-        switch(role) {
-          case 'admin':
-            color = 'red';
-            text = 'Admin';
+        let color = "blue";
+        let text = "Tình nguyện viên";
+
+        switch (role) {
+          case "admin":
+            color = "red";
+            text = "Admin";
             break;
-          case 'organization':
-            color = 'green';
-            text = 'Tổ chức';
+          case "organization":
+            color = "green";
+            text = "Tổ chức";
+            break;
+          case "staff":
+            color = "orange";
+            text = "Nhân viên";
             break;
           default:
-            color = 'blue';
-            text = 'Tình nguyện viên';
+            color = "blue";
+            text = "Tình nguyện viên";
         }
-        
+
         return <Tag color={color}>{text}</Tag>;
       },
     },
     {
-      title: 'Trạng thái',
-      dataIndex: 'status',
-      key: 'status',
+      title: "Trạng thái",
+      dataIndex: "status",
+      key: "status",
       render: (status) => {
-        let color = status === 'active' ? 'green' : 'red';
-        let text = status === 'active' ? 'Hoạt động' : 'Không hoạt động';
+        let color = status === "busy" ? "red" : "green";
+        let text = status === "busy" ? "Khóa" : "Hoạt động";
         return <Tag color={color}>{text}</Tag>;
       },
     },
     {
-      title: 'Điểm',
-      dataIndex: 'score',
-      key: 'score',
+      title: "Điểm",
+      dataIndex: "score",
+      key: "score",
       render: (score) => (
         <Space>
           <Award size={16} />
@@ -119,16 +186,24 @@ const UserManagement = () => {
       ),
     },
     {
-      title: 'Thao tác',
-      key: 'action',
+      title: "Thao tác",
+      key: "action",
       render: (_, record) => (
         <Space size="middle">
-          <Button 
-            type="primary" 
+          <Button
+            type="primary"
             icon={<Eye size={16} />}
             onClick={() => showUserDetail(record)}
           >
             Xem chi tiết
+          </Button>
+          <Button
+            type={record.status === "busy" ? "primary" : "danger"}
+            icon={record.status === "busy" ? <Unlock size={16} /> : <Lock size={16} />}
+            onClick={() => handleToggleStatus(record._id, record.status)}
+            loading={loading}
+          >
+            {record.status === "busy" ? "Mở khóa" : "Khóa"}
           </Button>
         </Space>
       ),
@@ -143,7 +218,7 @@ const UserManagement = () => {
         </div>
         <Table
           columns={columns}
-          dataSource={mockUsers}
+          dataSource={users}
           loading={loading}
           rowKey="_id"
           pagination={{
@@ -166,7 +241,7 @@ const UserManagement = () => {
         footer={[
           <Button key="close" onClick={handleCloseModal}>
             Đóng
-          </Button>
+          </Button>,
         ]}
         width={800}
       >
@@ -194,45 +269,55 @@ const UserManagement = () => {
               <Space>
                 <MapPin size={16} />
                 <span>
-                  {`${selectedUser.address.street}, ${selectedUser.address.ward}, ${selectedUser.address.district}, ${selectedUser.address.province}`}
+                  {`${selectedUser.address.street || ""}, ${selectedUser.address.ward || ""}, ${
+                    selectedUser.address.district || ""
+                  }, ${selectedUser.address.province || "Da Nang"}`}
                 </span>
               </Space>
             </Descriptions.Item>
             <Descriptions.Item label="Ngày sinh">
               <Space>
                 <Calendar size={16} />
-                <span>{formatDateVN(selectedUser.dateOfBirth)}</span>
+                <span>{selectedUser.dob ? formatDateVN(selectedUser.dob) : "Chưa cập nhật"}</span>
               </Space>
             </Descriptions.Item>
             <Descriptions.Item label="Giới tính">
-              {selectedUser.gender === 'male' ? 'Nam' : 'Nữ'}
+              {selectedUser.gender === "male"
+                ? "Nam"
+                : selectedUser.gender === "female"
+                ? "Nữ"
+                : "Chưa cập nhật"}
             </Descriptions.Item>
             <Descriptions.Item label="Vai trò">
               {(() => {
-                let color = 'blue';
-                let text = 'Tình nguyện viên';
-                
-                switch(selectedUser.role) {
-                  case 'admin':
-                    color = 'red';
-                    text = 'Admin';
+                let color = "blue";
+                let text = "Tình nguyện viên";
+
+                switch (selectedUser.role) {
+                  case "admin":
+                    color = "red";
+                    text = "Admin";
                     break;
-                  case 'organization':
-                    color = 'green';
-                    text = 'Tổ chức';
+                  case "organization":
+                    color = "green";
+                    text = "Tổ chức";
+                    break;
+                  case "staff":
+                    color = "orange";
+                    text = "Nhân viên";
                     break;
                   default:
-                    color = 'blue';
-                    text = 'Tình nguyện viên';
+                    color = "blue";
+                    text = "Tình nguyện viên";
                 }
-                
+
                 return <Tag color={color}>{text}</Tag>;
               })()}
             </Descriptions.Item>
             <Descriptions.Item label="Trạng thái">
               {(() => {
-                let color = selectedUser.status === 'active' ? 'green' : 'red';
-                let text = selectedUser.status === 'active' ? 'Hoạt động' : 'Không hoạt động';
+                let color = selectedUser.status === "busy" ? "red" : "green";
+                let text = selectedUser.status === "busy" ? "Khóa" : "Hoạt động";
                 return <Tag color={color}>{text}</Tag>;
               })()}
             </Descriptions.Item>
@@ -254,8 +339,25 @@ const UserManagement = () => {
                   {selectedUser.certificates.map((cert, index) => (
                     <Space key={index}>
                       <BookOpen size={16} />
-                      <span>{cert}</span>
+                      <span>{cert.name || `Chứng chỉ ${index + 1}`}</span>
                     </Space>
+                  ))}
+                </Space>
+              </Descriptions.Item>
+            )}
+            {selectedUser.cccdImages && selectedUser.cccdImages.length > 0 && (
+              <Descriptions.Item label="Hình ảnh CCCD" span={2}>
+                <Space wrap>
+                  <FileImage size={16} />
+                  {selectedUser.cccdImages.map((image, index) => (
+                    <Image
+                      key={index}
+                      src={image}
+                      alt={`CCCD ${index + 1}`}
+                      width={100}
+                      style={{ marginRight: 8 }}
+                      preview
+                    />
                   ))}
                 </Space>
               </Descriptions.Item>
@@ -267,4 +369,4 @@ const UserManagement = () => {
   );
 };
 
-export default UserManagement; 
+export default UserManagement;

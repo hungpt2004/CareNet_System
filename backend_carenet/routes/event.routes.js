@@ -8,5 +8,5 @@ eventRouter.get('/get-my-events',authenticateToken, eventController.getMyEvents)
 eventRouter.get('/get-finished-events',authenticateToken, eventController.getFinishedEvents);
 eventRouter.get("/events-by-organization",eventController.getEventsByOrganizationId);
 eventRouter.get('/get-processing-events', eventController.getAllProcessingEvent)
-
+eventRouter.get("/get-all-events", eventController.getAllEvents);
 module.exports = eventRouter;

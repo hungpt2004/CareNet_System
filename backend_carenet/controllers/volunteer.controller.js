@@ -168,3 +168,68 @@ exports.createQuestionRequest = asyncHandler(async (req, res) => {
   })
 
 });
+exports.getAllUsers = asyncHandler(async (req, res) => {
+  try {
+    const users = await User.find()
+      .select("-password")
+      .populate("organizationId", "name");
+
+    if (!users || users.length === 0) {
+      return res.status(200).json({
+        status: "success",
+        message: "Không có người dùng nào",
+        data: [],
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      message: "Lấy danh sách người dùng thành công",
+      data: users,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "fail",
+      message: "Lỗi khi lấy danh sách người dùng",
+    });
+  }
+});
+exports.updateUserStatus = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+  const { status } = req.body;
+
+  // Validate status
+  const validStatuses = ["ready", "busy"];
+  if (!validStatuses.includes(status)) {
+    return res.status(400).json({
+      status: "fail",
+      message: "Trạng thái không hợp lệ",
+    });
+  }
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { status },
+      { new: true, runValidators: true }
+    ).select("-password");
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Người dùng không tồn tại",
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      message: `Cập nhật trạng thái thành công: ${status === "busy" ? "Khóa" : "Mở khóa"}`,
+      data: updatedUser,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "fail",
+      message: "Lỗi khi cập nhật trạng thái",
+    });
+  }
+});

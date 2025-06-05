@@ -517,7 +517,7 @@ exports.getOwnStaff = asyncHandler(async (req, res) => {
 exports.getAllOrganizations = asyncHandler(async (req, res) => {
   try {
     const organizations = await Organization.find()
-   .populate('userId', 'avatar')
+      .populate('userId', 'avatar address')
       .populate("levelId", "name")
       .lean();
 
@@ -533,7 +533,7 @@ exports.getAllOrganizations = asyncHandler(async (req, res) => {
       org.eventCount = await Event.countDocuments({
         organizationId: org._id,
       });
-      console.log(`Org ${org.name}: staffCount=${org.staffCount}, eventCount=${org.eventCount}, userId.dob=${org.userId?.dob}`);
+      console.log(`Org ${org.name}: staffCount=${org.staffCount}, eventCount=${org.eventCount}, userId.avatar=${org.userId?.avatar}, userId.address=${JSON.stringify(org.userId?.address)}`);
     }
 
     console.log("Organizations found:", organizations.length, organizations);
@@ -547,7 +547,8 @@ exports.getAllOrganizations = asyncHandler(async (req, res) => {
       status: "fail",
       message: "Lỗi khi lấy danh sách tổ chức: " + error.message,
     });
-}});
+  }
+});
   
 exports.generateEventCertificate = asyncHandler(async (req, res) => {
   const { eventId } = req.params;

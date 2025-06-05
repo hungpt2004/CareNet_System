@@ -49,7 +49,7 @@ import CertificatePurchasePage from './pages/profile_page/CertificatePurchasePag
 import { PaymentSuccessOrgPage } from './pages/payment_status_page/PaymentSuccessOrgPage';
 import { PaymentCancelOrgPage } from './pages/payment_status_page/PaymentCancelOrgPage';
 import AdminOrganizationRefund from './pages/admin_students_page/AdminRefundPage';
-
+import UserManagement from './pages/user_management/UserManagement';
 const guestRoutes = [
   { path: '/', element: <LandingPage /> },
   { path: '/search', element: <VolunteerEventSearch /> },
@@ -94,6 +94,7 @@ const privateAdminRoutes = [
   { path: '/admin-organization', element: <AdminOrganizations /> },
   { path: '/admin-post', element: <AdminVolunteerPosts /> },
   { path: '/request-event', element: <AdminEventsPending /> },
+  { path: '/admin-users', element: <UserManagement/> },
 ];
 
 const privateOwnerRoutes = [

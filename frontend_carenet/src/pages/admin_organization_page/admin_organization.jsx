@@ -215,10 +215,10 @@ const AdminOrganizations = () => {
   };
 
   const openEditModal = (org) => {
-  setSelectedOrganization(org);
-  setNewLevelId(org.levelId?._id || "");
-  setShowModal(true);
-};
+    setSelectedOrganization(org);
+    setNewLevelId(org.levelId?._id || "");
+    setShowModal(true);
+  };
 
   const viewOrganizationDetails = (organization) => {
     setSelectedOrganization(organization);
@@ -289,9 +289,14 @@ const AdminOrganizations = () => {
   };
 
   const formatLocation = (location) => {
-    if (!location || typeof location !== 'object') return "N/A";
-    const { fullAddress } = location;
-    return fullAddress || "N/A";
+    if (!location || typeof location !== 'object') {
+      console.log("Location data invalid or missing:", location);
+      return "N/A";
+    }
+    const { street, ward, district, province } = location;
+    const formatted = [street, ward, district, province].filter(Boolean).join(", ");
+    console.log("Formatted location:", formatted || "N/A");
+    return formatted || "N/A";
   };
 
   if (loading) {
@@ -484,11 +489,13 @@ const AdminOrganizations = () => {
                     console.log("Rendering organization:", {
                       id: org._id,
                       name: org.name,
-                      userId: org.userId,
-                      avatar: typeof org.userId === 'object' ? org.userId?.avatar : 'userId is string',
+                      userId: typeof org.userId === 'object' ? org.userId : `UserId is ${typeof org.userId} with value: ${org.userId}`,
+                      avatar: org.userId?.avatar || "No avatar",
+                      address: org.userId?.address ? JSON.stringify(org.userId.address) : "No address",
                       staffCount: org.staffCount,
                       eventCount: org.eventCount,
-                      status: org.organizationStatus
+                      status: org.organizationStatus,
+                      createdAt: org.createdAt,
                     });
                     return (
                       <tr key={org._id}>
@@ -496,19 +503,22 @@ const AdminOrganizations = () => {
                         <td>
                           <div className="d-flex align-items-center">
                             <img
-                              src={typeof org.userId === 'object' && org.userId?.avatar ? org.userId.avatar : "https://via.placeholder.com/50"}
+                              src={org.userId?.avatar || "https://via.placeholder.com/50"}
                               alt={org.name || "Organization"}
                               className="rounded-circle me-2"
                               width="40"
                               height="40"
-                              onError={(e) => console.log("Image load error for:", typeof org.userId === 'object' ? org.userId?.avatar : 'userId is string', e)}
+                              onError={(e) => {
+                                console.log("Image load error for:", org.userId?.avatar || "No avatar URL", e);
+                                e.target.src = "https://via.placeholder.com/50";
+                              }}
                             />
                             <div className="fw-medium">{org.name || "N/A"}</div>
                           </div>
                         </td>
                         <td>{org.levelId?.name || "N/A"}</td>
-                        <td>{formatLocation(org.userId)}</td>
-                        <td>{typeof org.userId === 'object' && org.userId?.dob ? formatDate(org.userId.dob) : "N/A"}</td>
+                        <td>{formatLocation(org.userId?.address || {})}</td>
+                        <td>{org.createdAt ? formatDate(org.createdAt) : "N/A"}</td>
                         <td>
                           <div className="d-flex align-items-center">
                             <Users size={16} className="me-1 text-muted" />
@@ -602,12 +612,15 @@ const AdminOrganizations = () => {
               <Modal.Title>
                 <div className="d-flex align-items-center">
                   <img
-                    src={typeof selectedOrganization.userId === 'object' && selectedOrganization.userId?.avatar ? selectedOrganization.userId.avatar : "https://via.placeholder.com/50"}
+                    src={selectedOrganization.userId?.avatar || "https://via.placeholder.com/50"}
                     alt={selectedOrganization.name || "Organization"}
                     className="rounded-circle me-2"
                     width="40"
                     height="40"
-                    onError={(e) => console.log("Image load error for:", typeof selectedOrganization.userId === 'object' ? selectedOrganization.userId?.avatar : 'userId is string', e)}
+                    onError={(e) => {
+                      console.log("Image load error for:", selectedOrganization.userId?.avatar || "No avatar URL", e);
+                      e.target.src = "https://via.placeholder.com/50";
+                    }}
                   />
                   {selectedOrganization.name || "N/A"}
                   <div className="ms-2">{getStatusBadge(selectedOrganization.organizationStatus)}</div>
@@ -665,7 +678,7 @@ const AdminOrganizations = () => {
                         </div>
                         <div className="mb-2 d-flex align-items-center">
                           <MapPin size={18} className="me-2 text-muted" />
-                          <span>{formatLocation(selectedOrganization.userId)}</span>
+                          <span>{formatLocation(selectedOrganization.userId?.address || {})}</span>
                         </div>
                       </Col>
                       <Col md={6}>
@@ -673,7 +686,7 @@ const AdminOrganizations = () => {
                         <div className="mb-2 d-flex align-items-center">
                           <Calendar size={18} className="me-2 text-muted" />
                           <span>
-                            Ngày thành lập: {typeof selectedOrganization.userId === 'object' && selectedOrganization.userId?.dob ? formatDate(selectedOrganization.userId.dob) : "N/A"}
+                            Ngày thành lập: {selectedOrganization.createdAt ? formatDate(selectedOrganization.createdAt) : "N/A"}
                           </span>
                         </div>
                         <div className="mb-2 d-flex align-items-center">
@@ -724,20 +737,20 @@ const AdminOrganizations = () => {
                       <Form.Group className="mb-3">
                         <Form.Label>Loại tổ chức</Form.Label>
                         <Form.Select
-  value={newLevelId}
-  onChange={(e) => setNewLevelId(e.target.value)}
->
-  <option value="">Chọn loại tổ chức</option>
-  {organizationLevels.length > 0 ? (
-    organizationLevels.map((level) => (
-      <option key={level._id} value={level._id}>
-        {level.name} ({level.description})
-      </option>
-    ))
-  ) : (
-    <option disabled>Không có loại tổ chức nào</option>
-  )}
-</Form.Select>
+                          value={newLevelId}
+                          onChange={(e) => setNewLevelId(e.target.value)}
+                        >
+                          <option value="">Chọn loại tổ chức</option>
+                          {organizationLevels.length > 0 ? (
+                            organizationLevels.map((level) => (
+                              <option key={level._id} value={level._id}>
+                                {level.name} ({level.description})
+                              </option>
+                            ))
+                          ) : (
+                            <option disabled>Không có loại tổ chức nào</option>
+                          )}
+                        </Form.Select>
                       </Form.Group>
                       <Button
                         variant="primary"

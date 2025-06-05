@@ -18,5 +18,17 @@ userRouter.get(
   authenticateToken,
   userController.getMyFeedback
 )
+userRouter.get(
+  "/all-users",
+  authenticateToken,
+  authorizeRoles(["admin"]),
+  userController.getAllUsers
+);
 
+userRouter.put(
+  "/update-status/:userId",
+  authenticateToken,
+  authorizeRoles(["admin"]),
+  userController.updateUserStatus
+);
 module.exports = userRouter;
