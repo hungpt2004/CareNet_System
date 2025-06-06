@@ -5,7 +5,7 @@ const Feedback = require("../models/feedback.model");
 const asyncHandler = require("../middleware/asyncHandler");
 const checkWordByGemini = require("../services/geminiCheckInstance");
 const { cccdUpload } = require("../middleware/uploadMiddleware");
-
+const Certificate = require("../models/certificate.model");
 // backend for profile-information
 exports.editProfile = asyncHandler(async (req, res) => {
   const user = req.user.user;
@@ -263,4 +263,98 @@ exports.removeCCCD = asyncHandler(async (req, res) => {
       message: "Đã xóa ảnh CCCD thành công.",
     });
   
+});
+
+exports.getProfileScoreForCurrentUser = asyncHandler(async (req, res) => {
+  const user = req.user.user;
+  try {
+    // Get all history events for the user, populate event title
+    const historyEvents = await HistoryEvent.find({ user: user._id })
+      .populate({ path: 'event', select: 'title' });
+
+    // Prepare event info: title, attendedAt, earnedHours
+    const eventScores = historyEvents.map(he => ({
+      title: he.event?.title || null,
+      attendedAt: he.attendedAt,
+      earnedHours: he.earnedHours,
+    }));
+
+    // Calculate total earned hours from history events
+    const totalEarnedHours = historyEvents.reduce((sum, he) => sum + (he.earnedHours || 0), 0);
+
+    // Update user's totalHours in the database if it differs
+    if (user.totalHours !== totalEarnedHours) {
+      await User.findByIdAndUpdate(user._id, { totalHours: totalEarnedHours });
+    }
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'Get profile score successfully',
+      activityPoints: user.activityPoints,
+      totalHours: totalEarnedHours,
+      events: eventScores,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      status: 'fail',
+      message: 'Error getting profile score',
+      error: err.message,
+    });
+  }
+});
+
+
+
+exports.getProfileCertificateForCurrentUser = asyncHandler(async (req, res) => {
+  const user = req.user.user;
+
+  // Find all certificates for the current user
+  const certificates = await Certificate.find({ userId: user._id })
+    .select("fullName eventName organizationName completionDate signature")
+    .lean();
+
+  res.status(200).json({
+    success: true,
+    certificates,
+  });
+});
+
+exports.downloadProfileCertificateForCurrentUser = asyncHandler(async (req, res) => {
+  const user = req.user.user;
+
+  // Get certificateId from query or params (adjust as needed)
+  const { certificateId } = req.query;
+  if (!certificateId) {
+    return res.status(400).json({ success: false, message: "Missing certificateId" });
+  }
+
+  // Find the certificate for the current user
+  const certificate = await Certificate.findOne({ _id: certificateId, userId: user._id })
+    .select("certificateUrl fullName eventName organizationName completionDate signature")
+    .lean();
+
+  if (!certificate) {
+    return res.status(404).json({ success: false, message: "Certificate not found" });
+  }
+
+  // If certificateUrl exists, redirect or send the file
+  if (certificate.certificateUrl) {
+    // Option 1: Redirect to the file URL (if it's a public link)
+    return res.redirect(certificate.certificateUrl);
+    // Option 2: Download the file (if stored locally or accessible)
+    // return res.download(certificate.certificateUrl);
+  }
+
+  // If no file, return certificate info
+  return res.status(200).json({
+    success: true,
+    certificate: {
+      fullName: certificate.fullName,
+      eventName: certificate.eventName,
+      organizationName: certificate.organizationName,
+      completionDate: certificate.completionDate,
+      signature: certificate.signature,
+    },
+    message: "Certificate file not available, returning info only."
+  });
 });

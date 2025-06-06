@@ -23,10 +23,19 @@ import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import defaultAvatar from "../../assets/defaultAvatar.png";
 import { AiOutlineUser, AiOutlinePicture, AiOutlineHistory, AiOutlineHeart, AiOutlineStar, AiOutlineIdcard, AiOutlineLogout, AiOutlineUpload } from "react-icons/ai";
 
+
 const ProfileInfo = () => {
   // Get current user
   const currentUser = useAuthStore((state) => state.currentUser);
-  const { updateUser } = useAuthStore();
+  const { updateUser, logout } = useAuthStore();
+  const navigate = useNavigate();
+  // Logout function (like CustomNavbarLogged)
+  const handleLogout = async () => {
+    await logout();
+    setTimeout(() => {
+      navigate('/login');
+    }, 0);
+  };
 
   // CSS styles defined directly in the component
   const styles = {
@@ -326,7 +335,6 @@ const ProfileInfo = () => {
       CustomFailedToast("Xóa ảnh CCCD thất bại. Vui lòng thử lại.");
     }
   };
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
   // Khởi tạo form
@@ -563,10 +571,14 @@ const ProfileInfo = () => {
                       <AiOutlineIdcard style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
                       <span>Chứng Chỉ </span>
                     </div>
-                    <div className="menu-item" style={styles.menuItem}>
-                      <AiOutlineLogout style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
-                      <span>Đăng Xuất</span>
-                    </div>
+                  <div
+                    className="menu-item"
+                    style={styles.menuItem}
+                    onClick={handleLogout}
+                  >
+                    <AiOutlineLogout style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
+                    <span>Đăng Xuất</span>
+                  </div>
                   </div>
                 </Card.Body>
               </Card>

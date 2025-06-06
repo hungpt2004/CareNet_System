@@ -10,10 +10,22 @@ import {
   Pagination,
 } from "react-bootstrap";
 import { motion } from "framer-motion";
+import {
+  AiOutlineUser,
+  AiOutlinePicture,
+  AiOutlineHistory,
+  AiOutlineHeart,
+  AiOutlineStar,
+  AiOutlineIdcard,
+  AiOutlineLogout,
+} from "react-icons/ai";
+
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import derivative from "antd/es/theme/themes/default";
-import { AiOutlineUser, AiOutlinePicture, AiOutlineHistory, AiOutlineHeart, AiOutlineStar, AiOutlineIdcard, AiOutlineLogout } from "react-icons/ai";
-const ProfileScore = () => {
+import useAuthStore from "../../hooks/authStore";
+import axiosInstance from "../../utils/AxiosInstance";
+import defaultAvatar from "../../assets/defaultAvatar.png";
+const AccountScore = () => {
   // CSS styles defined directly in the component
   const styles = {
     root: {
@@ -215,84 +227,70 @@ const ProfileScore = () => {
     };
   }, []);
 
-  // Sample score data - expanded to demonstrate pagination
-  const scoreData = [
-    {
-      id: 1,
-      event: "Chương Trình Trồng Cây",
-      date: "19 tháng 4, 2023",
-      score: 85,
-      hours: 4,
-    },
-    {
-      id: 2,
-      event: "Trại Hiến Máu",
-      date: "23 tháng 4, 2023",
-      score: 70,
-      hours: 3,
-    },
-    {
-      id: 3,
-      event: "Tình Nguyện tại Trại Cứu Hộ Động Vật",
-      date: "5 tháng 5, 2023",
-      score: 90,
-      hours: 5,
-    },
-    {
-      id: 4,
-      event: "Dọn Dẹp Công Viên Cộng Đồng",
-      date: "12 tháng 5, 2023",
-      score: 75,
-      hours: 3.5,
-    },
-    {
-      id: 5,
-      event: "Chương Trình Tình Nguyện Giúp Đỡ Học Sinh",
-      date: "3 tháng 6, 2023",
-      score: 80,
-      hours: 4.5,
-    },
-    {
-      id: 6,
-      event: "Chương Trình Thăm Hỏi Người Cao Tuổi",
-      date: "15 tháng 6, 2023",
-      score: 95,
-      hours: 6,
-    },
-    {
-      id: 7,
-      event: "Tình Nguyện tại Ngân Hàng Thực Phẩm",
-      date: "8 tháng 7, 2023",
-      score: 85,
-      hours: 5,
-    },
-    {
-      id: 8,
-      event: "Sáng Kiến Dọn Dẹp Bãi Biển",
-      date: "22 tháng 7, 2023",
-      score: 80,
-      hours: 4,
-    },
-  ];
+  // State for fetched score data
+  const [scoreData, setScoreData] = useState([]);
+  const [totalScore, setTotalScore] = useState(0);
+  const [totalHours, setTotalHours] = useState(0);
+  const [currentLevel, setCurrentLevel] = useState(1);
+  const [progressPercentage, setProgressPercentage] = useState(0);
+  const [activityPoints, setActivityPoints] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const { logout } = useAuthStore();
+
+  const handleLogout = async () => {
+    await logout();
+    setTimeout(() => {
+      navigate('/login');
+    }, 0);
+  };
+  useEffect(() => {
+    const fetchProfileScore = async () => {
+      setLoading(true);
+      try {
+        const res = await axiosInstance.get("/profile/get-profile-score");
+        if (res.data && res.data.status === "success") {
+          const { events, totalHours, activityPoints } = res.data;
+          setScoreData(
+            (events || []).map((e, idx) => ({
+              id: idx + 1,
+              event: e.title || "(Không có tên)",
+              date: e.attendedAt
+                ? new Date(e.attendedAt).toLocaleDateString("vi-VN")
+                : "-",
+              hours: e.earnedHours || 0,
+            }))
+          );
+          setTotalHours(totalHours || 0);
+          setActivityPoints(activityPoints || 0);
+          // 10 points per level
+          setTotalScore(activityPoints || 0);
+          setCurrentLevel(Math.floor((activityPoints || 0) / 10) + 1);
+          setProgressPercentage(((activityPoints || 0) % 10) * 10);
+        }
+      } catch (err) {
+        // fallback: no data
+        setScoreData([]);
+        setTotalScore(0);
+        setTotalHours(0);
+        setCurrentLevel(1);
+        setProgressPercentage(0);
+        setActivityPoints(0);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProfileScore();
+  }, []);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const eventsPerPage = 3;
-
-  // Calculate total pages
   const totalPages = Math.ceil(scoreData.length / eventsPerPage);
-
-  // Get current events
   const indexOfLastEvent = currentPage * eventsPerPage;
   const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
   const currentEvents = scoreData.slice(indexOfFirstEvent, indexOfLastEvent);
-
-  // Change page
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
-  // Generate pagination items
+  const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
   const paginationItems = [];
   for (let number = 1; number <= totalPages; number++) {
     paginationItems.push(
@@ -305,17 +303,6 @@ const ProfileScore = () => {
       </Pagination.Item>
     );
   }
-
-  // Calculate total score
-  const totalScore = scoreData.reduce((sum, item) => sum + item.score, 0);
-  const totalHours = scoreData.reduce((sum, item) => sum + item.hours, 0);
-
-  // Calculate level progress
-  const currentLevel = Math.floor(totalScore / 100) + 1;
-  const nextLevelScore = currentLevel * 100;
-  const progressPercentage = totalScore % 100;
-
-  const navigate = useNavigate();
 
   return (
     <Container
@@ -333,7 +320,10 @@ const ProfileScore = () => {
               <Card.Body className="p-0">
                 <div style={styles.userProfile}>
                   <img
-                    src={JSON.parse(localStorage.getItem("user")).avatarUrl||defaultAvatar}
+                    src={
+                      JSON.parse(localStorage.getItem("user")).avatarUrl ||
+                      defaultAvatar
+                    }
                     alt="User Avatar"
                     className="avatar-img"
                     style={styles.avatar}
@@ -349,7 +339,13 @@ const ProfileScore = () => {
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-information")}
                   >
-                    <AiOutlineUser style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
+                    <AiOutlineUser
+                      style={{
+                        marginRight: 8,
+                        fontSize: 20,
+                        verticalAlign: "middle",
+                      }}
+                    />
                     <span>Thông Tin</span>
                   </div>
                   <div
@@ -357,7 +353,13 @@ const ProfileScore = () => {
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-avatar")}
                   >
-                    <AiOutlinePicture style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
+                    <AiOutlinePicture
+                      style={{
+                        marginRight: 8,
+                        fontSize: 20,
+                        verticalAlign: "middle",
+                      }}
+                    />
                     <span>Cập Nhật Avatar</span>
                   </div>
                   <div
@@ -365,7 +367,13 @@ const ProfileScore = () => {
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-history")}
                   >
-                    <AiOutlineHistory style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
+                    <AiOutlineHistory
+                      style={{
+                        marginRight: 8,
+                        fontSize: 20,
+                        verticalAlign: "middle",
+                      }}
+                    />
                     <span>Lịch Sử Nỗ Lực</span>
                   </div>
                   <div
@@ -373,7 +381,13 @@ const ProfileScore = () => {
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-favourite")}
                   >
-                    <AiOutlineHeart style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
+                    <AiOutlineHeart
+                      style={{
+                        marginRight: 8,
+                        fontSize: 20,
+                        verticalAlign: "middle",
+                      }}
+                    />
                     <span>Yêu Thích</span>
                   </div>
                   <div
@@ -381,7 +395,13 @@ const ProfileScore = () => {
                     style={{ ...styles.menuItem, ...styles.menuItemActive }}
                     onClick={() => navigate("/profile-score")}
                   >
-                    <AiOutlineStar style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
+                    <AiOutlineStar
+                      style={{
+                        marginRight: 8,
+                        fontSize: 20,
+                        verticalAlign: "middle",
+                      }}
+                    />
                     <span>Số Điểm</span>
                   </div>
                   <div
@@ -389,11 +409,27 @@ const ProfileScore = () => {
                     style={styles.menuItem}
                     onClick={() => navigate("/profile-certificate")}
                   >
-                    <AiOutlineIdcard style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
+                    <AiOutlineIdcard
+                      style={{
+                        marginRight: 8,
+                        fontSize: 20,
+                        verticalAlign: "middle",
+                      }}
+                    />
                     <span>Chứng Chỉ</span>
                   </div>
-                  <div className="menu-item" style={styles.menuItem}>
-                    <AiOutlineLogout style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
+                  <div
+                    className="menu-item"
+                    style={styles.menuItem}
+                    onClick={handleLogout}
+                  >
+                    <AiOutlineLogout
+                      style={{
+                        marginRight: 8,
+                        fontSize: 20,
+                        verticalAlign: "middle",
+                      }}
+                    />
                     <span>Đăng Xuất</span>
                   </div>
                 </div>
@@ -410,7 +446,13 @@ const ProfileScore = () => {
             <Card style={styles.infoCard}>
               <Card.Header style={styles.infoHeader}>
                 <h4 className="mb-0">
-                  <AiOutlineStar style={{ marginRight: 10, fontSize: 24, verticalAlign: 'middle' }} />
+                  <AiOutlineStar
+                    style={{
+                      marginRight: 10,
+                      fontSize: 24,
+                      verticalAlign: "middle",
+                    }}
+                  />
                   SỐ ĐIỂM
                 </h4>
               </Card.Header>
@@ -451,7 +493,7 @@ const ProfileScore = () => {
                   <small>{progressPercentage}% đến cấp tiếp theo</small>
                 </motion.div>
 
-                <h5 className="mb-3">Điểm Các Sự Kiện</h5>
+                <h5 className="mb-3">Các Sự Kiện</h5>
 
                 <table style={styles.scoreTable}>
                   <thead>
@@ -459,7 +501,6 @@ const ProfileScore = () => {
                       <th style={styles.scoreTableHeader}>Sự Kiện</th>
                       <th style={styles.scoreTableHeader}>Ngày</th>
                       <th style={styles.scoreTableHeader}>Giờ</th>
-                      <th style={styles.scoreTableHeader}>Điểm</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -483,15 +524,13 @@ const ProfileScore = () => {
                         <td style={styles.scoreTableCell}>
                           <span style={styles.scoreDate}>{item.date}</span>
                         </td>
-                        <td style={styles.scoreTableCell}>{item.hours} giờ</td>
                         <td
                           style={{
                             ...styles.scoreTableCell,
                             ...styles.scoreTableCellLast,
-                            ...styles.scoreValue,
                           }}
                         >
-                          {item.score}
+                          {item.hours} giờ
                         </td>
                       </motion.tr>
                     ))}
@@ -533,4 +572,4 @@ const ProfileScore = () => {
   );
 };
 
-export default ProfileScore;
+export default AccountScore;

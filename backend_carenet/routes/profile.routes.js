@@ -12,6 +12,16 @@ profileRouter.get("/get-current-user-for-profile-avatar",authenticateToken, prof
 profileRouter.post("/send-feedback-history-events/:eventId",authenticateToken, profileController.sendFeedbackHistoryEvents);
 profileRouter.get("/get-history-events", profileController.getHistoryEventById);
 profileRouter.get("/get-all-history-events",authenticateToken, profileController.getAllHistoryEvent);
+
+// Route for getting profile score for current user
+profileRouter.get("/get-profile-score", authenticateToken, profileController.getProfileScoreForCurrentUser);
+
 profileRouter.put("/remove-cccd", authenticateToken, profileController.removeCCCD);
+
+// Route for getting certificates for current user
+profileRouter.get("/get-profile-certificates", authenticateToken, profileController.getProfileCertificateForCurrentUser);
+
+// Route for downloading a certificate for current user
+profileRouter.get("/download-profile-certificate", authenticateToken, profileController.downloadProfileCertificateForCurrentUser);
 
 module.exports = profileRouter;

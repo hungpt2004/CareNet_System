@@ -12,9 +12,16 @@ import {
 } from "react-bootstrap";
 import { motion } from "framer-motion";
 import { Download, Printer, Eye } from "react-bootstrap-icons";
+import useAuthStore from "../../hooks/authStore";
 import { useNavigate } from "react-router-dom";
 import defaultAvatar from "../../assets/defaultAvatar.png";
 import { AiOutlineUser, AiOutlinePicture, AiOutlineHistory, AiOutlineHeart, AiOutlineStar, AiOutlineIdcard, AiOutlineLogout } from "react-icons/ai";
+import axiosInstance from "../../utils/AxiosInstance";
+import {
+  CustomFailedToast,
+  CustomSuccessToast,
+  CustomToast,
+} from "../../components/toast/CustomToast";
 const ProfileCertificate = () => {
   // CSS styles defined directly in the component
   const styles = {
@@ -353,111 +360,43 @@ const ProfileCertificate = () => {
     };
   }, []);
 
-  // Sample certificate data - expanded to demonstrate pagination
-  const certificates = [
-    {
-      id: 1,
-      organization: "Green Earth Foundation",
-      partner: "In partnership with City Environmental Department",
-      event: "Chương Trình Trồng Cây",
-      startDate: "19 tháng 4, 2023",
-      endDate: "19 tháng 4, 2023",
-      description:
-        "For outstanding contribution to environmental conservation through active participation in tree planting activities, demonstrating commitment to creating a greener and more sustainable future for our community.",
-      signatories: [
-        { name: "John Smith", title: "Program Director" },
-        { name: "Sarah Johnson", title: "City Environmental Officer" },
-      ],
-    },
-    {
-      id: 2,
-      organization: "National Blood Services",
-      partner: "In collaboration with City General Hospital",
-      event: "Trại Hiến Máu",
-      startDate: "23 tháng 4, 2023",
-      endDate: "23 tháng 4, 2023",
-      description:
-        "For the selfless act of donating blood, helping save lives and contributing to the community's health and well-being. Your generosity makes a significant difference in emergency medical care.",
-      signatories: [
-        { name: "Dr. Michael Chen", title: "Medical Director" },
-        { name: "Emily Rodriguez", title: "Blood Drive Coordinator" },
-      ],
-    },
-    {
-      id: 3,
-      organization: "Animal Welfare Society",
-      partner: "Supported by Pet Lovers Association",
-      event: "Tình Nguyện tại Trại Cứu Hộ Động Vật",
-      startDate: "5 tháng 5, 2023",
-      endDate: "5 tháng 5, 2023",
-      description:
-        "For dedicated service to animal welfare through volunteering at our shelter, providing care, comfort, and companionship to animals in need. Your compassion has made a meaningful impact on the lives of rescued animals.",
-      signatories: [
-        { name: "Robert Wilson", title: "Shelter Manager" },
-        { name: "Lisa Thompson", title: "Volunteer Coordinator" },
-      ],
-    },
-    {
-      id: 4,
-      organization: "Community Council",
-      partner: "In collaboration with City Parks Department",
-      event: "Dọn Dẹp Công Viên Cộng Đồng",
-      startDate: "12 tháng 5, 2023",
-      endDate: "12 tháng 5, 2023",
-      description:
-        "For dedicated service to the community through participation in the park cleanup initiative, helping to create cleaner, safer, and more beautiful public spaces for all residents to enjoy.",
-      signatories: [
-        { name: "David Martinez", title: "Community Coordinator" },
-        { name: "Jennifer Lee", title: "Parks Department Director" },
-      ],
-    },
-    {
-      id: 5,
-      organization: "Youth Education Foundation",
-      partner: "In partnership with City School District",
-      event: "Chương Trình Tình Nguyện Giúp Đỡ Học Sinh",
-      startDate: "3 tháng 6, 2023",
-      endDate: "10 tháng 6, 2023",
-      description:
-        "For dedicated service to youth education through participation in the literacy volunteer program, helping students develop essential reading skills and fostering a love of learning in our community.",
-      signatories: [
-        { name: "Patricia Wong", title: "Education Director" },
-        { name: "Thomas Brown", title: "School District Superintendent" },
-      ],
-    },
-    {
-      id: 6,
-      organization: "Elderly Care Association For Student",
-      partner: "Supported by Community Health Services",
-      event: "Chương Trình Thăm Hỏi Người Cao Tuổi",
-      startDate: "15 tháng 6, 2023",
-      endDate: "22 tháng 6, 2023",
-      description:
-        "For compassionate service to elderly community members through the senior companion program, providing social interaction, assistance, and emotional support to improve the quality of life for seniors.",
-      signatories: [
-        { name: "Margaret Wilson", title: "Program Coordinator" },
-        { name: "Dr. James Taylor", title: "Geriatric Care Specialist" },
-      ],
-    },
-  ];
+
+  // State for certificates from API
+  const [certificates, setCertificates] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  React.useEffect(() => {
+    const fetchCertificates = async () => {
+      try {
+        setLoading(true);
+        const res = await axiosInstance.get("/profile/get-profile-certificates");
+        if (res.data && res.data.success) {
+          setCertificates(res.data.certificates);
+        } else {
+          setCertificates([]);
+        }
+      } catch (err) {
+        setError("Không thể tải chứng chỉ. Vui lòng thử lại sau.");
+        setCertificates([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCertificates();
+  }, []);
 
   const [showModal, setShowModal] = useState(false);
   const [selectedCertificate, setSelectedCertificate] = useState(null);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
+
   const certificatesPerPage = 4;
-
-  // Calculate total pages
   const totalPages = Math.ceil(certificates.length / certificatesPerPage);
-
-  // Get current certificates
   const indexOfLastCertificate = currentPage * certificatesPerPage;
   const indexOfFirstCertificate = indexOfLastCertificate - certificatesPerPage;
-  const currentCertificates = certificates.slice(
-    indexOfFirstCertificate,
-    indexOfLastCertificate
-  );
+  const currentCertificates = certificates.slice(indexOfFirstCertificate, indexOfLastCertificate);
 
   // Change page
   const handlePageChange = (pageNumber) => {
@@ -473,12 +412,20 @@ const ProfileCertificate = () => {
     setShowModal(false);
   };
 
+
   const handlePrint = () => {
     window.print();
   };
 
-  const handleDownload = () => {
-    window.print();
+  // Download certificate from backend
+  const handleDownload = async () => {
+    if (!selectedCertificate?._id) return;
+    try {
+      // This will trigger a file download or redirect
+      window.open(`/profile/download-profile-certificate?certificateId=${selectedCertificate._id}`, '_blank');
+    } catch (err) {
+      CustomFailedToast("Không thể tải chứng chỉ. Vui lòng thử lại sau.");
+    }
   };
 
   // Generate pagination items
@@ -495,281 +442,347 @@ const ProfileCertificate = () => {
     );
   }
 
+
   const navigate = useNavigate();
+  const { logout } = useAuthStore();
+
+  const handleLogout = async () => {
+    await logout();
+    setTimeout(() => {
+      navigate('/login');
+    }, 0);
+  };
 
   return (
-    <Container
-      className="d-flex justify-content-center align-items-center"
-      style={{ ...styles.accountContainer, maxWidth: "1100px" }}
-    >
-      <Row className="w-100">
-        <Col md={4}>
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <Card style={styles.sidebarCard}>
-              <Card.Body className="p-0">
-                <div style={styles.userProfile}>
-                  <img
-                    src={JSON.parse(localStorage.getItem("user")).avatarUrl||defaultAvatar}
-                    alt="User Avatar"
-                    className="avatar-img"
-                    style={styles.avatar}
-                  />
-                  <div style={styles.userInfo}>
-                    <h5 style={styles.userName}>Hung Pham Trong</h5>
-                    <p style={styles.accountType}>Tài Khoản Cá Nhân</p>
+    <>
+    <CustomToast/>
+      <Container
+        className="d-flex justify-content-center align-items-center"
+        style={{ ...styles.accountContainer, maxWidth: "1100px" }}
+      >
+        <Row className="w-100">
+          <Col md={4}>
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Card style={styles.sidebarCard}>
+                <Card.Body className="p-0">
+                  <div style={styles.userProfile}>
+                    <img
+                      src={
+                        JSON.parse(localStorage.getItem("user")).avatarUrl ||
+                        defaultAvatar
+                      }
+                      alt="User Avatar"
+                      className="avatar-img"
+                      style={styles.avatar}
+                    />
+                    <div style={styles.userInfo}>
+                      <h5 style={styles.userName}>Hung Pham Trong</h5>
+                      <p style={styles.accountType}>Tài Khoản Cá Nhân</p>
+                    </div>
                   </div>
-                </div>
-                <div style={styles.menuItems}>
-                  <div
-                    className="menu-item"
-                    style={styles.menuItem}
-                    onClick={() => navigate("/profile-information")}
-                  >
-                    <AiOutlineUser style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
-                    <span>Thông Tin</span>
+                  <div style={styles.menuItems}>
+                    <div
+                      className="menu-item"
+                      style={styles.menuItem}
+                      onClick={() => navigate("/profile-information")}
+                    >
+                      <AiOutlineUser
+                        style={{
+                          marginRight: 8,
+                          fontSize: 20,
+                          verticalAlign: "middle",
+                        }}
+                      />
+                      <span>Thông Tin</span>
+                    </div>
+                    <div
+                      className="menu-item"
+                      style={styles.menuItem}
+                      onClick={() => navigate("/profile-avatar")}
+                    >
+                      <AiOutlinePicture
+                        style={{
+                          marginRight: 8,
+                          fontSize: 20,
+                          verticalAlign: "middle",
+                        }}
+                      />
+                      <span>Cập Nhật Avatar</span>
+                    </div>
+                    <div
+                      className="menu-item"
+                      style={styles.menuItem}
+                      onClick={() => navigate("/profile-history")}
+                    >
+                      <AiOutlineHistory
+                        style={{
+                          marginRight: 8,
+                          fontSize: 20,
+                          verticalAlign: "middle",
+                        }}
+                      />
+                      <span>Lịch Sử Nỗ Lực</span>
+                    </div>
+                    <div
+                      className="menu-item"
+                      style={styles.menuItem}
+                      onClick={() => navigate("/profile-favourite")}
+                    >
+                      <AiOutlineHeart
+                        style={{
+                          marginRight: 8,
+                          fontSize: 20,
+                          verticalAlign: "middle",
+                        }}
+                      />
+                      <span>Yêu Thích</span>
+                    </div>
+                    <div
+                      className="menu-item"
+                      style={styles.menuItem}
+                      onClick={() => navigate("/profile-score")}
+                    >
+                      <AiOutlineStar
+                        style={{
+                          marginRight: 8,
+                          fontSize: 20,
+                          verticalAlign: "middle",
+                        }}
+                      />
+                      <span>Số Điểm</span>
+                    </div>
+                    <div
+                      className="menu-item active"
+                      style={{ ...styles.menuItem, ...styles.menuItemActive }}
+                      onClick={() => navigate("/profile-certificate")}
+                    >
+                      <AiOutlineIdcard
+                        style={{
+                          marginRight: 8,
+                          fontSize: 20,
+                          verticalAlign: "middle",
+                        }}
+                      />
+                      <span>Chứng Chỉ</span>
+                    </div>
+                    <div
+                      className="menu-item"
+                      style={styles.menuItem}
+                      onClick={handleLogout}
+                    >
+                      <AiOutlineLogout
+                        style={{
+                          marginRight: 8,
+                          fontSize: 20,
+                          verticalAlign: "middle",
+                        }}
+                      />
+                      <span>Đăng Xuất</span>
+                    </div>
                   </div>
-                  <div
-                    className="menu-item"
-                    style={styles.menuItem}
-                    onClick={() => navigate("/profile-avatar")}
-                  >
-                    <AiOutlinePicture style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
-                    <span>Cập Nhật Avatar</span>
+                </Card.Body>
+              </Card>
+            </motion.div>
+          </Col>
+          <Col md={8} style={{ marginTop: "80px" }}>
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <Card style={styles.infoCard}>
+                <Card.Header style={styles.infoHeader}>
+                  <h4 className="mb-0">
+                    <AiOutlineIdcard
+                      style={{
+                        marginRight: 10,
+                        fontSize: 24,
+                        verticalAlign: "middle",
+                      }}
+                    />
+                    CHỨNG CHỈ
+                  </h4>
+                </Card.Header>
+                <Card.Body style={styles.infoCardBody}>
+
+                  <div style={styles.certificateGrid}>
+                    {loading ? (
+                      <div className="w-100 text-center py-5">Đang tải chứng chỉ...</div>
+                    ) : error ? (
+                      <div className="w-100 text-center text-danger py-5">{error}</div>
+                    ) : currentCertificates.length === 0 ? (
+                      <div className="w-100 text-center py-5">Bạn chưa có chứng chỉ nào.</div>
+                    ) : (
+                      currentCertificates.map((certificate) => (
+                        <motion.div
+                          key={certificate._id}
+                          style={styles.certificateCard}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{
+                            duration: 0.3,
+                            delay: 0.1,
+                          }}
+                        >
+
+                          <h5 style={styles.certificateHeader}>
+                            Chứng Chỉ:
+                          </h5>
+
+                          <div style={styles.certificateField}>
+                            <div style={styles.certificateLabel}>Sự Kiện:</div>
+                            <div style={styles.certificateValue}>
+                              {certificate.eventName}
+                            </div>
+                          </div>
+
+                          <div style={styles.certificateField}>
+                            <div style={styles.certificateLabel}>Tổ Chức:</div>
+                            <div style={styles.certificateValue}>
+                              {certificate.organizationName}
+                            </div>
+                          </div>
+
+                          <div style={styles.certificateField}>
+                            <div style={styles.certificateLabel}>Ngày:</div>
+                            <div style={styles.certificateValue}>
+                              {certificate.completionDate ? new Date(certificate.completionDate).toLocaleDateString("vi-VN") : "-"}
+                            </div>
+                          </div>
+
+                          <Button
+                            className="view-btn"
+                            style={styles.viewButton}
+                            onClick={() => handleShowCertificate(certificate)}
+                          >
+                            <Eye className="me-2" /> Xem Chứng Chỉ
+                          </Button>
+                        </motion.div>
+                      ))
+                    )}
                   </div>
-                  <div
-                    className="menu-item"
-                    style={styles.menuItem}
-                    onClick={() => navigate("/profile-history")}
-                  >
-                    <AiOutlineHistory style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
-                    <span>Lịch Sử Nỗ Lực</span>
-                  </div>
-                  <div
-                    className="menu-item"
-                    style={styles.menuItem}
-                    onClick={() => navigate("/profile-favourite")}
-                  >
-                    <AiOutlineHeart style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
-                    <span>Yêu Thích</span>
-                  </div>
-                  <div
-                    className="menu-item"
-                    style={styles.menuItem}
-                    onClick={() => navigate("/profile-score")}
-                  >
-                    <AiOutlineStar style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
-                    <span>Số Điểm</span>
-                  </div>
-                  <div
-                    className="menu-item active"
-                    style={{ ...styles.menuItem, ...styles.menuItemActive }}
-                    onClick={() => navigate("/profile-certificate")}
-                  >
-                    <AiOutlineIdcard style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
-                    <span>Chứng Chỉ</span>
-                  </div>
-                  <div className="menu-item" style={styles.menuItem}>
-                    <AiOutlineLogout style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
-                    <span>Đăng Xuất</span>
-                  </div>
-                </div>
-              </Card.Body>
-            </Card>
-          </motion.div>
-        </Col>
-        <Col md={8} style={{ marginTop: "80px" }}>
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            <Card style={styles.infoCard}>
-              <Card.Header style={styles.infoHeader}>
-                <h4 className="mb-0">
-                  <AiOutlineIdcard style={{ marginRight: 10, fontSize: 24, verticalAlign: 'middle' }} />
-                  CHỨNG CHỈ
-                </h4>
-              </Card.Header>
-              <Card.Body style={styles.infoCardBody}>
-                <div style={styles.certificateGrid}>
-                  {currentCertificates.map((certificate) => (
-                    <motion.div
-                      key={certificate.id}
-                      style={styles.certificateCard}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{
-                        duration: 0.3,
-                        delay: (certificate.id % certificatesPerPage) * 0.1,
+
+                  {/* Pagination */}
+                  <div style={styles.paginationContainer}>
+                    <Pagination
+                      style={{
+                        "--bs-pagination-color": "#0E606E",
+                        "--bs-pagination-active-bg": "#0E606E",
+                        "--bs-pagination-active-border-color": "#0E606E",
+                        "--bs-pagination-hover-color": "#0E606E",
+                        "--bs-pagination-focus-color": "#0E606E",
                       }}
                     >
-                      <h5 style={styles.certificateHeader}>
-                        Mã Chứng Chỉ: {certificate.id}
-                      </h5>
+                      <Pagination.Prev
+                        onClick={() =>
+                          setCurrentPage((prev) => Math.max(prev - 1, 1))
+                        }
+                        disabled={currentPage === 1}
+                      />
+                      {paginationItems}
+                      <Pagination.Next
+                        onClick={() =>
+                          setCurrentPage((prev) =>
+                            Math.min(prev + 1, totalPages)
+                          )
+                        }
+                        disabled={currentPage === totalPages}
+                      />
+                    </Pagination>
+                  </div>
+                </Card.Body>
+              </Card>
+            </motion.div>
+          </Col>
+        </Row>
 
-                      <div style={styles.certificateField}>
-                        <div style={styles.certificateLabel}>Sự Kiện:</div>
-                        <div style={styles.certificateValue}>
-                          {certificate.event}
-                        </div>
-                      </div>
-
-                      <div style={styles.certificateField}>
-                        <div style={styles.certificateLabel}>Tổ Chức:</div>
-                        <div style={styles.certificateValue}>
-                          {certificate.organization}
-                        </div>
-                      </div>
-
-                      <div style={styles.certificateField}>
-                        <div style={styles.certificateLabel}>Ngày:</div>
-                        <div style={styles.certificateValue}>
-                          {certificate.startDate === certificate.endDate
-                            ? certificate.startDate
-                            : `${certificate.startDate} - ${certificate.endDate}`}
-                        </div>
-                      </div>
-
-                      <Button
-                        className="view-btn"
-                        style={styles.viewButton}
-                        onClick={() => handleShowCertificate(certificate)}
-                      >
-                        <Eye className="me-2" /> Xem Chứng Chỉ
-                      </Button>
-                    </motion.div>
-                  ))}
-                </div>
-
-                {/* Pagination */}
-                <div style={styles.paginationContainer}>
-                  <Pagination
-                    style={{
-                      "--bs-pagination-color": "#0E606E",
-                      "--bs-pagination-active-bg": "#0E606E",
-                      "--bs-pagination-active-border-color": "#0E606E",
-                      "--bs-pagination-hover-color": "#0E606E",
-                      "--bs-pagination-focus-color": "#0E606E",
-                    }}
-                  >
-                    <Pagination.Prev
-                      onClick={() =>
-                        setCurrentPage((prev) => Math.max(prev - 1, 1))
-                      }
-                      disabled={currentPage === 1}
-                    />
-                    {paginationItems}
-                    <Pagination.Next
-                      onClick={() =>
-                        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                      }
-                      disabled={currentPage === totalPages}
-                    />
-                  </Pagination>
-                </div>
-              </Card.Body>
-            </Card>
-          </motion.div>
-        </Col>
-      </Row>
-
-      {/* Certificate Modal */}
-      <Modal
-        show={showModal}
-        onHide={handleCloseModal}
-        size="xl"
-        centered
-        dialogClassName="modal-90w"
-        contentClassName="certificate-modal"
-      >
-        <Modal.Header
-          closeButton
-          style={{ backgroundColor: "#0E606E", color: "white" }}
+        {/* Certificate Modal */}
+        <Modal
+          show={showModal}
+          onHide={handleCloseModal}
+          size="xl"
+          centered
+          dialogClassName="modal-90w"
+          contentClassName="certificate-modal"
         >
-          <Modal.Title>Chứng Chỉ - {selectedCertificate?.event}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body style={styles.modalBody}>
-          {selectedCertificate && (
-            <div className="certificate-to-print">
-              <div style={styles.certificate}>
-                <div style={styles.certificateInner}>
-                  <div>
-                    <div style={styles.certificateTitle}>
-                      Chứng Chỉ Tham Gia
-                    </div>
-                    <div style={styles.certificateSubtitle}>
-                      Chứng nhận rằng
-                    </div>
-                  </div>
-
-                  <div style={styles.certificateContent}>
-                    <div style={styles.certificateName}>Hung Pham Trong</div>
-                    <div style={styles.certificatePresented}>
-                      đã tham gia thành công vào
-                    </div>
-                    <div style={styles.certificateEvent}>
-                      {selectedCertificate.event}
-                    </div>
-                    <div style={styles.certificateDates}>
-                      {selectedCertificate.startDate ===
-                      selectedCertificate.endDate
-                        ? `vào ${selectedCertificate.startDate}`
-                        : `từ ${selectedCertificate.startDate} đến ${selectedCertificate.endDate}`}
-                    </div>
-                    <div style={styles.certificateOrg}>
-                      {selectedCertificate.organization}
-                    </div>
-                    <div style={styles.certificatePartner}>
-                      {selectedCertificate.partner}
-                    </div>
-                  </div>
-
-                  <div style={styles.certificateDescription}>
-                    {selectedCertificate.description}
-                  </div>
-
-                  <div style={styles.certificateFooter}>
-                    {selectedCertificate.signatories.map((sig, index) => (
-                      <div key={index} style={styles.certificateSignature}>
-                        <div style={styles.signatureLine}></div>
-                        <div style={styles.signatureName}>{sig.name}</div>
-                        <div style={styles.signatureTitle}>{sig.title}</div>
+          <Modal.Header
+            closeButton
+            style={{ backgroundColor: "#0E606E", color: "white" }}
+          >
+            <Modal.Title>Chứng Chỉ - {selectedCertificate?.event}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body style={styles.modalBody}>
+            {selectedCertificate && (
+              <div className="certificate-to-print">
+                <div style={styles.certificate}>
+                  <div style={styles.certificateInner}>
+                    <div>
+                      <div style={styles.certificateTitle}>
+                        Chứng Chỉ Tham Gia
                       </div>
-                    ))}
-                  </div>
+                      <div style={styles.certificateSubtitle}>
+                        Chứng nhận rằng
+                      </div>
+                    </div>
 
-                  <div style={styles.certificateSeal}>
-                    CHỨNG NHẬN CHÍNH THỨC
+                    <div style={styles.certificateContent}>
+                      <div style={styles.certificateName}>{selectedCertificate.fullName}</div>
+                      <div style={styles.certificatePresented}>
+                        đã tham gia thành công vào
+                      </div>
+                      <div style={styles.certificateEvent}>
+                        {selectedCertificate.eventName}
+                      </div>
+                      <div style={styles.certificateDates}>
+                        {selectedCertificate.completionDate ? `vào ${new Date(selectedCertificate.completionDate).toLocaleDateString("vi-VN")}` : ""}
+                      </div>
+                      <div style={styles.certificateOrg}>
+                        {selectedCertificate.organizationName}
+                      </div>
+                    </div>
+
+                    {/* You can add more fields if available, e.g. signature */}
+                    <div style={styles.certificateFooter}>
+                      <div style={styles.certificateSignature}>
+                        <div style={styles.signatureLine}></div>
+                        <div style={styles.signatureName}>{selectedCertificate.signature || ""}</div>
+                        <div style={styles.signatureTitle}>Chữ ký xác nhận</div>
+                      </div>
+                    </div>
+
+                    <div style={styles.certificateSeal}>
+                      CHỨNG NHẬN CHÍNH THỨC
+                    </div>
                   </div>
                 </div>
               </div>
+            )}
+          </Modal.Body>
+          <Modal.Footer>
+            <div style={styles.modalActions}>
+              <Button
+                className="action-btn"
+                style={styles.actionButton}
+                onClick={handlePrint}
+              >
+                <Printer className="me-1" /> In
+              </Button>
+              <Button
+                className="action-btn"
+                style={styles.actionButton}
+                onClick={handleDownload}
+              >
+                <Download className="me-1" /> Tải Xuống
+              </Button>
             </div>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <div style={styles.modalActions}>
-            <Button
-              className="action-btn"
-              style={styles.actionButton}
-              onClick={handlePrint}
-            >
-              <Printer className="me-1" /> In
-            </Button>
-            <Button
-              className="action-btn"
-              style={styles.actionButton}
-              onClick={handleDownload}
-            >
-              <Download className="me-1" /> Tải Xuống
-            </Button>
-          </div>
-        </Modal.Footer>
-      </Modal>
-    </Container>
+          </Modal.Footer>
+        </Modal>
+      </Container>
+    </>
   );
 };
 

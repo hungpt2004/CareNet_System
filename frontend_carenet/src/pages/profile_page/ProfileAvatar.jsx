@@ -13,8 +13,18 @@ import {
   CustomToast,
 } from "../../components/toast/CustomToast";
 import defaultAvatar from "../../assets/defaultAvatar.png";
+import useAuthStore from "../../hooks/authStore";
 import { AiOutlineUser, AiOutlinePicture, AiOutlineHistory, AiOutlineHeart, AiOutlineStar, AiOutlineIdcard, AiOutlineLogout } from "react-icons/ai";
 const ProfileAvatar = () => {
+  const { logout } = useAuthStore();
+  
+  // Logout function (like CustomNavbarLogged)
+  const handleLogout = async () => {
+    await logout();
+    setTimeout(() => {
+      navigate('/login');
+    }, 0);
+  };
   // CSS styles defined directly in the component
   const styles = {
     root: {
@@ -422,7 +432,11 @@ const ProfileAvatar = () => {
                       <AiOutlineIdcard style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
                       <span>Chứng Chỉ</span>
                     </div>
-                    <div className="menu-item" style={styles.menuItem}>
+                    <div
+                      className="menu-item"
+                      style={styles.menuItem}
+                      onClick={handleLogout}
+                    >
                       <AiOutlineLogout style={{ marginRight: 8, fontSize: 20, verticalAlign: 'middle' }} />
                       <span>Đăng Xuất</span>
                     </div>
